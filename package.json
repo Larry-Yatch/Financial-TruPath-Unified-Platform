@@ -1,0 +1,45 @@
+{
+  "name": "financial-trupath-unified-platform",
+  "version": "1.0.0",
+  "description": "Unified platform for Financial TruPath tools",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "unified-app"
+  ],
+  "scripts": {
+    "dev": "echo 'Select an app to run: npm run dev:app-name'",
+    "dev:control-fear-investment": "cd apps/control-fear-investment && npm run dev",
+    "dev:control-fear-grounding": "cd apps/control-fear-grounding && npm run dev",
+    "dev:external-validation": "cd apps/external-validation && npm run dev",
+    "dev:issues-showing-love": "cd apps/issues-showing-love && npm run dev",
+    "dev:unified": "cd unified-app && npm run dev",
+    "build": "npm run build:apps && npm run build:unified",
+    "build:apps": "echo 'Building all apps...' && npm run build --workspaces",
+    "build:unified": "cd unified-app && npm run build",
+    "test": "npm test --workspaces",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/financial-trupath-unified-platform.git"
+  },
+  "keywords": [
+    "financial",
+    "trupath",
+    "investment",
+    "grounding",
+    "web-app"
+  ],
+  "author": "Larry",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "eslint": "^8.54.0",
+    "prettier": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
