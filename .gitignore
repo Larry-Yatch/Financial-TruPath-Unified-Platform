@@ -63,6 +63,14 @@ Thumbs.db
 .turbo/
 
 # Package manager files
-package-lock.json
 yarn.lock
 pnpm-lock.yaml
+
+# Legacy archives (large local tool copies)
+legacy/local-tools/
+legacy/test-files/
+
+# V2 development files
+v2-platform/node_modules/
+v2-platform/dist/
+v2-platform/.cache/

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Financial TruPath V2.0</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="app" class="min-h-screen bg-gray-50">
+      <!-- Header -->
+      <header class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="py-6">
+            <h1 class="text-3xl font-bold text-gray-900">Financial TruPath V2.0</h1>
+            <p class="text-gray-600 mt-1">Week <?= currentWeek ?> of Course</p>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Tool Navigation -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+          <h2 class="text-xl font-semibold mb-4">Available Tools</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <button onclick="loadTool('orientation')" 
+                    class="p-4 border rounded-lg hover:bg-blue-50 transition text-left">
+              <h3 class="font-semibold">Tool 1: Orientation</h3>
+              <p class="text-sm text-gray-600">Demographics & Foundation</p>
+              <span class="text-xs text-green-600">Available</span>
+            </button>
+            
+            <button onclick="loadTool('financial-clarity')" 
+                    class="p-4 border rounded-lg hover:bg-blue-50 transition text-left">
+              <h3 class="font-semibold">Tool 2: Financial Clarity</h3>
+              <p class="text-sm text-gray-600">Assess your financial situation</p>
+              <span class="text-xs <?= currentWeek >= 2 ? 'text-green-600' : 'text-gray-400' ?>">
+                <?= currentWeek >= 2 ? 'Available' : 'Week 2' ?>
+              </span>
+            </button>
+            
+            <!-- Add more tools as needed -->
+          </div>
+        </div>
+
+        <!-- Tool Container -->
+        <div id="tool-container" class="bg-white rounded-lg shadow p-6">
+          <div class="text-center py-12">
+            <p class="text-gray-500">Select a tool to begin</p>
+          </div>
+        </div>
+
+        <!-- Insights Panel -->
+        <div id="insights-panel" class="mt-6 bg-blue-50 rounded-lg p-6" style="display: none;">
+          <h3 class="font-semibold text-blue-900 mb-2">Insights</h3>
+          <div id="insights-content"></div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Platform configuration from server
+      const userId = '<?= userId ?>';
+      const currentWeek = <?= currentWeek ?>;
+      
+      // Load a specific tool
+      function loadTool(toolId) {
+        // Check if tool is available
+        if (toolId === 'financial-clarity' && currentWeek < 2) {
+          alert('This tool will be available in Week 2');
+          return;
+        }
+        
+        document.getElementById('tool-container').innerHTML = 
+          '<div class="text-center py-4"><p>Loading...</p></div>';
+        
+        // Load tool content based on ID
+        if (toolId === 'orientation') {
+          loadOrientationTool();
+        } else if (toolId === 'financial-clarity') {
+          loadFinancialClarityTool();
+        }
+      }
+      
+      // Load Orientation Tool
+      function loadOrientationTool() {
+        const html = `
+          <h2 class="text-2xl font-bold mb-6">Tool 1: Orientation & Demographics</h2>
+          <form id="orientation-form" onsubmit="saveOrientationData(event)">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                <input type="text" name="firstName" required 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md">
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                <input type="text" name="lastName" required
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md">
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input type="email" name="email" required
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md">
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Age</label>
+                <input type="number" name="age" min="18" max="100" required
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md">
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Annual Income</label>
+                <input type="number" name="income" min="0" required
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md">
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Family Status</label>
+                <select name="familyStatus" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                  <option value="">Select...</option>
+                  <option value="single">Single</option>
+                  <option value="married">Married</option>
+                  <option value="divorced">Divorced</option>
+                  <option value="widowed">Widowed</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="mt-6">
+              <button type="submit" 
+                      class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                Save & Continue
+              </button>
+            </div>
+          </form>
+        `;
+        
+        document.getElementById('tool-container').innerHTML = html;
+      }
+      
+      // Save Orientation Data
+      function saveOrientationData(event) {
+        event.preventDefault();
+        
+        const form = event.target;
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+        
+        // Show saving state
+        const button = form.querySelector('button[type="submit"]');
+        button.disabled = true;
+        button.textContent = 'Saving...';
+        
+        // Call server function
+        google.script.run
+          .withSuccessHandler(function(result) {
+            button.disabled = false;
+            button.textContent = 'Saved!';
+            
+            // Show insights if any
+            if (result.insights && result.insights.length > 0) {
+              showInsights(result.insights);
+            }
+            
+            // Show success message
+            setTimeout(() => {
+              button.textContent = 'Save & Continue';
+              alert('Data saved successfully!');
+            }, 1000);
+          })
+          .withFailureHandler(function(error) {
+            button.disabled = false;
+            button.textContent = 'Save & Continue';
+            alert('Error saving data: ' + error);
+          })
+          .saveUserData(userId, 'orientation', data);
+      }
+      
+      // Show insights panel
+      function showInsights(insights) {
+        const panel = document.getElementById('insights-panel');
+        const content = document.getElementById('insights-content');
+        
+        let html = '<ul class="space-y-2">';
+        insights.forEach(insight => {
+          const priorityColor = insight.priority === 'high' ? 'text-red-600' : 
+                               insight.priority === 'critical' ? 'text-red-800' : 
+                               'text-blue-600';
+          html += `
+            <li class="border-l-4 border-blue-400 pl-4">
+              <p class="font-medium ${priorityColor}">${insight.message}</p>
+              <p class="text-sm text-gray-600 mt-1">${insight.recommendation}</p>
+            </li>
+          `;
+        });
+        html += '</ul>';
+        
+        content.innerHTML = html;
+        panel.style.display = 'block';
+      }
+      
+      // Auto-save functionality
+      let autoSaveTimer;
+      function enableAutoSave() {
+        document.addEventListener('input', function() {
+          clearTimeout(autoSaveTimer);
+          autoSaveTimer = setTimeout(function() {
+            console.log('Auto-saving...');
+            // Implement auto-save logic here
+          }, 30000); // 30 seconds
+        });
+      }
+      
+      // Initialize
+      enableAutoSave();
+    </script>
+  </body>
+</html>
