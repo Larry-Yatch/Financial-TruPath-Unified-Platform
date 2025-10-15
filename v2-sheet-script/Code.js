@@ -46,9 +46,18 @@ function generateUserId() {
 function getCurrentWeek() {
   const now = new Date();
   const courseStart = CONFIG.COURSE_START_DATE;
-  const diffTime = Math.abs(now - courseStart);
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return Math.max(1, Math.ceil(diffDays / 7));
+  
+  // If course hasn't started yet, return week 0
+  if (now < courseStart) {
+    return 0;
+  }
+  
+  // Calculate weeks since course start
+  const diffTime = now - courseStart;
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  const weekNumber = Math.floor(diffDays / 7) + 1;
+  
+  return weekNumber;
 }
 
 /**

@@ -11,7 +11,7 @@ const CONFIG = {
   VERSION: '2.0.0',
   
   // Course Settings
-  COURSE_START_DATE: new Date('2024-10-14'), // Course started this week
+  COURSE_START_DATE: new Date('2024-10-15'), // Course starts today
   
   // Sheet Names
   SHEETS: {

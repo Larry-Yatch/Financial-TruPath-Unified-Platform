@@ -138,5 +138,113 @@ const DataHub = {
   headerToKey(header) {
     return header.replace(/\s+/g, '').charAt(0).toLowerCase() + 
            header.replace(/\s+/g, '').slice(1);
+  },
+  
+  /**
+   * Find or create user row in a sheet
+   */
+  findOrCreateUserRow(sheet, userId) {
+    const data = sheet.getDataRange().getValues();
+    if (data.length === 0) {
+      // Add headers if sheet is empty
+      const headers = this.getHeadersForTool('orientation');
+      sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+      return 2; // First data row
+    }
+    
+    const headers = data[0];
+    const userIdCol = headers.indexOf('User ID');
+    
+    if (userIdCol === -1) {
+      // Add User ID column if missing
+      sheet.getRange(1, headers.length + 1).setValue('User ID');
+      return data.length + 1;
+    }
+    
+    // Find existing user row
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][userIdCol] === userId) {
+        return i + 1;
+      }
+    }
+    
+    // Return new row
+    return data.length + 1;
+  },
+  
+  /**
+   * Get headers for a tool
+   */
+  getHeadersForTool(toolId) {
+    switch(toolId) {
+      case 'orientation':
+        return ['Timestamp', 'User ID', 'First Name', 'Last Name', 'Email', 'Age', 'Income', 'Family Status'];
+      case 'financial-clarity':
+        return ['Timestamp', 'User ID', 'Income Score', 'Spending Score', 'Debt Score', 'Emergency Score'];
+      default:
+        return ['Timestamp', 'User ID', 'Data'];
+    }
+  },
+  
+  /**
+   * Create tool sheet with headers
+   */
+  createToolSheet(sheetName, toolId) {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.insertSheet(sheetName);
+    const headers = this.getHeadersForTool(toolId);
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+    return sheet;
+  },
+  
+  /**
+   * Update student record in master list
+   */
+  updateStudentRecord(userId, toolId) {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let studentsSheet = ss.getSheetByName(CONFIG.SHEETS.STUDENTS);
+    
+    if (!studentsSheet) {
+      studentsSheet = this.createStudentsSheet();
+    }
+    
+    const row = this.findOrCreateUserRow(studentsSheet, userId);
+    studentsSheet.getRange(row, 2).setValue(new Date()); // Last Active
+  },
+  
+  /**
+   * Create students sheet
+   */
+  createStudentsSheet() {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.insertSheet(CONFIG.SHEETS.STUDENTS);
+    const headers = ['User ID', 'Last Active', 'Tools Completed', 'Created Date'];
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+    return sheet;
+  },
+  
+  /**
+   * Get student created date
+   */
+  getStudentCreatedDate(userId) {
+    try {
+      const ss = SpreadsheetApp.getActiveSpreadsheet();
+      const sheet = ss.getSheetByName(CONFIG.SHEETS.STUDENTS);
+      if (!sheet) return new Date();
+      
+      const data = sheet.getDataRange().getValues();
+      for (let i = 1; i < data.length; i++) {
+        if (data[i][0] === userId) {
+          return data[i][3] || new Date();
+        }
+      }
+    } catch (error) {
+      console.error('Error getting created date:', error);
+    }
+    return new Date();
   }
 }

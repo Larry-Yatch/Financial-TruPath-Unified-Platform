@@ -168,16 +168,40 @@
               showInsights(result.insights);
             }
             
-            // Show success message
+            // Show completion message and next steps
             setTimeout(() => {
-              button.textContent = 'Save & Continue';
-              alert('Data saved successfully!');
-            }, 1000);
+              const completionHtml = `
+                <div class="text-center py-8">
+                  <div class="text-green-600 text-5xl mb-4">✓</div>
+                  <h3 class="text-2xl font-bold mb-4">Tool 1 Complete!</h3>
+                  <p class="text-gray-600 mb-6">Your demographic information has been saved.</p>
+                  
+                  ${currentWeek >= 2 ? `
+                    <button onclick="loadTool('financial-clarity')" 
+                            class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                      Continue to Tool 2: Financial Clarity
+                    </button>
+                  ` : `
+                    <p class="text-gray-500">Tool 2 will be available in Week 2 of the course.</p>
+                    <button onclick="location.reload()" 
+                            class="mt-4 px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700">
+                      Return to Dashboard
+                    </button>
+                  `}
+                </div>
+              `;
+              
+              document.getElementById('tool-container').innerHTML = completionHtml;
+              
+              // Scroll to top
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 1500);
           })
           .withFailureHandler(function(error) {
             button.disabled = false;
             button.textContent = 'Save & Continue';
             alert('Error saving data: ' + error);
+            console.error('Save error:', error);
           })
           .saveUserData(userId, 'orientation', data);
       }
