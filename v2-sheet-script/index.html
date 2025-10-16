@@ -801,15 +801,68 @@
               </ol>
             </div>
             
-            <!-- Tool Recommendations -->
+            <!-- Financial Clarity Prep Work -->
             <div class="card" style="margin-top: 20px; background: linear-gradient(135deg, rgba(24, 139, 246, 0.1) 0%, rgba(173, 145, 104, 0.1) 100%);">
-              <h4 style="color: var(--gold); margin-bottom: 15px;">🛠️ Recommended Tool Sequence</h4>
-              <p class="muted" style="margin-bottom: 15px;">Based on your profile, here\\'s your optimal path:</p>
-              <div style="display: flex; flex-direction: column; gap: 10px;">
-                <div>Week 2: Tool 2 - Financial Clarity ✅</div>
-                ${report.mindsetScore < 3 ? '<div>Week 3: Tool 3 - Control Fear Grounding ✅</div>' : ''}
-                ${report.data.primaryGoal === 'retirement' ? '<div>Week 6: Tool 6 - Retirement Blueprint ✅</div>' : ''}
-                <div>Week 8: Tool 8 - Investment Calculator ✅</div>
+              <h4 style="color: var(--gold); margin-bottom: 15px;">📝 Your Homework: Prepare for Tool 2 - Financial Clarity</h4>
+              <p class="muted" style="margin-bottom: 15px;">Tool 2 will deep-dive into your finances. Based on your profile, prioritize gathering this information:</p>
+              
+              ${report.healthScore < 40 || report.data.totalDebt > 25000 ? `
+                <div style="margin-bottom: 20px;">
+                  <h5 style="color: var(--bad); margin-bottom: 10px;">🔴 Priority 1: Debt Documentation (Critical for You)</h5>
+                  <ul style="list-style: none; padding-left: 0;">
+                    <li>☐ List ALL debts: credit cards, loans, medical, personal</li>
+                    <li>☐ For each debt, write down: Balance, Interest Rate, Minimum Payment</li>
+                    <li>☐ Calculate total minimum monthly debt payments</li>
+                    <li>☐ Identify highest interest rate debt</li>
+                  </ul>
+                </div>
+              ` : ''}
+              
+              ${report.data.emergencyFund <= 1 || report.healthScore < 50 ? `
+                <div style="margin-bottom: 20px;">
+                  <h5 style="color: var(--warn); margin-bottom: 10px;">🟡 Priority ${report.data.totalDebt > 25000 ? '2' : '1'}: Expense Tracking (Important for You)</h5>
+                  <ul style="list-style: none; padding-left: 0;">
+                    <li>☐ List all monthly fixed expenses (rent, insurance, subscriptions)</li>
+                    <li>☐ Track this week's variable spending (food, gas, entertainment)</li>
+                    <li>☐ Identify your 3 biggest expense categories</li>
+                    <li>☐ Find 3 expenses you could reduce or eliminate</li>
+                  </ul>
+                </div>
+              ` : ''}
+              
+              ${report.data.annualIncome && parseInt(report.data.annualIncome) > 0 ? `
+                <div style="margin-bottom: 20px;">
+                  <h5 style="color: var(--ok); margin-bottom: 10px;">🟢 Priority ${report.healthScore < 40 ? '3' : '2'}: Income & Assets Review</h5>
+                  <ul style="list-style: none; padding-left: 0;">
+                    <li>☐ Gather last 2 pay stubs</li>
+                    <li>☐ List all income sources and amounts</li>
+                    <li>☐ Check all account balances (checking, savings, retirement)</li>
+                    <li>☐ Note any expected income changes in next 6 months</li>
+                  </ul>
+                </div>
+              ` : ''}
+              
+              ${report.data.primaryGoal === 'retirement' || report.data.retirementAccess !== 'none' ? `
+                <div style="margin-bottom: 20px;">
+                  <h5 style="color: var(--gold); margin-bottom: 10px;">✨ Bonus: Retirement Account Review</h5>
+                  <ul style="list-style: none; padding-left: 0;">
+                    <li>☐ Find your 401k/IRA balance and contribution rate</li>
+                    <li>☐ Check if you're getting full employer match</li>
+                    <li>☐ Calculate years until retirement goal</li>
+                  </ul>
+                </div>
+              ` : ''}
+              
+              <div style="background: rgba(173, 145, 104, 0.1); border-radius: 10px; padding: 15px; margin-top: 15px;">
+                <p style="margin: 0; font-size: 14px;">
+                  <strong>💡 Pro Tip:</strong> ${
+                    report.healthScore < 40 ? 
+                    'Focus on the debt documentation first - this will be crucial for creating your debt elimination strategy.' :
+                    report.data.emergencyFund == 0 ?
+                    'Tracking expenses this week will reveal where your emergency fund money can come from.' :
+                    'Having these numbers ready will make Tool 2 much more powerful and actionable for you.'
+                  }
+                </p>
               </div>
             </div>
             
