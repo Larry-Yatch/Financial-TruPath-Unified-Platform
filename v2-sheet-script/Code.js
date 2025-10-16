@@ -170,10 +170,94 @@ function onOpen() {
   const ui = SpreadsheetApp.getUi();
   ui.createMenu('Financial TruPath V2.0')
     .addItem('Initialize Platform', 'initializePlatform')
-    .addItem('Test Web App', 'testWebApp')
+    .addItem('Create Data Sheets', 'createDataSheets')
+    .addSeparator()
+    .addSubMenu(ui.createMenu('🧪 Testing')
+      .addItem('Run All Tests', 'runAllTests')
+      .addItem('Validate Before Deploy', 'validateBeforeDeployment')
+      .addItem('Test Data Saving', 'testDataSaving')
+      .addItem('Test Web App', 'testWebApp'))
+    .addSubMenu(ui.createMenu('🔍 Debug')
+      .addItem('System Health Check', 'showSystemHealth')
+      .addItem('Check Common Issues', 'showCommonIssues')
+      .addItem('Clear Test Data', 'clearTestData'))
     .addSeparator()
     .addItem('View Logs', 'viewLogs')
+    .addItem('View Tool 1 Data', 'viewTool1Data')
     .addToUi();
+}
+
+/**
+ * Create all necessary data sheets with headers
+ */
+function createDataSheets() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  // Create Tool1_Orientation sheet with all headers
+  let tool1Sheet = ss.getSheetByName(CONFIG.SHEETS.TOOL1_ORIENTATION);
+  if (!tool1Sheet) {
+    tool1Sheet = ss.insertSheet(CONFIG.SHEETS.TOOL1_ORIENTATION);
+  }
+  
+  // Set comprehensive headers for Tool 1 (25 fields + metadata)
+  const tool1Headers = DataHub.getHeadersForTool('orientation');
+  if (tool1Sheet.getLastColumn() < tool1Headers.length) {
+    tool1Sheet.getRange(1, 1, 1, tool1Headers.length).setValues([tool1Headers]);
+    tool1Sheet.getRange(1, 1, 1, tool1Headers.length).setFontWeight('bold');
+    tool1Sheet.setFrozenRows(1);
+  }
+  
+  // Create Students sheet
+  let studentsSheet = ss.getSheetByName(CONFIG.SHEETS.STUDENTS);
+  if (!studentsSheet) {
+    studentsSheet = ss.insertSheet(CONFIG.SHEETS.STUDENTS);
+    const studentHeaders = ['User ID', 'Created Date', 'Last Active', 'Tools Completed', 'Email', 'Name'];
+    studentsSheet.getRange(1, 1, 1, studentHeaders.length).setValues([studentHeaders]);
+    studentsSheet.getRange(1, 1, 1, studentHeaders.length).setFontWeight('bold');
+    studentsSheet.setFrozenRows(1);
+  }
+  
+  // Create Insights sheet
+  let insightsSheet = ss.getSheetByName(CONFIG.SHEETS.INSIGHTS);
+  if (!insightsSheet) {
+    insightsSheet = ss.insertSheet(CONFIG.SHEETS.INSIGHTS);
+    const insightHeaders = ['Timestamp', 'User ID', 'Tool', 'Insight Type', 'Priority', 'Message', 'Recommendation'];
+    insightsSheet.getRange(1, 1, 1, insightHeaders.length).setValues([insightHeaders]);
+    insightsSheet.getRange(1, 1, 1, insightHeaders.length).setFontWeight('bold');
+    insightsSheet.setFrozenRows(1);
+  }
+  
+  SpreadsheetApp.getUi().alert('✅ Data sheets created successfully!');
+}
+
+/**
+ * View Tool 1 data
+ */
+function viewTool1Data() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(CONFIG.SHEETS.TOOL1_ORIENTATION);
+  
+  if (!sheet) {
+    SpreadsheetApp.getUi().alert('Tool 1 sheet not found. Run "Create Data Sheets" first.');
+    return;
+  }
+  
+  ss.setActiveSheet(sheet);
+}
+
+/**
+ * View system logs
+ */
+function viewLogs() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(CONFIG.SHEETS.LOGS);
+  
+  if (!sheet) {
+    SpreadsheetApp.getUi().alert('Logs sheet not found. It will be created when the first log entry is saved.');
+    return;
+  }
+  
+  ss.setActiveSheet(sheet);
 }
 
 /**
@@ -218,4 +302,49 @@ function testWebApp() {
     HtmlService.createHtmlOutput(html).setWidth(450).setHeight(400),
     'Platform Test'
   );
+}
+
+/**
+ * Test data saving function
+ */
+function testDataSaving() {
+  // Create test data that matches what the form would send
+  const testData = {
+    firstName: 'Test',
+    lastName: 'User',
+    email: 'test@example.com',
+    age: '35',
+    maritalStatus: 'single',
+    employmentStatus: 'employed_full',
+    profession: 'Teacher',
+    yearsEmployed: '5',
+    annualIncome: '75000',
+    otherIncome: '5000',
+    retirementAccess: 'yes_401k',
+    housingCost: '1500',
+    monthlyExpenses: '3500',
+    monthlySavings: '500',
+    totalDebt: '10k_25k',
+    emergencyFund: '1_3_months',
+    investmentExperience: 'beginner',
+    primaryGoal: 'retirement',
+    financialSituation: '0',
+    moneyRelationship: '1',
+    scarcityAbundance: '0',
+    goalConfidence: '1',
+    retirementTarget: '65',
+    biggestObstacle: 'debt'
+  };
+  
+  try {
+    const result = saveUserData('TEST-USER-001', 'orientation', testData);
+    
+    if (result.success) {
+      SpreadsheetApp.getUi().alert('✅ Data saved successfully! Check the Tool1_Orientation sheet.');
+    } else {
+      SpreadsheetApp.getUi().alert('❌ Error saving data: ' + result.message);
+    }
+  } catch (error) {
+    SpreadsheetApp.getUi().alert('❌ Error: ' + error.toString());
+  }
 }

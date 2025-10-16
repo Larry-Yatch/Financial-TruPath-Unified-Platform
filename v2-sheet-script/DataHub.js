@@ -69,14 +69,29 @@ const DataHub = {
     data.timestamp = new Date();
     data.userId = userId;
     
+    // Calculate scores for orientation data
+    if (toolId === 'orientation') {
+      // Calculate Financial Health Score
+      data.financialHealthScore = this.calculateFinancialHealth(data);
+      
+      // Calculate Mindset Score
+      data.mindsetScore = (parseInt(data.scarcityAbundance) || 0) + 
+                         (parseInt(data.financialAmbition) || 0) + 
+                         (parseInt(data.goalConfidence) || 0);
+      
+      // Determine Profile Type
+      const profile = this.determineProfileType(data.financialHealthScore, data.mindsetScore);
+      data.profileType = profile.type;
+    }
+    
     // Find or create row for this user
     const row = this.findOrCreateUserRow(sheet, userId);
     
-    // Update the row with new data
+    // Map form data to spreadsheet columns
     const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
     const rowData = headers.map(header => {
-      const key = this.headerToKey(header);
-      return data[key] || '';
+      const mappedValue = this.mapFormDataToColumn(header, data);
+      return mappedValue;
     });
     
     sheet.getRange(row, 1, 1, rowData.length).setValues([rowData]);
@@ -128,6 +143,123 @@ const DataHub = {
     }
     
     return null;
+  },
+  
+  /**
+   * Map form data to spreadsheet column
+   * @param {string} header - Column header name
+   * @param {Object} data - Form data object
+   * @returns {string|number} Mapped value for the column
+   */
+  mapFormDataToColumn(header, data) {
+    // Direct field mappings
+    const fieldMappings = {
+      'Timestamp': data.timestamp,
+      'User ID': data.userId,
+      'First Name': data.firstName,
+      'Last Name': data.lastName,
+      'Email': data.email,
+      'Date of Birth': data.age ? new Date(new Date().getFullYear() - parseInt(data.age), 0, 1) : '',
+      'Marital Status': data.maritalStatus,
+      'Dependents': data.dependents || 0,
+      'Employment Status': data.employmentStatus,
+      'Profession': data.profession,
+      'Annual Income': data.annualIncome,
+      'Other Income': data.otherIncome,
+      'Retirement Access': data.retirementAccess,
+      'Total Debt': data.totalDebt,
+      'Housing Cost': data.housingCost,
+      'Monthly Expenses': data.monthlyExpenses,
+      'Current Savings': data.currentSavings || 0,
+      'Emergency Fund': data.emergencyFund,
+      'Monthly Savings Capacity': data.monthlySavings,
+      'Investment Experience': data.investmentExperience,
+      'Financial Situation': data.financialSituation,
+      'Money Relationship': data.moneyRelationship,
+      'Scarcity Abundance': data.scarcityAbundance,
+      'Goal Confidence': data.goalConfidence,
+      'Primary Goal': data.primaryGoal,
+      'Retirement Age Target': data.retirementTarget,
+      'Biggest Obstacle': data.biggestObstacle,
+      'Financial Health Score': data.financialHealthScore,
+      'Mindset Score': data.mindsetScore,
+      'Profile Type': data.profileType
+    };
+    
+    return fieldMappings[header] !== undefined ? fieldMappings[header] : '';
+  },
+  
+  /**
+   * Calculate financial health score
+   * @param {Object} data - Form data
+   * @returns {number} Score from 0-100
+   */
+  calculateFinancialHealth(data) {
+    let score = 50; // Base score
+    
+    // Financial situation (-3 to +3) contributes ±30 points
+    score += (parseInt(data.financialSituation) || 0) * 10;
+    
+    // Income level impact
+    const income = parseInt(data.annualIncome) || 0;
+    if (income > 100000) score += 10;
+    else if (income > 75000) score += 5;
+    else if (income < 40000) score -= 10;
+    
+    // Debt level impact
+    if (data.totalDebt === 'none') score += 10;
+    else if (data.totalDebt === 'over_100k') score -= 15;
+    else if (data.totalDebt === '50k_100k') score -= 10;
+    
+    // Emergency fund impact
+    if (data.emergencyFund === '6_months') score += 10;
+    else if (data.emergencyFund === '3_6_months') score += 5;
+    else if (data.emergencyFund === 'none') score -= 10;
+    
+    // Money relationship (-3 to +3) contributes ±10 points
+    score += (parseInt(data.moneyRelationship) || 0) * 3.33;
+    
+    return Math.max(0, Math.min(100, Math.round(score)));
+  },
+  
+  /**
+   * Determine user profile type
+   * @param {number} healthScore - Financial health score
+   * @param {number} mindsetScore - Mindset score
+   * @returns {Object} Profile type and details
+   */
+  determineProfileType(healthScore, mindsetScore) {
+    if (healthScore >= 70 && mindsetScore >= 3) {
+      return {
+        type: 'Thriving Optimizer',
+        emoji: '🚀',
+        message: 'You are in a strong financial position with an abundance mindset'
+      };
+    } else if (healthScore >= 70 && mindsetScore < 3) {
+      return {
+        type: 'Cautious Success',
+        emoji: '🛡️',
+        message: 'Financially stable but held back by limiting beliefs'
+      };
+    } else if (healthScore >= 40 && mindsetScore >= 0) {
+      return {
+        type: 'Emerging Builder',
+        emoji: '🌱',
+        message: 'You are on the right path with room to grow'
+      };
+    } else if (healthScore < 40 && mindsetScore >= 0) {
+      return {
+        type: 'Optimistic Striver',
+        emoji: '💪',
+        message: 'Your positive mindset is your greatest asset'
+      };
+    } else {
+      return {
+        type: 'Foundation Builder',
+        emoji: '🏗️',
+        message: 'You are ready to build from the ground up'
+      };
+    }
   },
   
   /**

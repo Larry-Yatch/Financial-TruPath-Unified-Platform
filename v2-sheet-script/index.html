@@ -227,7 +227,7 @@
           <p style="font-family: 'Rubik', sans-serif; font-size: 35px; color: #94a3b8; letter-spacing: 3px; text-transform: uppercase; font-weight: 500; margin: 0;">
             Platform V2.0
           </p>
-          <p class="muted" style="margin-top: 10px;">Week <?= currentWeek ?> of Course</p>
+          <p class="muted" style="margin-top: 10px;">Week <span id="current-week">1</span> of Course</p>
         </div>
       </div>
     </div>
@@ -241,18 +241,18 @@
           <h2>🎯 Available Tools</h2>
           <div class="hr"></div>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-            <button onclick="loadTool('orientation')" class="tool-card" style="width: 100%; text-align: left; border: 1px solid var(--border);">
+            <button type="button" onclick="loadTool('orientation')" class="tool-card" style="width: 100%; text-align: left; border: 1px solid var(--border);">
               <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text);">💡 Tool 1: Orientation</h3>
               <p class="muted" style="margin-bottom: 10px;">Demographics & Foundation Assessment</p>
               <span class="badge">✓ Available</span>
             </button>
             
-            <button onclick="loadTool('financial-clarity')" 
-                 class="tool-card <?= currentWeek < 2 ? 'locked' : '' ?>" style="width: 100%; text-align: left; border: 1px solid var(--border);">
+            <button type="button" onclick="loadTool('financial-clarity')" 
+                 class="tool-card" style="width: 100%; text-align: left; border: 1px solid var(--border);">
               <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text);">💰 Tool 2: Financial Clarity</h3>
               <p class="muted" style="margin-bottom: 10px;">Assess your financial situation</p>
-              <span class="badge" style="<?= currentWeek >= 2 ? 'border-color: var(--ok); color: var(--ok);' : 'opacity: 0.5;' ?>">
-                <?= currentWeek >= 2 ? '✓ Available' : '🔒 Week 2' ?>
+              <span class="badge" style="opacity: 0.5;">
+                🔒 Week 2
               </span>
             </button>
             
@@ -281,42 +281,59 @@
 
     <script>
       // Platform configuration from server
-      const userId = '<?= userId ?>';
-      const currentWeek = <?= currentWeek ?>;
+      const userId = '<?!= userId ?>' || 'user-' + Date.now();
+      const currentWeek = <?!= currentWeek ?> || 1;
       
-      // Load a specific tool
-      function loadTool(toolId) {
+      // Update week display
+      document.addEventListener('DOMContentLoaded', function() {
+        const weekSpan = document.getElementById('current-week');
+        if (weekSpan) {
+          weekSpan.textContent = currentWeek;
+        }
+      });
+      
+      // Make loadTool globally accessible for onclick handlers
+      window.loadTool = function(toolId) {
         console.log('Loading tool:', toolId);
         
-        // Check if tool is available
-        if (toolId === 'financial-clarity' && currentWeek < 2) {
-          alert('This tool will be available in Week 2');
-          return;
-        }
-        
-        // Show loading state
-        const container = document.getElementById('tool-container');
-        if (!container) {
-          console.error('Tool container not found!');
-          return;
-        }
-        
-        container.innerHTML = '<div style="text-align: center; padding: 40px;"><p class="muted">Loading...</p></div>';
-        
-        // Load tool content based on ID
-        setTimeout(() => {
+        try {
+          // Check if tool is available
+          if (toolId === 'financial-clarity' && currentWeek < 2) {
+            alert('This tool will be available in Week 2');
+            return;
+          }
+          
+          // Show loading state
+          const container = document.getElementById('tool-container');
+          if (!container) {
+            console.error('Tool container not found!');
+            alert('Error: Tool container not found. Please refresh the page.');
+            return;
+          }
+          
+          container.innerHTML = '<div style="text-align: center; padding: 40px;"><p class="muted">Loading...</p></div>';
+          
+          // Load tool content immediately (remove setTimeout for better reliability)
           if (toolId === 'orientation') {
+            console.log('Loading orientation tool...');
             loadOrientationTool();
           } else if (toolId === 'financial-clarity') {
+            console.log('Loading financial clarity tool...');
             loadFinancialClarityTool();
           } else {
             container.innerHTML = '<div style="text-align: center; padding: 40px;"><p class="muted">Tool not yet implemented</p></div>';
           }
-        }, 100);
+        } catch (error) {
+          console.error('Error loading tool:', error);
+          const container = document.getElementById('tool-container');
+          if (container) {
+            container.innerHTML = '<div style="text-align: center; padding: 40px;"><p class="error">Error loading tool. Please refresh and try again.</p></div>';
+          }
+        }
       }
       
       // Load Comprehensive Orientation Tool (25 Questions)
-      function loadOrientationTool() {
+      window.loadOrientationTool = function() {
         const html = `
           <h2>📋 Tool 1: Comprehensive Financial Profile Assessment</h2>
           <div class="hr"></div>
@@ -582,7 +599,7 @@
       }
       
       // Update scale label helper
-      function updateScaleLabel(input, labelType) {
+      window.updateScaleLabel = function(input, labelType) {
         const value = parseInt(input.value);
         const label = document.getElementById(labelType + '-label');
         
@@ -639,7 +656,7 @@
       }
       
       // Save Orientation Data and Generate Insights Report
-      function saveOrientationData(event) {
+      window.saveOrientationData = function(event) {
         event.preventDefault();
         
         const form = event.target;
@@ -668,7 +685,7 @@
       }
       
       // Generate Insights Report Locally
-      function generateLocalInsightsReport(data) {
+      window.generateLocalInsightsReport = function(data) {
         // Calculate Financial Health Score (0-100)
         let healthScore = 50; // Base score
         
@@ -704,7 +721,7 @@
           profile = {
             type: 'Thriving Optimizer',
             emoji: '🚀',
-            message: 'You\\'re in a strong financial position with an abundance mindset',
+            message: 'You are in a strong financial position with an abundance mindset',
             focus: 'Focus on wealth multiplication and advanced strategies'
           };
         } else if (healthScore >= 70 && mindsetScore < 3) {
@@ -718,7 +735,7 @@
           profile = {
             type: 'Emerging Builder',
             emoji: '🌱',
-            message: 'You\\'re on the right path with room to grow',
+            message: 'You are on the right path with room to grow',
             focus: 'Focus on systematic improvement and building confidence'
           };
         } else if (healthScore < 40 && mindsetScore >= 0) {
@@ -732,7 +749,7 @@
           profile = {
             type: 'Foundation Builder',
             emoji: '🏗️',
-            message: 'You\\'re ready to build from the ground up',
+            message: 'You are ready to build from the ground up',
             focus: 'Start with basics and celebrate small wins to build momentum'
           };
         }
@@ -741,7 +758,7 @@
       }
       
       // Display the Insights Report
-      function displayInsightsReport(report) {
+      window.displayInsightsReport = function(report) {
         const reportHtml = `
           <div style="animation: fadeIn 0.5s;">
             <h2>📊 Your Personalized Financial Insights Report</h2>
@@ -885,7 +902,7 @@
       }
       
       // Show insights panel
-      function showInsights(insights) {
+      window.showInsights = function(insights) {
         const panel = document.getElementById('insights-panel');
         const content = document.getElementById('insights-content');
         
@@ -908,7 +925,7 @@
       }
       
       // Load Financial Clarity Tool (Tool 2)
-      function loadFinancialClarityTool() {
+      window.loadFinancialClarityTool = function() {
         const html = `
           <h2>💰 Tool 2: Financial Clarity Assessment</h2>
           <div class="hr"></div>
@@ -935,7 +952,7 @@
       
       // Auto-save functionality
       let autoSaveTimer;
-      function enableAutoSave() {
+      window.enableAutoSave = function() {
         document.addEventListener('input', function() {
           clearTimeout(autoSaveTimer);
           autoSaveTimer = setTimeout(function() {
