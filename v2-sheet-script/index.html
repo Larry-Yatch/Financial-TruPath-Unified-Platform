@@ -97,14 +97,22 @@
         padding: 20px;
         cursor: pointer;
         transition: all 0.3s;
+        display: block;
+        font-family: inherit;
+        color: inherit;
       }
-      .tool-card:hover:not(.locked) {
+      button.tool-card {
+        appearance: none;
+        -webkit-appearance: none;
+        font-size: inherit;
+      }
+      .tool-card:hover:not(.locked):not(:disabled) {
         background: linear-gradient(315deg, rgba(173, 145, 104, 0.3) 0%, rgba(30, 25, 43, 0.5) 100%);
         border-color: var(--gold);
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(173, 145, 104, 0.2);
       }
-      .tool-card.locked {
+      .tool-card.locked, .tool-card:disabled {
         opacity: 0.5;
         cursor: not-allowed;
       }
@@ -211,26 +219,26 @@
           <h2>🎯 Available Tools</h2>
           <div class="hr"></div>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-            <div onclick="loadTool('orientation')" class="tool-card">
+            <button onclick="loadTool('orientation')" class="tool-card" style="width: 100%; text-align: left; border: 1px solid var(--border);">
               <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text);">💡 Tool 1: Orientation</h3>
               <p class="muted" style="margin-bottom: 10px;">Demographics & Foundation Assessment</p>
               <span class="badge">✓ Available</span>
-            </div>
+            </button>
             
-            <div onclick="loadTool('financial-clarity')" 
-                 class="tool-card <?= currentWeek < 2 ? 'locked' : '' ?>">
+            <button onclick="loadTool('financial-clarity')" 
+                 class="tool-card <?= currentWeek < 2 ? 'locked' : '' ?>" style="width: 100%; text-align: left; border: 1px solid var(--border);">
               <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text);">💰 Tool 2: Financial Clarity</h3>
               <p class="muted" style="margin-bottom: 10px;">Assess your financial situation</p>
               <span class="badge" style="<?= currentWeek >= 2 ? 'border-color: var(--ok); color: var(--ok);' : 'opacity: 0.5;' ?>">
                 <?= currentWeek >= 2 ? '✓ Available' : '🔒 Week 2' ?>
               </span>
-            </div>
+            </button>
             
-            <div class="tool-card locked">
+            <button class="tool-card locked" disabled style="width: 100%; text-align: left; border: 1px solid var(--border);">
               <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text);">🎯 Tool 3: Control Fear</h3>
               <p class="muted" style="margin-bottom: 10px;">Investment grounding exercises</p>
               <span class="badge" style="opacity: 0.5;">🔒 Week 3</span>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -256,21 +264,33 @@
       
       // Load a specific tool
       function loadTool(toolId) {
+        console.log('Loading tool:', toolId);
+        
         // Check if tool is available
         if (toolId === 'financial-clarity' && currentWeek < 2) {
           alert('This tool will be available in Week 2');
           return;
         }
         
-        document.getElementById('tool-container').innerHTML = 
-          '<div class="text-center py-4"><p>Loading...</p></div>';
+        // Show loading state
+        const container = document.getElementById('tool-container');
+        if (!container) {
+          console.error('Tool container not found!');
+          return;
+        }
+        
+        container.innerHTML = '<div style="text-align: center; padding: 40px;"><p class="muted">Loading...</p></div>';
         
         // Load tool content based on ID
-        if (toolId === 'orientation') {
-          loadOrientationTool();
-        } else if (toolId === 'financial-clarity') {
-          loadFinancialClarityTool();
-        }
+        setTimeout(() => {
+          if (toolId === 'orientation') {
+            loadOrientationTool();
+          } else if (toolId === 'financial-clarity') {
+            loadFinancialClarityTool();
+          } else {
+            container.innerHTML = '<div style="text-align: center; padding: 40px;"><p class="muted">Tool not yet implemented</p></div>';
+          }
+        }, 100);
       }
       
       // Load Orientation Tool with Essential Questions
@@ -491,6 +511,32 @@
         
         content.innerHTML = html;
         panel.style.display = 'block';
+      }
+      
+      // Load Financial Clarity Tool (Tool 2)
+      function loadFinancialClarityTool() {
+        const html = `
+          <h2>💰 Tool 2: Financial Clarity Assessment</h2>
+          <div class="hr"></div>
+          <p class="muted" style="margin-bottom: 20px;">
+            This tool helps you gain clarity on your complete financial picture.
+          </p>
+          
+          <div style="background: rgba(173, 145, 104, 0.2); border-radius: 15px; padding: 30px; text-align: center;">
+            <p style="color: var(--gold); font-size: 18px; margin-bottom: 15px;">
+              🚧 Coming in Week 2
+            </p>
+            <p class="muted">
+              This comprehensive financial assessment will help you understand:<br><br>
+              • Your income and expense patterns<br>
+              • Debt situation and management strategies<br>
+              • Savings and investment readiness<br>
+              • Areas needing immediate attention
+            </p>
+          </div>
+        `;
+        
+        document.getElementById('tool-container').innerHTML = html;
       }
       
       // Auto-save functionality
