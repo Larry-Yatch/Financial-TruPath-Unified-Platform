@@ -273,81 +273,133 @@
         }
       }
       
-      // Load Comprehensive Tool 1
-      <?!= include('Tool1_Comprehensive') ?>
-      
-      // Include the comprehensive Tool 1 functions
+      // Load Orientation Tool with Essential Questions
       function loadOrientationTool() {
-        // This function is now defined in Tool1_Comprehensive.js
-        // But we can override it here if needed for Google Apps Script context
-        const script = document.createElement('script');
-        script.textContent = loadOrientationToolComprehensive.toString() + '; loadOrientationToolComprehensive();';
-        document.head.appendChild(script);
-      }
-      
-      // Comprehensive Tool 1 loader
-      function loadOrientationToolComprehensive() {
         const html = `
-          <h2>📋 Comprehensive Financial Profile Assessment</h2>
+          <h2>📋 Tool 1: Financial Profile Assessment</h2>
           <div class="hr"></div>
           <p class="muted" style="margin-bottom: 20px;">
-            This one-time comprehensive assessment gathers all the information needed across our entire platform. 
-            <strong>You won't have to answer these questions again!</strong>
+            Complete your financial profile to receive personalized insights and recommendations.
           </p>
           
           <form id="orientation-form" onsubmit="saveOrientationData(event)">
-            <!-- Keep simple version for now with note about comprehensive -->
-            <div style="background: rgba(173, 145, 104, 0.2); border-radius: 15px; padding: 20px; margin-bottom: 25px; text-align: center;">
-              <p style="color: var(--gold); font-size: 16px; margin-bottom: 10px;">
-                🚀 <strong>Coming Soon:</strong> Comprehensive 25-Question Assessment
-              </p>
-              <p class="muted" style="font-size: 14px;">
-                We're implementing a complete assessment that collects all data needed for all 8 tools in one go.
-                For now, please complete this basic profile.
-              </p>
+            <!-- Section 1: Basic Information -->
+            <div style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+              <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--gold);">👤 Basic Information</h3>
+              <div class="form-grid">
+                <div>
+                  <label class="form-label">First Name *</label>
+                  <input type="text" name="firstName" required class="form-input" placeholder="John">
+                </div>
+                
+                <div>
+                  <label class="form-label">Last Name *</label>
+                  <input type="text" name="lastName" required class="form-input" placeholder="Doe">
+                </div>
+                
+                <div>
+                  <label class="form-label">Email Address *</label>
+                  <input type="email" name="email" required class="form-input" placeholder="john@example.com">
+                </div>
+                
+                <div>
+                  <label class="form-label">Age *</label>
+                  <input type="number" name="age" min="18" max="100" required class="form-input" placeholder="35">
+                </div>
+                
+                <div>
+                  <label class="form-label">Marital Status *</label>
+                  <select name="maritalStatus" required class="form-select">
+                    <option value="">Select...</option>
+                    <option value="single">Single</option>
+                    <option value="married">Married</option>
+                    <option value="divorced">Divorced</option>
+                    <option value="widowed">Widowed</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label class="form-label">Employment Status *</label>
+                  <select name="employmentStatus" required class="form-select">
+                    <option value="">Select...</option>
+                    <option value="employed-ft">Employed Full-Time</option>
+                    <option value="employed-pt">Employed Part-Time</option>
+                    <option value="self-employed">Self-Employed</option>
+                    <option value="unemployed">Unemployed</option>
+                    <option value="retired">Retired</option>
+                  </select>
+                </div>
+              </div>
             </div>
             
-            <div class="form-grid">
-              <div>
-                <label class="form-label">First Name *</label>
-                <input type="text" name="firstName" required class="form-input">
-              </div>
-              
-              <div>
-                <label class="form-label">Last Name *</label>
-                <input type="text" name="lastName" required class="form-input">
-              </div>
-              
-              <div>
-                <label class="form-label">Email *</label>
-                <input type="email" name="email" required class="form-input">
-              </div>
-              
-              <div>
-                <label class="form-label">Age *</label>
-                <input type="number" name="age" min="18" max="100" required class="form-input">
-              </div>
-              
-              <div>
-                <label class="form-label">Annual Income *</label>
-                <input type="number" name="income" min="0" required class="form-input">
-              </div>
-              
-              <div>
-                <label class="form-label">Family Status *</label>
-                <select name="familyStatus" required class="form-select">
-                  <option value="">Select...</option>
-                  <option value="single">Single</option>
-                  <option value="married">Married</option>
-                  <option value="divorced">Divorced</option>
-                  <option value="widowed">Widowed</option>
-                </select>
+            <!-- Section 2: Financial Snapshot -->
+            <div style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+              <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--gold);">💰 Financial Snapshot</h3>
+              <div class="form-grid">
+                <div>
+                  <label class="form-label">Annual Income *</label>
+                  <input type="number" name="annualIncome" min="0" required class="form-input" placeholder="75000">
+                </div>
+                
+                <div>
+                  <label class="form-label">Monthly Savings *</label>
+                  <input type="number" name="monthlySavings" min="0" required class="form-input" placeholder="500">
+                </div>
+                
+                <div>
+                  <label class="form-label">Total Debt *</label>
+                  <select name="totalDebt" required class="form-select">
+                    <option value="">Select...</option>
+                    <option value="0">$0 (Debt Free)</option>
+                    <option value="5000">Under $5,000</option>
+                    <option value="10000">$5,000 - $10,000</option>
+                    <option value="25000">$10,000 - $25,000</option>
+                    <option value="50000">$25,000 - $50,000</option>
+                    <option value="100000">$50,000 - $100,000</option>
+                    <option value="100001">Over $100,000</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label class="form-label">Emergency Fund *</label>
+                  <select name="emergencyFund" required class="form-select">
+                    <option value="">Select...</option>
+                    <option value="0">No Emergency Fund</option>
+                    <option value="1">1 Month</option>
+                    <option value="3">3 Months</option>
+                    <option value="6">6 Months</option>
+                    <option value="12">12+ Months</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label class="form-label">Investment Experience *</label>
+                  <select name="investmentExperience" required class="form-select">
+                    <option value="">Select...</option>
+                    <option value="none">No Experience</option>
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="experienced">Experienced</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label class="form-label">Primary Goal *</label>
+                  <select name="primaryGoal" required class="form-select">
+                    <option value="">Select...</option>
+                    <option value="retirement">Retirement</option>
+                    <option value="debt">Pay Off Debt</option>
+                    <option value="emergency">Emergency Fund</option>
+                    <option value="home">Buy a Home</option>
+                    <option value="wealth">Build Wealth</option>
+                  </select>
+                </div>
               </div>
             </div>
             
             <div style="margin-top: 30px; text-align: center;">
-              <button type="submit" class="btn">
-                Save & Continue
+              <button type="submit" class="btn" style="min-width: 200px;">
+                📊 Complete Assessment
               </button>
             </div>
           </form>
