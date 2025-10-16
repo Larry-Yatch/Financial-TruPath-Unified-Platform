@@ -1,0 +1,346 @@
+<!-- Tool 1: Orientation Assessment with Insights Report -->
+<!-- This file contains the HTML structure for Tool 1 that will be loaded into index.html -->
+
+<div id="orientation-tool">
+  <h2>📋 Tool 1: Orientation & Financial Assessment</h2>
+  <div class="hr"></div>
+  <p class="muted" style="margin-bottom: 20px;">This assessment helps us understand your financial situation and mindset to provide personalized insights and recommendations.</p>
+  
+  <form id="orientation-form" onsubmit="saveOrientationData(event)">
+    <!-- Progress Indicator -->
+    <div style="margin-bottom: 25px;">
+      <div style="background: rgba(173, 145, 104, 0.2); border-radius: 20px; height: 8px; overflow: hidden;">
+        <div id="progress-bar" style="background: var(--gold); height: 100%; width: 20%; transition: width 0.3s;"></div>
+      </div>
+      <p class="muted" style="text-align: center; margin-top: 8px;">Section <span id="current-section">1</span> of 4</p>
+    </div>
+
+    <!-- Section 1: Basic Information -->
+    <div id="section-1" class="form-section" style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+      <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--gold);">👤 Basic Information</h3>
+      <div class="form-grid">
+        <div>
+          <label class="form-label">First Name *</label>
+          <input type="text" name="firstName" required class="form-input" placeholder="John">
+        </div>
+        
+        <div>
+          <label class="form-label">Last Name *</label>
+          <input type="text" name="lastName" required class="form-input" placeholder="Doe">
+        </div>
+        
+        <div>
+          <label class="form-label">Email Address *</label>
+          <input type="email" name="email" required class="form-input" placeholder="john.doe@example.com">
+        </div>
+        
+        <div>
+          <label class="form-label">Age Range *</label>
+          <select name="ageRange" required class="form-select">
+            <option value="">Select...</option>
+            <option value="18-25">18-25</option>
+            <option value="26-35">26-35</option>
+            <option value="36-45">36-45</option>
+            <option value="46-55">46-55</option>
+            <option value="56-65">56-65</option>
+            <option value="65+">65+</option>
+          </select>
+        </div>
+        
+        <div>
+          <label class="form-label">Employment Status *</label>
+          <select name="employmentStatus" required class="form-select">
+            <option value="">Select...</option>
+            <option value="employed-ft">Employed Full-Time</option>
+            <option value="employed-pt">Employed Part-Time</option>
+            <option value="self-employed">Self-Employed</option>
+            <option value="unemployed">Unemployed</option>
+            <option value="retired">Retired</option>
+            <option value="student">Student</option>
+          </select>
+        </div>
+        
+        <div>
+          <label class="form-label">Marital Status *</label>
+          <select name="maritalStatus" required class="form-select">
+            <option value="">Select...</option>
+            <option value="single">Single</option>
+            <option value="married">Married</option>
+            <option value="partnered">Domestic Partnership</option>
+            <option value="divorced">Divorced</option>
+            <option value="widowed">Widowed</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Financial Reality (Scored Questions) -->
+    <div id="section-2" class="form-section" style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+      <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--gold);">💰 Financial Reality Check</h3>
+      
+      <div style="margin-bottom: 20px;">
+        <label class="form-label">How would you describe your current Financial Situation? *</label>
+        <div class="scale-selector">
+          <input type="range" name="financialSituation" min="-3" max="3" value="0" required 
+                 oninput="updateScaleLabel(this, 'financial-situation-label')">
+          <div id="financial-situation-label" class="scale-label" style="text-align: center; margin-top: 10px; color: var(--gold);">
+            Okay (0)
+          </div>
+        </div>
+        <div class="scale-description muted" style="font-size: 12px; margin-top: 8px;">
+          <div style="float: left;">-3: Horrible</div>
+          <div style="float: right;">+3: Great</div>
+          <div style="text-align: center;">0: Okay</div>
+        </div>
+      </div>
+      
+      <div style="margin-bottom: 20px; clear: both;">
+        <label class="form-label">How would you describe your relationship with Money? *</label>
+        <div class="scale-selector">
+          <input type="range" name="moneyRelationship" min="-3" max="3" value="0" required 
+                 oninput="updateScaleLabel(this, 'money-relationship-label')">
+          <div id="money-relationship-label" class="scale-label" style="text-align: center; margin-top: 10px; color: var(--gold);">
+            Okay (0)
+          </div>
+        </div>
+        <div class="scale-description muted" style="font-size: 12px; margin-top: 8px;">
+          <div style="float: left;">-3: Constant Combat</div>
+          <div style="float: right;">+3: Great</div>
+          <div style="text-align: center;">0: Okay</div>
+        </div>
+      </div>
+      
+      <div class="form-grid" style="clear: both;">
+        <div>
+          <label class="form-label">Current Annual Income *</label>
+          <select name="incomeLevel" required class="form-select">
+            <option value="">Select...</option>
+            <option value="-3">$0 - $35k</option>
+            <option value="-2">$35k - $50k</option>
+            <option value="-1">$50k - $75k</option>
+            <option value="0">$75k - $150k</option>
+            <option value="1">$150k - $400k</option>
+            <option value="2">$400k - $1M</option>
+            <option value="3">Over $1M</option>
+          </select>
+        </div>
+        
+        <div>
+          <label class="form-label">Personal Debt Level (excluding mortgage) *</label>
+          <select name="debtLevel" required class="form-select">
+            <option value="">Select...</option>
+            <option value="3">Zero Debt</option>
+            <option value="2">Under $1k</option>
+            <option value="1">$1k - $25k</option>
+            <option value="0">$25k - $50k</option>
+            <option value="-1">$50k - $75k</option>
+            <option value="-2">$75k - $100k</option>
+            <option value="-3">Over $100k</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Mindset Assessment -->
+    <div id="section-3" class="form-section" style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+      <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--gold);">🧠 Mindset Assessment</h3>
+      
+      <div style="margin-bottom: 20px;">
+        <label class="form-label">Where do you fall on the Financial Scarcity vs Abundance scale? *</label>
+        <div class="scale-selector">
+          <input type="range" name="scarcityAbundance" min="-3" max="3" value="0" required 
+                 oninput="updateScaleLabel(this, 'scarcity-abundance-label')">
+          <div id="scarcity-abundance-label" class="scale-label" style="text-align: center; margin-top: 10px; color: var(--gold);">
+            I will be okay (0)
+          </div>
+        </div>
+        <div class="scale-description muted" style="font-size: 12px; margin-top: 8px;">
+          <div style="float: left;">-3: Full Scarcity</div>
+          <div style="float: right;">+3: Full Abundance</div>
+          <div style="text-align: center;">0: Balanced</div>
+        </div>
+      </div>
+      
+      <div style="margin-bottom: 20px; clear: both;">
+        <label class="form-label">What is your Financial Ambition level? *</label>
+        <div class="scale-selector">
+          <input type="range" name="financialAmbition" min="-3" max="3" value="0" required 
+                 oninput="updateScaleLabel(this, 'ambition-label')">
+          <div id="ambition-label" class="scale-label" style="text-align: center; margin-top: 10px; color: var(--gold);">
+            I want some change (0)
+          </div>
+        </div>
+        <div class="scale-description muted" style="font-size: 12px; margin-top: 8px;">
+          <div style="float: left;">-3: No Change Needed</div>
+          <div style="float: right;">+3: Most Important Thing</div>
+          <div style="text-align: center;">0: Want Change</div>
+        </div>
+      </div>
+      
+      <div style="margin-bottom: 20px; clear: both;">
+        <label class="form-label">How confident are you in reaching your financial goals? *</label>
+        <div class="scale-selector">
+          <input type="range" name="goalConfidence" min="-3" max="3" value="0" required 
+                 oninput="updateScaleLabel(this, 'confidence-label')">
+          <div id="confidence-label" class="scale-label" style="text-align: center; margin-top: 10px; color: var(--gold);">
+            Maybe (0)
+          </div>
+        </div>
+        <div class="scale-description muted" style="font-size: 12px; margin-top: 8px;">
+          <div style="float: left;">-3: Not a Chance</div>
+          <div style="float: right;">+3: 100% Certain</div>
+          <div style="text-align: center;">0: Maybe</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Goals & Obstacles -->
+    <div id="section-4" class="form-section" style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px; clear: both;">
+      <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--gold);">🎯 Goals & Focus Areas</h3>
+      
+      <div style="margin-bottom: 20px;">
+        <label class="form-label">What is your PRIMARY financial goal? *</label>
+        <select name="primaryGoal" required class="form-select">
+          <option value="">Select...</option>
+          <option value="retirement">Save for Retirement</option>
+          <option value="debt">Pay Off Debt</option>
+          <option value="emergency">Build Emergency Fund</option>
+          <option value="home">Buy a Home</option>
+          <option value="education">Fund Education</option>
+          <option value="wealth">Build Wealth</option>
+          <option value="income">Increase Income</option>
+          <option value="freedom">Financial Freedom</option>
+        </select>
+      </div>
+      
+      <div>
+        <label class="form-label">What is your BIGGEST financial obstacle? *</label>
+        <textarea name="biggestObstacle" required class="form-input" rows="3" 
+                  placeholder="Describe what's holding you back financially..." 
+                  style="border-radius: 15px; resize: vertical;"></textarea>
+      </div>
+    </div>
+    
+    <div style="margin-top: 30px; text-align: center;">
+      <button type="submit" class="btn" style="min-width: 200px;">
+        📊 Generate My Insights Report
+      </button>
+    </div>
+  </form>
+  
+  <!-- Insights Report Display (Hidden initially) -->
+  <div id="insights-report" style="display: none;">
+    <!-- Report content will be dynamically generated here -->
+  </div>
+</div>
+
+<style>
+.scale-selector input[type="range"] {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: rgba(173, 145, 104, 0.2);
+  border-radius: 5px;
+  outline: none;
+}
+
+.scale-selector input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--gold);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.scale-label {
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.scale-description {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+</style>
+
+<script>
+// Scale label updater
+function updateScaleLabel(input, labelId) {
+  const value = parseInt(input.value);
+  const label = document.getElementById(labelId);
+  
+  const labels = {
+    'financial-situation-label': {
+      '-3': 'Horrible and getting worse (-3)',
+      '-2': 'Bad but stable (-2)',
+      '-1': 'Not where I want it (-1)',
+      '0': 'Okay (0)',
+      '1': 'Bad but hopeful (+1)',
+      '2': 'Good and improving (+2)',
+      '3': 'Great and stable (+3)'
+    },
+    'money-relationship-label': {
+      '-3': 'Constant combat (-3)',
+      '-2': 'Consistent fear (-2)',
+      '-1': 'Troubled but improving (-1)',
+      '0': 'Okay (0)',
+      '1': 'Pretty good (+1)',
+      '2': 'Good (+2)',
+      '3': 'Great (+3)'
+    },
+    'scarcity-abundance-label': {
+      '-3': 'Full scarcity all the time (-3)',
+      '-2': 'Scarcity and fear in most areas (-2)',
+      '-1': 'Scarcity but I know it\'s not real (-1)',
+      '0': 'I will be okay (0)',
+      '1': 'Mostly okay (+1)',
+      '2': 'Abundance but sometimes blocked (+2)',
+      '3': 'Experience abundance always (+3)'
+    },
+    'ambition-label': {
+      '-3': 'I want no change (-3)',
+      '-2': 'Little room for improvement (-2)',
+      '-1': 'Want change but feel fear (-1)',
+      '0': 'I want some change (0)',
+      '1': 'I want change (+1)',
+      '2': 'I want a lot of change (+2)',
+      '3': 'This is my #1 priority (+3)'
+    },
+    'confidence-label': {
+      '-3': 'Not a chance (-3)',
+      '-2': 'It\'s a long shot (-2)',
+      '-1': 'Possible but unlikely (-1)',
+      '0': 'Maybe (0)',
+      '1': 'Likely (+1)',
+      '2': 'Probably (+2)',
+      '3': '100% certain (+3)'
+    }
+  };
+  
+  if (labels[labelId] && labels[labelId][value]) {
+    label.textContent = labels[labelId][value];
+    
+    // Color coding
+    if (value < 0) {
+      label.style.color = 'var(--bad)';
+    } else if (value > 0) {
+      label.style.color = 'var(--ok)';
+    } else {
+      label.style.color = 'var(--gold)';
+    }
+  }
+}
+
+// Update progress bar
+function updateProgress(section) {
+  const progressBar = document.getElementById('progress-bar');
+  const currentSectionSpan = document.getElementById('current-section');
+  const width = (section / 4) * 100;
+  progressBar.style.width = width + '%';
+  currentSectionSpan.textContent = section;
+}
+</script>

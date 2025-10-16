@@ -259,5 +259,239 @@ const Middleware = {
     }
     
     return factors;
+  },
+  
+  /**
+   * Generate comprehensive Orientation Assessment Report
+   */
+  generateOrientationReport(data) {
+    const report = {
+      timestamp: new Date(),
+      scores: {},
+      profile: {},
+      insights: [],
+      recommendations: [],
+      nextSteps: []
+    };
+    
+    // Calculate Financial Health Score (0-100)
+    report.scores.financialHealth = this.calculateOrientationFinancialHealth(data);
+    
+    // Calculate Mindset Score (-9 to +9)
+    report.scores.mindset = 
+      (parseInt(data.scarcityAbundance) || 0) + 
+      (parseInt(data.financialAmbition) || 0) + 
+      (parseInt(data.goalConfidence) || 0);
+    
+    // Determine profile type
+    report.profile = this.determineUserProfile(
+      report.scores.financialHealth, 
+      report.scores.mindset
+    );
+    
+    // Generate insights  
+    report.insights = this.generateDetailedInsights(data, report.scores);
+    
+    // Generate recommendations
+    report.recommendations = this.generateRecommendations(data, report);
+    
+    // Determine next steps
+    report.nextSteps = this.determineNextSteps(report);
+    
+    return report;
+  },
+  
+  /**
+   * Calculate financial health from orientation data
+   */
+  calculateOrientationFinancialHealth(data) {
+    let score = 50; // Base score
+    
+    // Financial situation (-3 to +3) contributes ±30 points
+    score += (parseInt(data.financialSituation) || 0) * 10;
+    
+    // Income level (-3 to +3) contributes ±15 points  
+    score += (parseInt(data.incomeLevel) || 0) * 5;
+    
+    // Debt level (-3 to +3) contributes ±15 points
+    score += (parseInt(data.debtLevel) || 0) * 5;
+    
+    // Money relationship (-3 to +3) contributes ±10 points
+    score += (parseInt(data.moneyRelationship) || 0) * 3.33;
+    
+    return Math.max(0, Math.min(100, Math.round(score)));
+  },
+  
+  /**
+   * Determine user profile type based on scores
+   */
+  determineUserProfile(healthScore, mindsetScore) {
+    if (healthScore >= 70 && mindsetScore >= 3) {
+      return {
+        type: 'Thriving Optimizer',
+        emoji: '🚀',
+        message: 'You\'re in a strong financial position with an abundance mindset',
+        strengths: ['Strong financial foundation', 'Positive money mindset', 'Ready for growth'],
+        focus: 'Wealth multiplication and optimization strategies'
+      };
+    } else if (healthScore >= 70 && mindsetScore < 3) {
+      return {
+        type: 'Cautious Success', 
+        emoji: '🛡️',
+        message: 'Financially stable but held back by limiting beliefs',
+        strengths: ['Good financial position', 'Solid foundation', 'Room for mindset growth'],
+        focus: 'Aligning mindset with financial reality'
+      };
+    } else if (healthScore >= 40 && mindsetScore >= 0) {
+      return {
+        type: 'Emerging Builder',
+        emoji: '🌱',
+        message: 'You\'re on the right path with room to grow',
+        strengths: ['Positive trajectory', 'Balanced approach', 'Growth potential'],
+        focus: 'Systematic improvement and confidence building'
+      };
+    } else if (healthScore < 40 && mindsetScore >= 0) {
+      return {
+        type: 'Optimistic Striver',
+        emoji: '💪',
+        message: 'Your positive mindset is your greatest asset',
+        strengths: ['Strong mindset', 'High motivation', 'Ready for change'],
+        focus: 'Converting optimism into concrete financial actions'
+      };
+    } else {
+      return {
+        type: 'Foundation Builder',
+        emoji: '🏗️', 
+        message: 'You\'re ready to build from the ground up',
+        strengths: ['Clear starting point', 'Opportunity for growth', 'Fresh perspective'],
+        focus: 'Building basics and celebrating small wins'
+      };
+    }
+  },
+  
+  /**
+   * Generate detailed insights from assessment
+   */
+  generateDetailedInsights(data, scores) {
+    const insights = [];
+    
+    // Financial situation insights
+    if (data.financialSituation <= -2) {
+      insights.push({
+        category: 'Urgent',
+        icon: '🚨',
+        message: 'Your financial situation needs immediate attention',
+        detail: 'Starting with a clear financial picture is crucial',
+        tool: 'Tool 2: Financial Clarity'
+      });
+    }
+    
+    // Debt insights
+    if (data.debtLevel <= -2) {
+      insights.push({
+        category: 'Debt',
+        icon: '⚠️',
+        message: 'High debt is constraining your financial growth',
+        detail: 'Strategic debt elimination can free up resources',
+        tool: 'Tool 4: Financial Freedom Framework'
+      });
+    }
+    
+    // Mindset insights  
+    if (scores.mindset <= -3) {
+      insights.push({
+        category: 'Mindset',
+        icon: '🧠',
+        message: 'Scarcity thinking is blocking your progress',
+        detail: 'Shifting mindset is as important as financial strategy',
+        tool: 'Tool 3: Control Fear Grounding'
+      });
+    } else if (scores.mindset >= 6) {
+      insights.push({
+        category: 'Strength',
+        icon: '✨',
+        message: 'Your abundance mindset is a powerful asset',
+        detail: 'Leverage this strength for accelerated growth',
+        tool: 'Tool 8: Investment Tool'
+      });
+    }
+    
+    // Goal-specific insights
+    if (data.primaryGoal === 'retirement') {
+      insights.push({
+        category: 'Goal',
+        icon: '🎯',
+        message: 'Retirement planning is your priority',
+        detail: 'Structured retirement strategies will serve you well',
+        tool: 'Tools 6 & 8: Retirement Blueprint & Investment Tool'
+      });
+    }
+    
+    return insights;
+  },
+  
+  /**
+   * Generate personalized recommendations
+   */
+  generateRecommendations(data, report) {
+    const recommendations = [];
+    const healthScore = report.scores.financialHealth;
+    
+    // Priority 1: Emergency situations
+    if (healthScore < 30) {
+      recommendations.push({
+        priority: 1,
+        action: 'Complete Financial Clarity Assessment immediately',
+        why: 'Understanding your complete financial picture is critical',
+        timeframe: 'This week'
+      });
+    }
+    
+    // Priority 2: Debt management
+    if (data.debtLevel <= -1) {
+      recommendations.push({
+        priority: 2,
+        action: 'Create a debt elimination strategy',
+        why: 'Reducing debt will improve cash flow and reduce stress',
+        timeframe: 'Next 2 weeks'
+      });
+    }
+    
+    // Priority 3: Mindset work
+    if (report.scores.mindset < 0) {
+      recommendations.push({
+        priority: 3,
+        action: 'Begin daily mindset exercises',
+        why: 'Your beliefs about money directly impact your financial outcomes',
+        timeframe: 'Start today'
+      });
+    }
+    
+    return recommendations.sort((a, b) => a.priority - b.priority).slice(0, 3);
+  },
+  
+  /**
+   * Determine next steps based on profile
+   */
+  determineNextSteps(report) {
+    const toolSequence = [];
+    
+    // Determine tool sequence based on profile
+    if (report.scores.financialHealth < 50) {
+      toolSequence.push('Tool 2: Financial Clarity - Week 2');
+      toolSequence.push('Tool 4: Freedom Framework - Week 4');
+    }
+    
+    if (report.scores.mindset < 0) {
+      toolSequence.push('Tool 3: Control Fear - Week 3');
+      toolSequence.push('Tool 5: Issues Showing Love - Week 5');
+    }
+    
+    if (report.profile.type === 'Thriving Optimizer') {
+      toolSequence.push('Tool 8: Investment Tool - Available Now');
+      toolSequence.push('Tool 6: Retirement Blueprint - Week 6');
+    }
+    
+    return toolSequence.slice(0, 3);
   }
 }

@@ -178,7 +178,23 @@ const DataHub = {
   getHeadersForTool(toolId) {
     switch(toolId) {
       case 'orientation':
-        return ['Timestamp', 'User ID', 'First Name', 'Last Name', 'Email', 'Age', 'Income', 'Family Status'];
+        // Comprehensive 25-field assessment
+        return [
+          'Timestamp', 'User ID', 
+          // Core Demographics (6)
+          'First Name', 'Last Name', 'Email', 'Date of Birth', 'Marital Status', 'Dependents',
+          // Employment & Income (5)
+          'Employment Status', 'Profession', 'Annual Income', 'Other Income', 'Retirement Access',
+          // Financial Snapshot (7)
+          'Total Debt', 'Housing Cost', 'Monthly Expenses', 'Current Savings', 
+          'Emergency Fund', 'Monthly Savings Capacity', 'Investment Experience',
+          // Mindset (4)
+          'Financial Situation', 'Money Relationship', 'Scarcity Abundance', 'Goal Confidence',
+          // Goals (3)
+          'Primary Goal', 'Retirement Age Target', 'Biggest Obstacle',
+          // Calculated Scores
+          'Financial Health Score', 'Mindset Score', 'Profile Type'
+        ];
       case 'financial-clarity':
         return ['Timestamp', 'User ID', 'Income Score', 'Spending Score', 'Debt Score', 'Emergency Score'];
       default:
