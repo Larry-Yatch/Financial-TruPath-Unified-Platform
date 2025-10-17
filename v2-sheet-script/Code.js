@@ -64,6 +64,7 @@ function doGet(e) {
  * Create login page
  */
 function createLoginPage() {
+  const baseUrl = ScriptApp.getService().getUrl();
   const html = `
 <!DOCTYPE html>
 <html>
@@ -197,7 +198,7 @@ function createLoginPage() {
       <strong>Test Mode:</strong><br>
       To test, click "Get Sample Client IDs" from the spreadsheet menu to get valid IDs.<br><br>
       Or go directly to Tool 1:<br>
-      <a href="${ScriptApp.getService().getUrl()}?route=tool">Skip Login (Test)</a>
+      <a href="${baseUrl}?route=tool">Skip Login (Test)</a>
     </div>
   </div>
 
@@ -229,7 +230,7 @@ function createLoginPage() {
         .withSuccessHandler(function(result) {
           if (result.success) {
             // Redirect to Dashboard (not directly to tool)
-            window.location.href = '${ScriptApp.getService().getUrl()}?route=dashboard&client=' + 
+            window.location.href = '${baseUrl}?route=dashboard&client=' + 
               encodeURIComponent(result.clientId);
             showAlert('Login successful!', 'success');
           } else {
@@ -259,6 +260,8 @@ function createLoginPage() {
  * Create dashboard page showing all available tools
  */
 function createDashboardPage(clientId) {
+  const baseUrl = ScriptApp.getService().getUrl();
+  
   // Get user's completion status for all tools
   const tools = [
     { id: 'orientation', name: 'Tool 1: Orientation Assessment', week: 1, available: true },
@@ -308,8 +311,15 @@ function createDashboardPage(clientId) {
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
     .header h1 {
-      color: #333;
-      margin-bottom: 10px;
+      color: #AD9168;
+      font-size: 32px;
+      letter-spacing: 2px;
+      margin-bottom: 5px;
+    }
+    .header .subtitle {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 20px;
     }
     .header p {
       color: #666;
@@ -408,7 +418,8 @@ function createDashboardPage(clientId) {
   <div class="dashboard-container">
     <div class="header">
       <button class="btn-logout" onclick="logout()">Logout</button>
-      <h1>Welcome to Your Dashboard</h1>
+      <h1>FINANCIAL TRUPATH</h1>
+      <p class="subtitle">Version 2.0 - Progressive Life Planning System</p>
       <p>Student ID: ${clientId}</p>
       
       <div class="progress-bar">
@@ -421,7 +432,7 @@ function createDashboardPage(clientId) {
       ${toolStatuses.map(tool => {
         const isClickable = tool.available;
         const href = isClickable ? 
-          '${ScriptApp.getService().getUrl()}?route=tool&tool=' + tool.id + '&client=' + clientId : 
+          '${baseUrl}?route=tool&tool=' + tool.id + '&client=' + clientId : 
           '#';
         const className = 'tool-card' + (!tool.available ? ' unavailable' : '');
         const badgeClass = 'week-badge' + (tool.completed ? ' completed' : '');
@@ -446,7 +457,7 @@ function createDashboardPage(clientId) {
   <script>
     function logout() {
       if (confirm('Are you sure you want to logout?')) {
-        window.location.href = '${ScriptApp.getService().getUrl()}';
+        window.location.href = '${baseUrl}';
       }
     }
   </script>
@@ -462,6 +473,7 @@ function createDashboardPage(clientId) {
  * Create welcome back page for returning students
  */
 function createWelcomeBackPage(clientId, toolId, completion) {
+  const baseUrl = ScriptApp.getService().getUrl();
   const completedDate = new Date(completion.completedAt).toLocaleDateString();
   const lastModified = completion.lastModified ? new Date(completion.lastModified).toLocaleDateString() : null;
   const version = completion.version || 1;
@@ -581,17 +593,17 @@ function createWelcomeBackPage(clientId, toolId, completion) {
     </div>
     
     <div class="actions">
-      <a href="${ScriptApp.getService().getUrl()}?route=tool&client=${clientId}&action=view" class="action-card">
+      <a href="${baseUrl}?route=tool&client=${clientId}&action=view" class="action-card">
         <h4><span class="icon">📊</span> View Your Report</h4>
         <p>See your assessment results and download your PDF report</p>
       </a>
       
-      <a href="${ScriptApp.getService().getUrl()}?route=tool&client=${clientId}&action=edit" class="action-card">
+      <a href="${baseUrl}?route=tool&client=${clientId}&action=edit" class="action-card">
         <h4><span class="icon">✏️</span> Update Your Answers</h4>
         <p>Modify your existing responses (creates version ${version + 1})</p>
       </a>
       
-      <a href="${ScriptApp.getService().getUrl()}?route=tool&client=${clientId}&action=new" class="action-card">
+      <a href="${baseUrl}?route=tool&client=${clientId}&action=new" class="action-card">
         <h4><span class="icon">🔄</span> Start Fresh</h4>
         <p>Begin a completely new assessment (keeps previous as separate attempt)</p>
       </a>
@@ -626,6 +638,8 @@ function handleAdminRoute(adminKey) {
   if (adminKey !== 'admin2024') { // Change this to a secure key
     return createErrorPage('Unauthorized');
   }
+  
+  const baseUrl = ScriptApp.getService().getUrl();
   
   // For now, show the test interface
   const html = `
@@ -690,8 +704,8 @@ function handleAdminRoute(adminKey) {
           
           <div class="section">
             <h3>Quick Links</h3>
-            <a href="${ScriptApp.getService().getUrl()}" class="btn">Login Page</a>
-            <a href="${ScriptApp.getService().getUrl()}?route=dashboard&client=TEST-001&session=test" class="btn">
+            <a href="${baseUrl}" class="btn">Login Page</a>
+            <a href="${baseUrl}?route=dashboard&client=TEST-001&session=test" class="btn">
               Test Dashboard
             </a>
           </div>
