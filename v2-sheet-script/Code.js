@@ -330,20 +330,11 @@ function onOpen() {
  */
 
 /**
- * Test authentication system - wrapper function
+ * Test authentication system - main test function
  */
 function runAllAuthTests() {
-  // This function is defined in TestAuthentication.js
-  // If it's not loading, we'll provide a fallback here
-  try {
-    if (typeof TestAuthentication !== 'undefined' && TestAuthentication.runAllAuthTests) {
-      return TestAuthentication.runAllAuthTests();
-    }
-    // Fallback: Run basic test
-    return testAuthenticationSystem();
-  } catch (error) {
-    SpreadsheetApp.getUi().alert('Error', 'Authentication test error: ' + error.toString(), SpreadsheetApp.getUi().ButtonSet.OK);
-  }
+  // Direct implementation - don't rely on external references
+  return testAuthenticationSystem();
 }
 
 /**
