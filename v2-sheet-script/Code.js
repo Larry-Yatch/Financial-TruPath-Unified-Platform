@@ -27,6 +27,16 @@ function doGet(e) {
     if (route === 'tool' || route === 'orientation') {
       const toolId = e.parameter.tool || 'orientation';
       
+      // Handle action=view to show the report
+      if (action === 'view' && clientId) {
+        const completion = DataHub.checkToolCompletion(clientId, toolId);
+        if (completion.completed && completion.data) {
+          return createReportView(clientId, toolId, completion.data);
+        } else {
+          return createErrorPage('No completed assessment found for this user.');
+        }
+      }
+      
       // Check if student has existing data ONLY when no action is specified
       if (clientId && !action) {
         const completion = DataHub.checkToolCompletion(clientId, toolId);
@@ -613,6 +623,227 @@ function createWelcomeBackPage(clientId, toolId, completion) {
       <strong>Note:</strong> Updating your answers will preserve your original completion date while tracking the changes you make. Starting fresh creates a new assessment alongside your existing one.
     </div>
   </div>
+</body>
+</html>
+  `;
+  
+  return HtmlService.createHtmlOutput(html)
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+/**
+ * Create report view page for displaying assessment results
+ */
+function createReportView(clientId, toolId, data) {
+  const baseUrl = ScriptApp.getService().getUrl();
+  
+  // Calculate insights from data
+  const insights = DataHub.generateInsights(data);
+  const scoreData = insights.scoreData || {};
+  
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assessment Report - Financial TruPath V2.0</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .report-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      padding: 40px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      border-bottom: 3px solid #AD9168;
+      padding-bottom: 30px;
+    }
+    .header h1 {
+      color: #AD9168;
+      font-size: 36px;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+    .header .subtitle {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    .score-section {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .score-value {
+      font-size: 72px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    .score-label {
+      font-size: 18px;
+      opacity: 0.9;
+    }
+    .data-section {
+      margin: 30px 0;
+    }
+    .data-section h3 {
+      color: #333;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    .data-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .data-label {
+      color: #666;
+      font-weight: 500;
+    }
+    .data-value {
+      color: #333;
+      text-align: right;
+    }
+    .actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 40px;
+    }
+    .btn {
+      flex: 1;
+      padding: 15px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #5a67d8;
+      transform: translateY(-2px);
+    }
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+    .btn-secondary:hover {
+      background: #d0d0d0;
+    }
+    .btn-success {
+      background: #22c55e;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #16a34a;
+    }
+  </style>
+</head>
+<body>
+  <div class="report-container">
+    <div class="header">
+      <h1>FINANCIAL TRUPATH</h1>
+      <p class="subtitle">Version 2.0 - Progressive Life Planning System</p>
+      <h2>Orientation Assessment Report</h2>
+      <p>Student ID: ` + clientId + `</p>
+    </div>
+    
+    ` + (scoreData.totalScore ? `
+    <div class="score-section">
+      <div class="score-label">Financial Foundation Score</div>
+      <div class="score-value">` + Math.round(scoreData.totalScore) + `%</div>
+      <div class="score-label">` + (scoreData.totalScore >= 70 ? 'Strong Foundation' : scoreData.totalScore >= 40 ? 'Developing Foundation' : 'Needs Attention') + `</div>
+    </div>
+    ` : '') + `
+    
+    <div class="data-section">
+      <h3>Personal Information</h3>
+      <div class="data-row">
+        <span class="data-label">Name:</span>
+        <span class="data-value">` + (data.firstName || '') + ` ` + (data.lastName || '') + `</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Email:</span>
+        <span class="data-value">` + (data.email || 'Not provided') + `</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Age:</span>
+        <span class="data-value">` + (data.age || 'Not provided') + `</span>
+      </div>
+    </div>
+    
+    <div class="data-section">
+      <h3>Financial Situation</h3>
+      <div class="data-row">
+        <span class="data-label">Income Level:</span>
+        <span class="data-value">` + (data.income || 'Not provided') + `</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Savings:</span>
+        <span class="data-value">` + (data.savings || 'Not provided') + `</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Debt:</span>
+        <span class="data-value">` + (data.debt || 'Not provided') + `</span>
+      </div>
+    </div>
+    
+    <div class="data-section">
+      <h3>Assessment Details</h3>
+      <div class="data-row">
+        <span class="data-label">Completed:</span>
+        <span class="data-value">` + (data.originalTimestamp ? new Date(data.originalTimestamp).toLocaleDateString() : 'N/A') + `</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Last Modified:</span>
+        <span class="data-value">` + (data.lastModified ? new Date(data.lastModified).toLocaleDateString() : 'Never') + `</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Version:</span>
+        <span class="data-value">` + (data.version || 1) + `</span>
+      </div>
+    </div>
+    
+    <div class="actions">
+      <button class="btn btn-success" onclick="generatePDF()">📄 Download PDF Report</button>
+      <a href="` + baseUrl + `?route=tool&client=` + clientId + `&action=edit" class="btn btn-primary">✏️ Edit Answers</a>
+      <a href="` + baseUrl + `?route=dashboard&client=` + clientId + `" class="btn btn-secondary">🏠 Back to Dashboard</a>
+    </div>
+  </div>
+  
+  <script>
+    function generatePDF() {
+      google.script.run.withSuccessHandler(function(result) {
+        if (result && result.url) {
+          window.open(result.url, '_blank');
+        } else {
+          alert('Could not generate PDF. Please try again.');
+        }
+      }).generatePDFReport('` + clientId + `', '` + toolId + `');
+    }
+  </script>
 </body>
 </html>
   `;

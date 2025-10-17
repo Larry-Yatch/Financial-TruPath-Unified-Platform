@@ -283,12 +283,40 @@
       // Platform configuration from server
       const userId = '<?!= userId ?>' || 'user-' + Date.now();
       const currentWeek = <?!= currentWeek ?> || 1;
+      const action = '<?!= action ?>' || 'new';
+      const existingData = <?!= JSON.stringify(existingData || {}) ?>;
       
-      // Update week display
+      // Update week display and load existing data if in edit mode
       document.addEventListener('DOMContentLoaded', function() {
         const weekSpan = document.getElementById('current-week');
         if (weekSpan) {
           weekSpan.textContent = currentWeek;
+        }
+        
+        // Load existing data if in edit mode
+        if (action === 'edit' && existingData && Object.keys(existingData).length > 0) {
+          console.log('Loading existing data for editing...');
+          
+          // Populate form fields with existing data
+          const fields = ['firstName', 'lastName', 'email', 'phone', 'age', 'gender', 
+                         'income', 'savings', 'debt', 'goals', 'challenges', 'risk_tolerance'];
+          
+          fields.forEach(field => {
+            const element = document.querySelector(`[name="${field}"]`);
+            if (element && existingData[field]) {
+              element.value = existingData[field];
+            }
+          });
+          
+          // Show a notice that they're editing
+          const toolContainer = document.getElementById('tool-container');
+          if (toolContainer) {
+            const editNotice = document.createElement('div');
+            editNotice.className = 'edit-notice';
+            editNotice.style.cssText = 'background: #fef3c7; color: #92400e; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #f59e0b;';
+            editNotice.innerHTML = '<strong>Edit Mode:</strong> You are updating your existing assessment. Your original completion date will be preserved.';
+            toolContainer.insertBefore(editNotice, toolContainer.firstChild);
+          }
         }
       });
       
@@ -669,6 +697,9 @@
         button.textContent = 'Analyzing your profile...';
         
         // Call server function
+        // Determine save mode based on action
+        const saveMode = action === 'edit' ? 'update' : 'new';
+        
         google.script.run
           .withSuccessHandler(function(result) {
             // Generate and display the insights report
@@ -681,7 +712,7 @@
             alert('Error saving data: ' + error);
             console.error('Save error:', error);
           })
-          .saveUserData(userId, 'orientation', data);
+          .saveUserData(userId, 'orientation', data, saveMode);
       }
       
       // Generate Insights Report Locally
