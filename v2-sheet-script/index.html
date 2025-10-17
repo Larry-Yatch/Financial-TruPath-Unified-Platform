@@ -759,6 +759,9 @@
       
       // Display the Insights Report
       window.displayInsightsReport = function(report) {
+        // Store report data for download function
+        window.lastGeneratedReport = report;
+        
         const reportHtml = `
           <div style="animation: fadeIn 0.5s;">
             <h2>📊 Your Personalized Financial Insights Report</h2>
@@ -885,12 +888,15 @@
             
             <!-- Next Steps -->
             <div style="text-align: center; margin-top: 30px;">
+              <button onclick="downloadReport()" class="btn" style="margin-right: 10px; background: linear-gradient(135deg, #AD9168 0%, #8B7355 100%);">
+                📥 Download Report
+              </button>
               ${currentWeek >= 2 ? `
                 <button onclick="loadTool('financial-clarity')" class="btn" style="margin-right: 10px;">
                   Continue to Tool 2
                 </button>
               ` : ''}
-              <button onclick="location.reload()" class="btn">
+              <button onclick="location.reload()" class="btn-secondary" style="background: var(--card-bg); color: var(--text);">
                 Return to Dashboard
               </button>
             </div>
@@ -899,6 +905,206 @@
         
         document.getElementById('tool-container').innerHTML = reportHtml;
         window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      
+      // Download report function with website styling
+      window.downloadReport = function() {
+        const reportData = window.lastGeneratedReport;
+        if (!reportData) {
+          alert('No report available to download');
+          return;
+        }
+        
+        // Create a formatted HTML document matching website theme
+        const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Financial TruPath - Assessment Report</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(180deg, #1e1933 0%, #2d2844 50%, #1e1933 100%);
+      min-height: 100vh;
+      color: #e2e8f0;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    
+    .header {
+      text-align: center;
+      padding: 40px;
+      background: rgba(30, 25, 51, 0.8);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      border: 1px solid rgba(173, 145, 104, 0.3);
+      margin-bottom: 30px;
+    }
+    
+    .logo {
+      font-family: 'Rubik', sans-serif;
+      font-size: 48px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #AD9168 0%, #8B7355 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 4px;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      font-size: 35px;
+      color: #94a3b8;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-weight: 500;
+      margin: 10px 0;
+    }
+    
+    .profile-card {
+      background: linear-gradient(135deg, rgba(173, 145, 104, 0.2) 0%, rgba(30, 25, 43, 0.4) 100%);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(173, 145, 104, 0.3);
+      padding: 40px;
+      border-radius: 15px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .profile-emoji {
+      font-size: 80px;
+      margin-bottom: 20px;
+    }
+    
+    .profile-type {
+      font-size: 32px;
+      color: #AD9168;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+    
+    .scores-container {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .score-box {
+      flex: 1;
+      background: rgba(30, 25, 51, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(173, 145, 104, 0.3);
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+    }
+    
+    .score-label {
+      color: #AD9168;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    
+    .score-value {
+      font-size: 56px;
+      font-weight: bold;
+      margin: 15px 0;
+    }
+    
+    .section {
+      background: rgba(30, 25, 51, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(173, 145, 104, 0.3);
+      padding: 30px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .section h3 {
+      color: #AD9168;
+      font-size: 24px;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(173, 145, 104, 0.3);
+    }
+    
+    .good { color: #22c55e; }
+    .warning { color: #f59e0b; }
+    .critical { color: #ef4444; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">FINANCIAL TRUPATH</div>
+      <div class="subtitle">Assessment Report</div>
+    </div>
+
+    <div class="profile-card">
+      <div class="profile-emoji">\${reportData.profile.emoji || '🎯'}</div>
+      <div class="profile-type">\${reportData.profile.type}</div>
+      <p>\${reportData.profile.message}</p>
+      <p style="color: #94a3b8;">\${reportData.profile.focus}</p>
+    </div>
+
+    <div class="scores-container">
+      <div class="score-box">
+        <div class="score-label">Financial Health</div>
+        <div class="score-value \${reportData.healthScore >= 70 ? 'good' : reportData.healthScore >= 40 ? 'warning' : 'critical'}">
+          \${reportData.healthScore}
+        </div>
+      </div>
+      
+      <div class="score-box">
+        <div class="score-label">Mindset Score</div>
+        <div class="score-value \${reportData.mindsetScore >= 3 ? 'good' : reportData.mindsetScore >= 0 ? 'warning' : 'critical'}">
+          \${reportData.mindsetScore > 0 ? '+' : ''}\${reportData.mindsetScore}
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Your Personalized Homework</h3>
+      <p>Complete these tasks before Tool 2 to maximize your success.</p>
+    </div>
+
+    <div class="section">
+      <h3>Next Steps</h3>
+      <ol>
+        <li>Review this report and complete your homework</li>
+        <li>Complete Tool 2: Financial Clarity (Week 2)</li>
+        <li>Track your progress weekly</li>
+      </ol>
+    </div>
+  </div>
+</body>
+</html>
+        `;
+        
+        // Create a Blob and download
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `FinancialTruPath_Report_\${new Date().toISOString().split('T')[0]}.html`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        console.log('Report downloaded successfully');
       }
       
       // Show insights panel
