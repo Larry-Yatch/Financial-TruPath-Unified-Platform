@@ -1,24 +1,154 @@
 /**
  * Financial TruPath V2.0 - Main Entry Point
- * This is the main code file for the web application
+ * Routes requests to appropriate handlers based on URL parameters
  */
 
 /**
- * Serves the web application
- * @param {Object} e - Event object
- * @returns {HtmlOutput} The HTML page
+ * Main router for web application
+ * @param {Object} e - Event object with parameters
+ * @returns {HtmlOutput} The appropriate HTML page
  */
 function doGet(e) {
-  const template = HtmlService.createTemplateFromFile('index');
+  try {
+    // Get route from URL parameters
+    const route = e.parameter.route || 'login';
+    const toolId = e.parameter.tool;
+    const clientId = e.parameter.client;
+    const sessionId = e.parameter.session;
+    
+    // Route to appropriate handler
+    switch(route) {
+      case 'login':
+        return handleLoginRoute();
+        
+      case 'dashboard':
+        return handleDashboardRoute(clientId, sessionId);
+        
+      case 'tool':
+        return handleToolRoute(toolId, clientId, sessionId);
+        
+      case 'report':
+        return handleReportRoute(clientId, sessionId);
+        
+      case 'admin':
+        return handleAdminRoute(e.parameter.key);
+        
+      default:
+        // Default to login for unknown routes
+        return handleLoginRoute();
+    }
+    
+  } catch (error) {
+    console.error('Router error:', error);
+    return createErrorPage(error.toString());
+  }
+}
+
+/**
+ * Handle admin route (for testing/debugging)
+ */
+function handleAdminRoute(adminKey) {
+  // Simple admin key check
+  if (adminKey !== 'admin2024') { // Change this to a secure key
+    return createErrorPage('Unauthorized');
+  }
   
-  // Pass configuration to the frontend
-  template.config = CONFIG;
-  template.userId = e.parameter.uid || generateUserId();
-  template.currentWeek = getCurrentWeek();
+  // For now, show the test interface
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Financial TruPath V2.0 - Admin</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f7fa;
+          }
+          .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+          }
+          h1 { color: #333; }
+          .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px 10px 10px 0;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+          }
+          .btn:hover {
+            background: #5a67d8;
+          }
+          .section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>🔧 Admin Panel</h1>
+          
+          <div class="section">
+            <h3>Test Functions</h3>
+            <button class="btn" onclick="google.script.run.withSuccessHandler(showResult).createDataSheets()">
+              Create Data Sheets
+            </button>
+            <button class="btn" onclick="google.script.run.withSuccessHandler(showResult).testDataSaving()">
+              Test Data Saving
+            </button>
+            <button class="btn" onclick="testAuth()">
+              Test Authentication
+            </button>
+          </div>
+          
+          <div class="section">
+            <h3>Quick Links</h3>
+            <a href="${ScriptApp.getService().getUrl()}" class="btn">Login Page</a>
+            <a href="${ScriptApp.getService().getUrl()}?route=dashboard&client=TEST-001&session=test" class="btn">
+              Test Dashboard
+            </a>
+          </div>
+          
+          <div id="result" class="section" style="display: none;">
+            <h3>Result</h3>
+            <pre id="resultContent"></pre>
+          </div>
+        </div>
+        
+        <script>
+          function showResult(result) {
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('resultContent').textContent = JSON.stringify(result, null, 2);
+          }
+          
+          function testAuth() {
+            const testId = prompt('Enter a test Client ID:');
+            if (testId) {
+              google.script.run
+                .withSuccessHandler(showResult)
+                .withFailureHandler(showResult)
+                .lookupClientById(testId);
+            }
+          }
+        </script>
+      </body>
+    </html>
+  `;
   
-  return template.evaluate()
-    .setTitle('Financial TruPath V2.0')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+  return HtmlService.createHtmlOutput(html)
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
@@ -32,10 +162,10 @@ function include(filename) {
 }
 
 /**
- * Generate a unique user ID
- * @returns {string} Unique user ID
+ * Generate a unique session ID
+ * @returns {string} Unique session ID
  */
-function generateUserId() {
+function generateSessionId() {
   return Utilities.getUuid();
 }
 
@@ -172,6 +302,11 @@ function onOpen() {
     .addItem('Initialize Platform', 'initializePlatform')
     .addItem('Create Data Sheets', 'createDataSheets')
     .addSeparator()
+    .addSubMenu(ui.createMenu('🔐 Authentication')
+      .addItem('Test Authentication System', 'runAllAuthTests')
+      .addItem('Test Roster Connection', 'testRosterConnection')
+      .addItem('Get Sample Client IDs', 'getSampleClientIds')
+      .addItem('Test Session Management', 'testSessionCreation'))
     .addSubMenu(ui.createMenu('🧪 Testing')
       .addItem('Run All Tests', 'runAllTests')
       .addItem('Validate Before Deploy', 'validateBeforeDeployment')
@@ -184,7 +319,66 @@ function onOpen() {
     .addSeparator()
     .addItem('View Logs', 'viewLogs')
     .addItem('View Tool 1 Data', 'viewTool1Data')
+    .addItem('Open Admin Panel', 'openAdminPanel')
     .addToUi();
+}
+
+/**
+ * Open Admin Panel in browser
+ */
+function openAdminPanel() {
+  const url = ScriptApp.getService().getUrl();
+  if (!url) {
+    SpreadsheetApp.getUi().alert('Web app not deployed yet. Please deploy first.');
+    return;
+  }
+  
+  const adminUrl = url + '?route=admin&key=admin2024';
+  const html = `
+    <div style="padding: 20px; font-family: Arial, sans-serif;">
+      <h3>Admin Panel URL</h3>
+      <p>Click the link below to open the admin panel:</p>
+      <p><a href="${adminUrl}" target="_blank" style="color: #667eea;">${adminUrl}</a></p>
+      <hr style="margin: 20px 0;">
+      <p style="color: #666; font-size: 12px;">
+        Note: You'll need the admin key to access this panel.<br>
+        Current key: admin2024 (change this in production)
+      </p>
+    </div>
+  `;
+  
+  SpreadsheetApp.getUi().showModalDialog(
+    HtmlService.createHtmlOutput(html).setWidth(500).setHeight(250),
+    'Open Admin Panel'
+  );
+}
+
+/**
+ * Initialize the platform (first-time setup)
+ */
+function initializePlatform() {
+  const ui = SpreadsheetApp.getUi();
+  
+  try {
+    // Step 1: Create data sheets
+    createDataSheets();
+    
+    // Step 2: Test roster connection
+    const rosterTest = testRosterConnection();
+    if (!rosterTest.success) {
+      ui.alert('⚠️ Warning', 'Could not connect to roster. Please check Authentication.js configuration.', ui.ButtonSet.OK);
+    }
+    
+    // Step 3: Get deployment URL
+    const url = ScriptApp.getService().getUrl();
+    const message = url ? 
+      `✅ Platform initialized successfully!\n\nWeb App URL: ${url}\n\nNext steps:\n1. Test authentication with real Client IDs\n2. Deploy to production when ready` :
+      `✅ Platform initialized!\n\nNext steps:\n1. Deploy the web app (Extensions → Apps Script → Deploy)\n2. Test authentication\n3. Share URL with clients`;
+    
+    ui.alert('Platform Initialized', message, ui.ButtonSet.OK);
+  } catch (error) {
+    ui.alert('❌ Error', 'Failed to initialize platform: ' + error.toString(), ui.ButtonSet.OK);
+  }
 }
 
 /**

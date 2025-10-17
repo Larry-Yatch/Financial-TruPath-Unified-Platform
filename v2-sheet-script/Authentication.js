@@ -6,16 +6,15 @@
 // ====== ROSTER CONFIGURATION ======
 const ROSTER = {
   SPREADSHEET_ID: '104pHxIgsGAcOrktL75Hi7WlEd8j0BoeadntLR9PrGYo', // Same roster as investment tool
-  SHEET_NAME: 'Financial v2',  // New tab for V2 platform
-  SHEET_GID: null,  // Will be set when sheet is created
+  SHEET_NAME: 'Financial v2 (24SEPT25 start)',  // Tab for V2 platform starting Sept 24, 2025
+  SHEET_GID: 753820167,  // GID from the URL you provided
   COLUMNS: {
-    FIRST_NAME: 2,  // B
-    LAST_NAME: 3,   // C
-    EMAIL: 4,       // D
-    PHONE: 5,       // E
-    CLIENT_ID: 6,   // F
-    ENROLLED_DATE: 7, // G
-    STATUS: 8       // H - Active/Inactive
+    FIRST_NAME: 3,  // C - First Name
+    LAST_NAME: 4,   // D - Last Name
+    PHONE: 5,       // E - Phone (if present)
+    EMAIL: 6,       // F - Email
+    CLIENT_ID: 7,   // G - Student IDs
+    STATUS: 8       // H - Status (if present)
   }
 };
 
