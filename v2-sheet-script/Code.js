@@ -261,6 +261,282 @@ function viewLogs() {
 }
 
 /**
+ * Generate PDF report for user
+ * @param {Object} reportData - The report data from the assessment
+ * @returns {Object} PDF file details
+ */
+function generatePDFReport(reportData) {
+  try {
+    // Create HTML content for PDF
+    const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    @page { margin: 0.5in; }
+    body {
+      font-family: Arial, sans-serif;
+      color: #333;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      background: #1e1933;
+      color: white;
+      padding: 30px;
+      margin: -20px -20px 30px -20px;
+    }
+    .logo {
+      font-size: 36px;
+      font-weight: bold;
+      letter-spacing: 3px;
+      color: #AD9168;
+    }
+    .subtitle {
+      font-size: 18px;
+      color: #94a3b8;
+      margin-top: 10px;
+    }
+    .profile-section {
+      background: #f8f9fa;
+      padding: 25px;
+      border-radius: 10px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .profile-emoji {
+      font-size: 60px;
+      margin-bottom: 15px;
+    }
+    .profile-type {
+      font-size: 28px;
+      color: #AD9168;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .scores-container {
+      display: flex;
+      justify-content: space-around;
+      margin: 30px 0;
+    }
+    .score-box {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      width: 45%;
+    }
+    .score-label {
+      color: #666;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .score-value {
+      font-size: 48px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    .good { color: #22c55e; }
+    .warning { color: #f59e0b; }
+    .critical { color: #dc3545; }
+    .section {
+      margin-bottom: 30px;
+      page-break-inside: avoid;
+    }
+    .section h3 {
+      color: #AD9168;
+      border-bottom: 2px solid #AD9168;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    .homework-item {
+      background: #fff;
+      border-left: 4px solid;
+      padding: 15px;
+      margin-bottom: 15px;
+      page-break-inside: avoid;
+    }
+    .priority-high {
+      border-left-color: #dc3545;
+      background: #fff5f5;
+    }
+    .priority-medium {
+      border-left-color: #f59e0b;
+      background: #fffef5;
+    }
+    .priority-low {
+      border-left-color: #22c55e;
+      background: #f5fff5;
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    li {
+      padding: 5px 0;
+      padding-left: 20px;
+      position: relative;
+    }
+    li:before {
+      content: "☐";
+      position: absolute;
+      left: 0;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 2px solid #e0e0e0;
+      color: #666;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">FINANCIAL TRUPATH</div>
+    <div class="subtitle">Comprehensive Assessment Report</div>
+    <div style="margin-top: 10px; font-size: 14px;">Generated: ${new Date().toLocaleDateString()}</div>
+  </div>
+
+  <div class="profile-section">
+    <div class="profile-emoji">${reportData.profile.emoji || '🎯'}</div>
+    <div class="profile-type">${reportData.profile.type}</div>
+    <p style="font-size: 16px; margin: 10px 0;">${reportData.profile.message}</p>
+    <p style="color: #666; font-style: italic;">${reportData.profile.focus}</p>
+  </div>
+
+  <div class="scores-container">
+    <div class="score-box">
+      <div class="score-label">Financial Health Score</div>
+      <div class="score-value ${reportData.healthScore >= 70 ? 'good' : reportData.healthScore >= 40 ? 'warning' : 'critical'}">
+        ${reportData.healthScore}
+      </div>
+      <div style="color: #999; font-size: 12px;">out of 100</div>
+    </div>
+    <div class="score-box">
+      <div class="score-label">Mindset Score</div>
+      <div class="score-value ${reportData.mindsetScore >= 3 ? 'good' : reportData.mindsetScore >= 0 ? 'warning' : 'critical'}">
+        ${reportData.mindsetScore > 0 ? '+' : ''}${reportData.mindsetScore}
+      </div>
+      <div style="color: #999; font-size: 12px;">Range: -9 to +9</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>📊 Key Insights</h3>
+    ${reportData.healthScore < 40 ? '<p>⚠️ <strong>Immediate attention needed:</strong> Your financial health score indicates areas requiring urgent focus.</p>' : ''}
+    ${reportData.mindsetScore < 0 ? '<p>🧠 <strong>Mindset barriers detected:</strong> Your beliefs about money may be limiting your progress.</p>' : ''}
+    ${reportData.mindsetScore >= 6 ? '<p>✨ <strong>Exceptional mindset:</strong> Your positive outlook is a powerful asset for financial growth.</p>' : ''}
+    ${reportData.healthScore >= 70 ? '<p>💪 <strong>Strong foundation:</strong> You have a solid financial base to build upon.</p>' : ''}
+  </div>
+
+  <div class="section">
+    <h3>📚 Your Personalized Homework</h3>
+    
+    ${reportData.healthScore < 40 || (reportData.data && reportData.data.totalDebt === 'over_100k') ? `
+    <div class="homework-item priority-high">
+      <h4 style="color: #dc3545; margin-top: 0;">🔴 Priority 1: Debt & Cash Flow Review (Critical)</h4>
+      <ul>
+        <li>List all debts with balances, interest rates, and minimum payments</li>
+        <li>Calculate total monthly debt payments</li>
+        <li>Identify highest interest rate debts</li>
+        <li>Review last 3 months of bank statements</li>
+      </ul>
+    </div>
+    ` : ''}
+    
+    ${reportData.healthScore < 60 || (reportData.data && reportData.data.emergencyFund === 'none') ? `
+    <div class="homework-item priority-medium">
+      <h4 style="color: #f59e0b; margin-top: 0;">🟡 Priority 2: Expense Tracking</h4>
+      <ul>
+        <li>Track all expenses for next 7 days</li>
+        <li>Identify top 3 spending categories</li>
+        <li>Find 3 expenses you could reduce</li>
+        <li>Calculate true monthly living costs</li>
+      </ul>
+    </div>
+    ` : ''}
+    
+    <div class="homework-item priority-low">
+      <h4 style="color: #22c55e; margin-top: 0;">🟢 Priority 3: Income & Assets Review</h4>
+      <ul>
+        <li>Gather last 2 pay stubs</li>
+        <li>List all income sources</li>
+        <li>Check all account balances</li>
+        <li>Review any investment accounts</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>🎯 Next Steps</h3>
+    <ol>
+      <li>Complete your personalized homework tasks above</li>
+      <li>Take Tool 2: Financial Clarity Assessment (Week 2)</li>
+      ${reportData.mindsetScore < 0 ? '<li>Prepare for Tool 3: Control Fear Grounding (Week 3)</li>' : ''}
+      <li>Track your progress weekly using the platform</li>
+      <li>Celebrate small wins along your journey</li>
+    </ol>
+  </div>
+
+  <div class="footer">
+    <p><strong>Financial TruPath V2.0</strong></p>
+    <p>This report is confidential and for your personal use only</p>
+    <p>© ${new Date().getFullYear()} Financial TruPath. All rights reserved.</p>
+  </div>
+</body>
+</html>
+    `;
+    
+    // Create a blob from the HTML
+    const blob = Utilities.newBlob(htmlContent, 'text/html', 'report.html');
+    
+    // Convert HTML to PDF
+    const pdf = blob.getAs('application/pdf').setName(`FinancialTruPath_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+    
+    // Create temporary file in Drive
+    const file = DriveApp.createFile(pdf);
+    
+    // Get download URL
+    const downloadUrl = file.getDownloadUrl();
+    const fileId = file.getId();
+    
+    // Return the URL for download (file will be deleted after download)
+    return {
+      success: true,
+      downloadUrl: downloadUrl,
+      fileId: fileId,
+      fileName: file.getName()
+    };
+    
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    return {
+      success: false,
+      error: error.toString()
+    };
+  }
+}
+
+/**
+ * Delete temporary PDF file after download
+ * @param {string} fileId - The file ID to delete
+ */
+function deleteTempFile(fileId) {
+  try {
+    DriveApp.getFileById(fileId).setTrashed(true);
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting temp file:', error);
+    return { success: false };
+  }
+}
+
+/**
  * Test function to verify setup
  */
 function testWebApp() {

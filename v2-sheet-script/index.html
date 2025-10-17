@@ -888,8 +888,8 @@
             
             <!-- Next Steps -->
             <div style="text-align: center; margin-top: 30px;">
-              <button onclick="downloadReport()" class="btn" style="margin-right: 10px; background: linear-gradient(135deg, #AD9168 0%, #8B7355 100%);">
-                📥 Download Report
+              <button onclick="downloadReport(event)" class="btn" style="margin-right: 10px; background: linear-gradient(135deg, #AD9168 0%, #8B7355 100%);">
+                📥 Download Report (PDF)
               </button>
               ${currentWeek >= 2 ? `
                 <button onclick="loadTool('financial-clarity')" class="btn" style="margin-right: 10px;">
@@ -907,8 +907,57 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
       
-      // Download report function with website styling
-      window.downloadReport = function() {
+      // Download report function - generates PDF server-side
+      window.downloadReport = function(event) {
+        const reportData = window.lastGeneratedReport;
+        if (!reportData) {
+          alert('No report available to download');
+          return;
+        }
+        
+        // Show loading state
+        const downloadBtn = event ? event.target : document.querySelector('button[onclick*="downloadReport"]');
+        const originalText = downloadBtn.textContent;
+        downloadBtn.textContent = '⏳ Generating PDF...';
+        downloadBtn.disabled = true;
+        
+        // Call server to generate PDF
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              // Create a temporary link to download the PDF
+              const a = document.createElement('a');
+              a.href = result.downloadUrl;
+              a.download = result.fileName;
+              a.target = '_blank';
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              
+              // Clean up the temporary file after a delay
+              setTimeout(() => {
+                google.script.run.deleteTempFile(result.fileId);
+              }, 5000);
+              
+              console.log('PDF downloaded successfully');
+            } else {
+              alert('Error generating PDF: ' + (result.error || 'Unknown error'));
+            }
+            
+            // Restore button state
+            downloadBtn.textContent = originalText;
+            downloadBtn.disabled = false;
+          })
+          .withFailureHandler(function(error) {
+            alert('Error generating report: ' + error.message);
+            downloadBtn.textContent = originalText;
+            downloadBtn.disabled = false;
+          })
+          .generatePDFReport(reportData);
+      }
+      
+      // Legacy HTML download function (kept as backup)
+      window.downloadHTMLReport = function() {
         const reportData = window.lastGeneratedReport;
         if (!reportData) {
           alert('No report available to download');
