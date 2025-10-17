@@ -198,7 +198,7 @@ function createLoginPage() {
       <strong>Test Mode:</strong><br>
       To test, click "Get Sample Client IDs" from the spreadsheet menu to get valid IDs.<br><br>
       Or go directly to Tool 1:<br>
-      <a href="${baseUrl}?route=tool">Skip Login (Test)</a>
+      <a href="` + baseUrl + `?route=tool">Skip Login (Test)</a>
     </div>
   </div>
 
@@ -230,7 +230,7 @@ function createLoginPage() {
         .withSuccessHandler(function(result) {
           if (result.success) {
             // Redirect to Dashboard (not directly to tool)
-            window.location.href = '${baseUrl}?route=dashboard&client=' + 
+            window.location.href = '` + baseUrl + `?route=dashboard&client=' + 
               encodeURIComponent(result.clientId);
             showAlert('Login successful!', 'success');
           } else {
@@ -420,19 +420,19 @@ function createDashboardPage(clientId) {
       <button class="btn-logout" onclick="logout()">Logout</button>
       <h1>FINANCIAL TRUPATH</h1>
       <p class="subtitle">Version 2.0 - Progressive Life Planning System</p>
-      <p>Student ID: ${clientId}</p>
+      <p>Student ID: ` + clientId + `</p>
       
       <div class="progress-bar">
-        <div class="progress-fill" style="width: ${(toolStatuses.filter(t => t.completed).length / 8) * 100}%"></div>
+        <div class="progress-fill" style="width: ` + ((toolStatuses.filter(t => t.completed).length / 8) * 100) + `%"></div>
       </div>
-      <p>${toolStatuses.filter(t => t.completed).length} of 8 tools completed</p>
+      <p>` + toolStatuses.filter(t => t.completed).length + ` of 8 tools completed</p>
     </div>
     
     <div class="tools-grid">
       ${toolStatuses.map(tool => {
         const isClickable = tool.available;
         const href = isClickable ? 
-          '${baseUrl}?route=tool&tool=' + tool.id + '&client=' + clientId : 
+          baseUrl + '?route=tool&tool=' + tool.id + '&client=' + clientId : 
           '#';
         const className = 'tool-card' + (!tool.available ? ' unavailable' : '');
         const badgeClass = 'week-badge' + (tool.completed ? ' completed' : '');
@@ -457,7 +457,7 @@ function createDashboardPage(clientId) {
   <script>
     function logout() {
       if (confirm('Are you sure you want to logout?')) {
-        window.location.href = '${baseUrl}';
+        window.location.href = '` + baseUrl + `';
       }
     }
   </script>
@@ -585,25 +585,25 @@ function createWelcomeBackPage(clientId, toolId, completion) {
     <div class="status-box">
       <h3>Your Assessment Status</h3>
       <div class="status-info">
-        <p><strong>Originally Completed:</strong> ${completedDate}</p>
-        ${lastModified ? '<p><strong>Last Updated:</strong> ' + lastModified + '</p>' : ''}
-        <p><strong>Version:</strong> ${version}</p>
+        <p><strong>Originally Completed:</strong> ` + completedDate + `</p>
+        ` + (lastModified ? '<p><strong>Last Updated:</strong> ' + lastModified + '</p>' : '') + `
+        <p><strong>Version:</strong> ` + version + `</p>
         <p><strong>Tool:</strong> Orientation Assessment</p>
       </div>
     </div>
     
     <div class="actions">
-      <a href="${baseUrl}?route=tool&client=${clientId}&action=view" class="action-card">
+      <a href="` + baseUrl + `?route=tool&client=` + clientId + `&action=view" class="action-card">
         <h4><span class="icon">📊</span> View Your Report</h4>
         <p>See your assessment results and download your PDF report</p>
       </a>
       
-      <a href="${baseUrl}?route=tool&client=${clientId}&action=edit" class="action-card">
+      <a href="` + baseUrl + `?route=tool&client=` + clientId + `&action=edit" class="action-card">
         <h4><span class="icon">✏️</span> Update Your Answers</h4>
-        <p>Modify your existing responses (creates version ${version + 1})</p>
+        <p>Modify your existing responses (creates version ` + (version + 1) + `)</p>
       </a>
       
-      <a href="${baseUrl}?route=tool&client=${clientId}&action=new" class="action-card">
+      <a href="` + baseUrl + `?route=tool&client=` + clientId + `&action=new" class="action-card">
         <h4><span class="icon">🔄</span> Start Fresh</h4>
         <p>Begin a completely new assessment (keeps previous as separate attempt)</p>
       </a>
@@ -704,8 +704,8 @@ function handleAdminRoute(adminKey) {
           
           <div class="section">
             <h3>Quick Links</h3>
-            <a href="${baseUrl}" class="btn">Login Page</a>
-            <a href="${baseUrl}?route=dashboard&client=TEST-001&session=test" class="btn">
+            <a href="` + baseUrl + `" class="btn">Login Page</a>
+            <a href="` + baseUrl + `?route=dashboard&client=TEST-001&session=test" class="btn">
               Test Dashboard
             </a>
           </div>
