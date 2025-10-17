@@ -503,12 +503,14 @@ function createWelcomeBackPage(clientId, toolId, completion) {
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome Back - Financial TruPath V2.0</title>
+  <title>Welcome Back - TruPath Financial V2.0</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Radley:wght@400&family=Rubik:wght@300;400;500;600;700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Rubik', Arial, sans-serif;
+      background: linear-gradient(135deg, #4b4166, #1e192b);
+      background-attachment: fixed;
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -516,9 +518,11 @@ function createWelcomeBackPage(clientId, toolId, completion) {
       padding: 20px;
     }
     .welcome-container {
-      background: white;
+      background: rgba(20, 15, 35, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(173, 145, 104, 0.2);
       border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
       width: 100%;
       max-width: 600px;
       padding: 40px;
@@ -528,27 +532,30 @@ function createWelcomeBackPage(clientId, toolId, completion) {
       margin-bottom: 30px;
     }
     .header h1 {
-      color: #333;
+      font-family: 'Radley', serif;
+      color: #ad9168;
       font-size: 28px;
       margin-bottom: 10px;
+      font-weight: 400;
     }
     .status-box {
-      background: #f0f9ff;
-      border-left: 4px solid #3b82f6;
+      background: rgba(173, 145, 104, 0.1);
+      border-left: 4px solid #ad9168;
       padding: 20px;
       border-radius: 8px;
       margin-bottom: 30px;
     }
     .status-box h3 {
-      color: #1e40af;
+      font-family: 'Radley', serif;
+      color: #ad9168;
       margin-bottom: 10px;
     }
     .status-info {
-      color: #64748b;
+      color: #94a3b8;
       line-height: 1.6;
     }
     .status-info strong {
-      color: #334155;
+      color: #ffffff;
     }
     .actions {
       display: flex;
@@ -556,7 +563,8 @@ function createWelcomeBackPage(clientId, toolId, completion) {
       gap: 15px;
     }
     .action-card {
-      border: 2px solid #e2e8f0;
+      border: 2px solid rgba(173, 145, 104, 0.2);
+      background: rgba(173, 145, 104, 0.05);
       border-radius: 12px;
       padding: 20px;
       cursor: pointer;
@@ -566,40 +574,41 @@ function createWelcomeBackPage(clientId, toolId, completion) {
       display: block;
     }
     .action-card:hover {
-      border-color: #667eea;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+      border-color: #ad9168;
+      background: rgba(173, 145, 104, 0.1);
+      box-shadow: 0 4px 12px rgba(173, 145, 104, 0.25);
       transform: translateY(-2px);
     }
     .action-card h4 {
-      color: #1e293b;
+      color: #ffffff;
       margin-bottom: 8px;
       display: flex;
       align-items: center;
       gap: 10px;
     }
     .action-card p {
-      color: #64748b;
+      color: #94a3b8;
       font-size: 14px;
     }
     .icon {
       font-size: 24px;
     }
     .note {
-      background: #fef3c7;
-      border-left: 4px solid #f59e0b;
+      background: rgba(173, 145, 104, 0.1);
+      border-left: 4px solid #ad9168;
       padding: 15px;
       border-radius: 8px;
       margin-top: 20px;
       font-size: 14px;
-      color: #92400e;
+      color: #94a3b8;
     }
   </style>
 </head>
 <body>
   <div class="welcome-container">
     <div class="header">
-      <h1>Welcome Back!</h1>
-      <p style="color: #64748b;">You've already completed this assessment</p>
+      <h1>TruPath Financial</h1>
+      <p style="color: #94a3b8;">Welcome Back - You've already completed this assessment</p>
     </div>
     
     <div class="status-box">
@@ -613,17 +622,17 @@ function createWelcomeBackPage(clientId, toolId, completion) {
     </div>
     
     <div class="actions">
-      <a href="` + baseUrl + `?route=tool&client=` + clientId + `&action=view" class="action-card">
+      <a href="` + baseUrl + `?route=tool&tool=` + toolId + `&client=` + clientId + `&action=view" class="action-card">
         <h4><span class="icon">📊</span> View Your Report</h4>
         <p>See your assessment results and download your PDF report</p>
       </a>
       
-      <a href="` + baseUrl + `?route=tool&client=` + clientId + `&action=edit" class="action-card">
+      <a href="` + baseUrl + `?route=tool&tool=` + toolId + `&client=` + clientId + `&action=edit" class="action-card">
         <h4><span class="icon">✏️</span> Update Your Answers</h4>
         <p>Modify your existing responses (creates version ` + (version + 1) + `)</p>
       </a>
       
-      <a href="` + baseUrl + `?route=tool&client=` + clientId + `&action=new" class="action-card">
+      <a href="` + baseUrl + `?route=tool&tool=` + toolId + `&client=` + clientId + `&action=new" class="action-card">
         <h4><span class="icon">🔄</span> Start Fresh</h4>
         <p>Begin a completely new assessment (keeps previous as separate attempt)</p>
       </a>
