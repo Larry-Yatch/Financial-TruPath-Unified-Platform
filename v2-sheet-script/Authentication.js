@@ -103,13 +103,25 @@ function lookupClientById(clientId) {
         const lastName = String(sheet.getRange(row, ROSTER.COLUMNS.LAST_NAME).getValue() || '').trim();
         const email = String(sheet.getRange(row, ROSTER.COLUMNS.EMAIL).getValue() || '').trim();
         
+        // Check if returning student (has completed any tools)
+        let hasCompletedTools = false;
+        try {
+          const profile = DataHub.getUnifiedProfile(idNorm);
+          if (profile && profile.metadata && profile.metadata.completedTools) {
+            hasCompletedTools = profile.metadata.completedTools.length > 0;
+          }
+        } catch (e) {
+          console.log('Could not check tool completion status:', e);
+        }
+        
         return {
           success: true,
           clientId: idNorm,
           firstName: firstName,
           lastName: lastName,
           email: email,
-          fullName: `${firstName} ${lastName}`
+          fullName: `${firstName} ${lastName}`,
+          hasCompletedTools: hasCompletedTools
         };
       }
     }
