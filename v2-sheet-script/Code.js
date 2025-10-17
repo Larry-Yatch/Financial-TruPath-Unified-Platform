@@ -15,15 +15,23 @@ function doGet(e) {
     const clientId = e.parameter.client;
     const action = e.parameter.action; // view, edit, or new
     
-    // For now, show the login page or the tool based on route
+    // Handle dashboard route
+    if (route === 'dashboard') {
+      if (!clientId) {
+        return createLoginPage(); // Redirect to login if no client ID
+      }
+      return createDashboardPage(clientId);
+    }
+    
+    // Handle tool route
     if (route === 'tool' || route === 'orientation') {
       const toolId = e.parameter.tool || 'orientation';
       
-      // Check if student has existing data
+      // Check if student has existing data ONLY when no action is specified
       if (clientId && !action) {
         const completion = DataHub.checkToolCompletion(clientId, toolId);
         if (completion.completed) {
-          // Show welcome back screen
+          // Show welcome back screen for THIS specific tool
           return createWelcomeBackPage(clientId, toolId, completion);
         }
       }
@@ -43,7 +51,7 @@ function doGet(e) {
         .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
     }
     
-    // Default: Show login page (inline HTML)
+    // Default: Show login page
     return createLoginPage();
     
   } catch (error) {
@@ -220,8 +228,8 @@ function createLoginPage() {
       google.script.run
         .withSuccessHandler(function(result) {
           if (result.success) {
-            // Redirect to Tool 1
-            window.location.href = '${ScriptApp.getService().getUrl()}?route=tool&client=' + 
+            // Redirect to Dashboard (not directly to tool)
+            window.location.href = '${ScriptApp.getService().getUrl()}?route=dashboard&client=' + 
               encodeURIComponent(result.clientId);
             showAlert('Login successful!', 'success');
           } else {
@@ -237,6 +245,209 @@ function createLoginPage() {
           console.error(error);
         })
         .lookupClientById(clientId);
+    }
+  </script>
+</body>
+</html>
+  `;
+  
+  return HtmlService.createHtmlOutput(html)
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+/**
+ * Create dashboard page showing all available tools
+ */
+function createDashboardPage(clientId) {
+  // Get user's completion status for all tools
+  const tools = [
+    { id: 'orientation', name: 'Tool 1: Orientation Assessment', week: 1, available: true },
+    { id: 'financial-clarity', name: 'Tool 2: Financial Clarity', week: 2, available: false },
+    { id: 'control-fear', name: 'Tool 3: Control Fear Grounding', week: 3, available: false },
+    { id: 'freedom-framework', name: 'Tool 4: Freedom Framework', week: 4, available: false },
+    { id: 'false-self-view', name: 'Tool 5: False Self View', week: 5, available: false },
+    { id: 'retirement-blueprint', name: 'Tool 6: Retirement Blueprint', week: 6, available: false },
+    { id: 'issues-showing-love', name: 'Tool 7: Issues Showing Love', week: 7, available: false },
+    { id: 'investment-tool', name: 'Tool 8: Investment Tool', week: 8, available: false }
+  ];
+  
+  // Check completion status for each tool
+  const toolStatuses = tools.map(tool => {
+    const completion = DataHub.checkToolCompletion(clientId, tool.id);
+    return {
+      ...tool,
+      completed: completion.completed,
+      completedAt: completion.completedAt,
+      version: completion.version
+    };
+  });
+  
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Financial TruPath V2.0</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .header {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .header h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .header p {
+      color: #666;
+      font-size: 16px;
+    }
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .tool-card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s;
+      position: relative;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .tool-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+    .tool-card.unavailable {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .tool-card.unavailable:hover {
+      transform: none;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .week-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: #667eea;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .week-badge.completed {
+      background: #22c55e;
+    }
+    .tool-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .tool-status {
+      color: #666;
+      font-size: 14px;
+      margin-top: 15px;
+    }
+    .completed-indicator {
+      color: #22c55e;
+      font-weight: 600;
+    }
+    .locked-indicator {
+      color: #999;
+      font-style: italic;
+    }
+    .btn-logout {
+      background: #dc3545;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      float: right;
+    }
+    .btn-logout:hover {
+      background: #c82333;
+    }
+    .progress-bar {
+      background: #e0e0e0;
+      height: 8px;
+      border-radius: 4px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+    .progress-fill {
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      height: 100%;
+      transition: width 0.5s;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <div class="header">
+      <button class="btn-logout" onclick="logout()">Logout</button>
+      <h1>Welcome to Your Dashboard</h1>
+      <p>Student ID: ${clientId}</p>
+      
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: ${(toolStatuses.filter(t => t.completed).length / 8) * 100}%"></div>
+      </div>
+      <p>${toolStatuses.filter(t => t.completed).length} of 8 tools completed</p>
+    </div>
+    
+    <div class="tools-grid">
+      ${toolStatuses.map(tool => {
+        const isClickable = tool.available;
+        const href = isClickable ? 
+          '${ScriptApp.getService().getUrl()}?route=tool&tool=' + tool.id + '&client=' + clientId : 
+          '#';
+        const className = 'tool-card' + (!tool.available ? ' unavailable' : '');
+        const badgeClass = 'week-badge' + (tool.completed ? ' completed' : '');
+        
+        return '<a href="' + href + '" class="' + className + '" ' + 
+          (!isClickable ? 'onclick="event.preventDefault();"' : '') + '>' +
+          '<span class="' + badgeClass + '">Week ' + tool.week + '</span>' +
+          '<div class="tool-name">' + tool.name + '</div>' +
+          '<div class="tool-status">' +
+            (tool.completed ? 
+              '<span class="completed-indicator">✅ Completed' + 
+              (tool.version > 1 ? ' (v' + tool.version + ')' : '') + '</span>' :
+              (tool.available ? 
+                '<span>📝 Ready to start</span>' : 
+                '<span class="locked-indicator">🔒 Coming soon</span>')) +
+          '</div>' +
+        '</a>';
+      }).join('')}
+    </div>
+  </div>
+  
+  <script>
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        window.location.href = '${ScriptApp.getService().getUrl()}';
+      }
     }
   </script>
 </body>
