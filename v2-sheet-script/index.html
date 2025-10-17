@@ -896,7 +896,7 @@
                   Continue to Tool 2
                 </button>
               ` : ''}
-              <button onclick="location.reload()" class="btn-secondary" style="background: var(--card-bg); color: var(--text);">
+              <button onclick="window.location.href = '${window.location.origin}${window.location.pathname}?route=dashboard&client=${userId}'" class="btn-secondary" style="background: var(--card-bg); color: var(--text);">
                 Return to Dashboard
               </button>
             </div>
