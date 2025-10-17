@@ -7,6 +7,56 @@ store_daddy: [what you learned/decided/failed]
 ```
 Check recall_daddy before assuming you need to figure something out.
 
+## When to Suggest MCP Tools
+
+### 🧠 Hey Daddy (store_daddy/recall_daddy)
+
+**SUGGEST store_daddy when:**
+- User solves a tricky problem → "Should we store this solution?"
+- Deployment URL/ID is found working → "Let me store this working URL"
+- Design decision is made → "I'll save this branding decision"
+- Authentication flow is established → "Storing this auth pattern"
+- Data structure is finalized → "Let me remember this structure"
+
+**SUGGEST recall_daddy when:**
+- Start of new session → "Let me check what we stored last time"
+- User asks "where were we?" → "Let me recall our previous work"
+- Before reimplementing something → "Let me check if we solved this before"
+- User mentions previous session → "Let me recall that context"
+
+**Example prompts to user:**
+- "This worked! Should I store this deployment URL for next time?"
+- "Let me check recall_daddy for any previous decisions about [topic]"
+- "I'll store this solution so we don't lose it between sessions"
+
+### 🤔 Ken You Think
+
+**SUGGEST when:**
+- Architecture decision with multiple approaches
+- User says "think through this carefully"
+- Complex algorithm design needed
+- Trade-offs need systematic evaluation
+- User seems stuck between options
+
+**Example prompts to user:**
+- "This needs careful thinking. Should I use Ken You Think to explore the options?"
+- "Let me think through the branches of this decision systematically"
+- "This is complex - I'll use the thinking tool to map out approaches"
+
+### ✅ TodoWrite Tool
+
+**AUTOMATICALLY use when:**
+- User lists multiple tasks
+- Starting work on feature with multiple steps
+- User says "we need to..."
+- Session has clear goals
+- More than 3 things to track
+
+**Example usage:**
+- "I'll create a todo list to track these tasks"
+- "Let me update our progress on the todo list"
+- "Adding this new issue to our todos"
+
 ## Delegate, Don't Hero
 
 **STOP trying to do everything yourself.**
