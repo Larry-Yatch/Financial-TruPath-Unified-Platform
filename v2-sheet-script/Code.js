@@ -80,12 +80,13 @@ function createLoginPage() {
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Financial TruPath V2.0 - Login</title>
+  <title>TruPath Financial V2.0 - Login</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Radley:wght@400&family=Rubik:wght@300;400;500;600;700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Rubik', Arial, sans-serif;
+      background: linear-gradient(135deg, #4b4166, #1e192b);
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -105,10 +106,12 @@ function createLoginPage() {
       margin-bottom: 30px;
     }
     .logo h1 {
-      color: #AD9168;
+      font-family: 'Radley', serif;
+      color: #ad9168;
       font-size: 28px;
       letter-spacing: 2px;
       margin-bottom: 10px;
+      font-weight: 400;
     }
     .logo p {
       color: #666;
@@ -185,8 +188,8 @@ function createLoginPage() {
 <body>
   <div class="login-container">
     <div class="logo">
-      <h1>FINANCIAL TRUPATH</h1>
-      <p>Version 2.0 - Student Portal</p>
+      <h1>TruPath Financial</h1>
+      <p>Investment Planning Platform V2.0</p>
     </div>
     
     <div id="alertBox" class="alert"></div>
@@ -300,12 +303,13 @@ function createDashboardPage(clientId) {
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Financial TruPath V2.0</title>
+  <title>Dashboard - TruPath Financial V2.0</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Radley:wght@400&family=Rubik:wght@300;400;500;600;700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      font-family: 'Rubik', Arial, sans-serif;
+      background: linear-gradient(135deg, #4b4166, #1e192b);
       min-height: 100vh;
       padding: 20px;
     }
@@ -314,25 +318,29 @@ function createDashboardPage(clientId) {
       margin: 0 auto;
     }
     .header {
-      background: white;
+      background: rgba(20, 15, 35, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(173, 145, 104, 0.2);
       border-radius: 15px;
       padding: 30px;
       margin-bottom: 30px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
     }
     .header h1 {
-      color: #AD9168;
+      font-family: 'Radley', serif;
+      color: #ad9168;
       font-size: 32px;
       letter-spacing: 2px;
       margin-bottom: 5px;
+      font-weight: 400;
     }
     .header .subtitle {
-      color: #666;
+      color: #94a3b8;
       font-size: 14px;
       margin-bottom: 20px;
     }
     .header p {
-      color: #666;
+      color: #94a3b8;
       font-size: 16px;
     }
     .tools-grid {
@@ -341,10 +349,12 @@ function createDashboardPage(clientId) {
       gap: 20px;
     }
     .tool-card {
-      background: white;
+      background: rgba(20, 15, 35, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(173, 145, 104, 0.2);
       border-radius: 12px;
       padding: 25px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
       transition: all 0.3s;
       position: relative;
       cursor: pointer;
@@ -381,11 +391,11 @@ function createDashboardPage(clientId) {
     .tool-name {
       font-size: 18px;
       font-weight: 600;
-      color: #333;
+      color: #ffffff;
       margin-bottom: 10px;
     }
     .tool-status {
-      color: #666;
+      color: #94a3b8;
       font-size: 14px;
       margin-top: 15px;
     }
@@ -428,8 +438,8 @@ function createDashboardPage(clientId) {
   <div class="dashboard-container">
     <div class="header">
       <button class="btn-logout" onclick="logout()">Logout</button>
-      <h1>FINANCIAL TRUPATH</h1>
-      <p class="subtitle">Version 2.0 - Progressive Life Planning System</p>
+      <h1>TruPath Financial</h1>
+      <p class="subtitle">Investment Planning Platform V2.0</p>
       <p>Student ID: ` + clientId + `</p>
       
       <div class="progress-bar">
@@ -638,29 +648,32 @@ function createReportView(clientId, toolId, data) {
   const baseUrl = ScriptApp.getService().getUrl();
   
   // Calculate insights from data
-  const insights = DataHub.generateInsights(data);
-  const scoreData = insights.scoreData || {};
+  const insights = Middleware.generateInsights(data);
+  const scoreData = insights && insights.scoreData ? insights.scoreData : {};
   
   const html = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Assessment Report - Financial TruPath V2.0</title>
+  <title>Assessment Report - TruPath Financial V2.0</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Radley:wght@400&family=Rubik:wght@300;400;500;600;700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      font-family: 'Rubik', Arial, sans-serif;
+      background: linear-gradient(135deg, #4b4166, #1e192b);
       min-height: 100vh;
       padding: 20px;
     }
     .report-container {
       max-width: 900px;
       margin: 0 auto;
-      background: white;
+      background: rgba(20, 15, 35, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(173, 145, 104, 0.2);
       border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
       padding: 40px;
     }
     .header {
@@ -670,13 +683,15 @@ function createReportView(clientId, toolId, data) {
       padding-bottom: 30px;
     }
     .header h1 {
-      color: #AD9168;
+      font-family: 'Radley', serif;
+      color: #ad9168;
       font-size: 36px;
       letter-spacing: 2px;
       margin-bottom: 10px;
+      font-weight: 400;
     }
     .header .subtitle {
-      color: #666;
+      color: #94a3b8;
       font-size: 14px;
       margin-bottom: 20px;
     }
@@ -701,10 +716,11 @@ function createReportView(clientId, toolId, data) {
       margin: 30px 0;
     }
     .data-section h3 {
-      color: #333;
+      color: #ad9168;
+      font-family: 'Radley', serif;
       margin-bottom: 20px;
       padding-bottom: 10px;
-      border-bottom: 2px solid #e0e0e0;
+      border-bottom: 2px solid rgba(173, 145, 104, 0.2);
     }
     .data-row {
       display: flex;
@@ -713,11 +729,11 @@ function createReportView(clientId, toolId, data) {
       border-bottom: 1px solid #f0f0f0;
     }
     .data-label {
-      color: #666;
+      color: #94a3b8;
       font-weight: 500;
     }
     .data-value {
-      color: #333;
+      color: #ffffff;
       text-align: right;
     }
     .actions {
@@ -764,10 +780,10 @@ function createReportView(clientId, toolId, data) {
 <body>
   <div class="report-container">
     <div class="header">
-      <h1>FINANCIAL TRUPATH</h1>
-      <p class="subtitle">Version 2.0 - Progressive Life Planning System</p>
-      <h2>Orientation Assessment Report</h2>
-      <p>Student ID: ` + clientId + `</p>
+      <h1>TruPath Financial</h1>
+      <p class="subtitle">Investment Planning Platform V2.0</p>
+      <h2 style="color: #ffffff; font-family: 'Radley', serif;">Orientation Assessment Report</h2>
+      <p style="color: #94a3b8;">Student ID: ` + clientId + `</p>
     </div>
     
     ` + (scoreData.totalScore ? `
