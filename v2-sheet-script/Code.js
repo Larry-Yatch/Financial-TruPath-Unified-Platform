@@ -29,17 +29,25 @@ function doGet(e) {
       
       // Handle action=view to show the report
       if (action === 'view' && clientId) {
-        try {
-          const completion = DataHub.checkToolCompletion(clientId, toolId);
-          if (completion.completed && completion.data) {
-            return createReportView(clientId, toolId, completion.data);
-          } else {
-            return createErrorPage('No completed assessment found for this user.');
-          }
-        } catch (error) {
-          console.error('Error in view action:', error);
-          return createErrorPage('Error loading report: ' + error.toString());
-        }
+        // SIMPLIFIED TEST - just return a basic HTML page
+        const testHtml = `<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Report View</title>
+</head>
+<body style="background: #4b4166; color: white; padding: 40px; font-family: Arial;">
+  <h1>Simple Test Page</h1>
+  <p>If you can see this, the routing is working!</p>
+  <p>Client ID: ${clientId}</p>
+  <p>Tool ID: ${toolId}</p>
+  <p>Action: ${action}</p>
+  <hr>
+  <p>The issue is in the createReportView function or data loading.</p>
+  <a href="${ScriptApp.getService().getUrl()}?route=dashboard&client=${clientId}" style="color: #ad9168;">Back to Dashboard</a>
+</body>
+</html>`;
+        return HtmlService.createHtmlOutput(testHtml)
+          .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
       }
       
       // Check if student has existing data ONLY when no action is specified
