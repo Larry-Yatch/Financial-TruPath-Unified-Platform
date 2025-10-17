@@ -888,7 +888,7 @@
             
             <!-- Next Steps -->
             <div style="text-align: center; margin-top: 30px;">
-              <button onclick="downloadReport(event)" class="btn" style="margin-right: 10px; background: linear-gradient(135deg, #AD9168 0%, #8B7355 100%);">
+              <button onclick="downloadReport(event)" class="btn" style="margin-right: 10px; background: linear-gradient(135deg, #AD9168 0%, #8B7355 100%); color: #1e1933 !important;">
                 📥 Download Report (PDF)
               </button>
               ${currentWeek >= 2 ? `
@@ -925,19 +925,26 @@
         google.script.run
           .withSuccessHandler(function(result) {
             if (result.success) {
-              // Create a temporary link to download the PDF
+              // Convert base64 to blob
+              const byteCharacters = atob(result.base64);
+              const byteNumbers = new Array(byteCharacters.length);
+              for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+              }
+              const byteArray = new Uint8Array(byteNumbers);
+              const blob = new Blob([byteArray], {type: result.mimeType});
+              
+              // Create download link
+              const url = window.URL.createObjectURL(blob);
               const a = document.createElement('a');
-              a.href = result.downloadUrl;
+              a.href = url;
               a.download = result.fileName;
-              a.target = '_blank';
               document.body.appendChild(a);
               a.click();
-              document.body.removeChild(a);
               
-              // Clean up the temporary file after a delay
-              setTimeout(() => {
-                google.script.run.deleteTempFile(result.fileId);
-              }, 5000);
+              // Clean up
+              document.body.removeChild(a);
+              window.URL.revokeObjectURL(url);
               
               console.log('PDF downloaded successfully');
             } else {

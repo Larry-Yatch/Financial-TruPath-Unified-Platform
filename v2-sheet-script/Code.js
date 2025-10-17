@@ -263,7 +263,7 @@ function viewLogs() {
 /**
  * Generate PDF report for user
  * @param {Object} reportData - The report data from the assessment
- * @returns {Object} PDF file details
+ * @returns {Object} Base64 encoded PDF
  */
 function generatePDFReport(reportData) {
   try {
@@ -496,21 +496,18 @@ function generatePDFReport(reportData) {
     const blob = Utilities.newBlob(htmlContent, 'text/html', 'report.html');
     
     // Convert HTML to PDF
-    const pdf = blob.getAs('application/pdf').setName(`FinancialTruPath_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+    const pdf = blob.getAs('application/pdf');
     
-    // Create temporary file in Drive
-    const file = DriveApp.createFile(pdf);
+    // Convert to base64 for client-side download
+    const base64 = Utilities.base64Encode(pdf.getBytes());
+    const fileName = `FinancialTruPath_Report_${new Date().toISOString().split('T')[0]}.pdf`;
     
-    // Get download URL
-    const downloadUrl = file.getDownloadUrl();
-    const fileId = file.getId();
-    
-    // Return the URL for download (file will be deleted after download)
+    // Return base64 encoded PDF
     return {
       success: true,
-      downloadUrl: downloadUrl,
-      fileId: fileId,
-      fileName: file.getName()
+      base64: base64,
+      fileName: fileName,
+      mimeType: 'application/pdf'
     };
     
   } catch (error) {
@@ -519,20 +516,6 @@ function generatePDFReport(reportData) {
       success: false,
       error: error.toString()
     };
-  }
-}
-
-/**
- * Delete temporary PDF file after download
- * @param {string} fileId - The file ID to delete
- */
-function deleteTempFile(fileId) {
-  try {
-    DriveApp.getFileById(fileId).setTrashed(true);
-    return { success: true };
-  } catch (error) {
-    console.error('Error deleting temp file:', error);
-    return { success: false };
   }
 }
 
