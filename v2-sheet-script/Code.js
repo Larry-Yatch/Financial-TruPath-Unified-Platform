@@ -299,7 +299,10 @@ function getAvailableTools() {
 function onOpen() {
   const ui = SpreadsheetApp.getUi();
   ui.createMenu('Financial TruPath V2.0')
-    .addItem('Initialize Platform', 'initializePlatform')
+    .addItem('🚀 Initialize Platform', 'initializePlatform')
+    .addItem('✅ Verify Complete Setup', 'verifyCompleteSetup')
+    .addItem('🔍 Quick Diagnostic', 'quickDiagnostic')
+    .addSeparator()
     .addItem('Create Data Sheets', 'createDataSheets')
     .addSeparator()
     .addSubMenu(ui.createMenu('🔐 Authentication')
@@ -347,6 +350,11 @@ function testAuthenticationSystem() {
   };
   
   try {
+    // First verify Authentication.js is loaded
+    if (typeof getRosterSheet !== 'function') {
+      throw new Error('Authentication.js not loaded. Please refresh the spreadsheet.');
+    }
+    
     // Test 1: Check if roster sheet is accessible
     const sheet = getRosterSheet();
     results.tests.rosterAccess = {
@@ -362,7 +370,9 @@ function testAuthenticationSystem() {
     
     // Test 3: Try to get a sample Client ID
     if (sheet && sheet.getLastRow() > 1) {
-      const sampleId = sheet.getRange(2, ROSTER.COLUMNS.CLIENT_ID).getValue();
+      // Use column 7 (G) directly if ROSTER isn't available
+      const clientIdColumn = typeof ROSTER !== 'undefined' ? ROSTER.COLUMNS.CLIENT_ID : 7;
+      const sampleId = sheet.getRange(2, clientIdColumn).getValue();
       results.tests.sampleId = sampleId || 'No Client ID found';
       
       // Test 4: Try lookup if we have a sample
@@ -445,14 +455,18 @@ function getSampleClientIds() {
     
     // Get first 5 Client IDs
     const numRows = Math.min(5, sheet.getLastRow() - 1);
-    const data = sheet.getRange(2, ROSTER.COLUMNS.FIRST_NAME, numRows, 
-      ROSTER.COLUMNS.CLIENT_ID - ROSTER.COLUMNS.FIRST_NAME + 1).getValues();
+    // Use hardcoded columns if ROSTER isn't available: First=3(C), Last=4(D), ClientID=7(G)
+    const firstNameCol = typeof ROSTER !== 'undefined' ? ROSTER.COLUMNS.FIRST_NAME : 3;
+    const clientIdCol = typeof ROSTER !== 'undefined' ? ROSTER.COLUMNS.CLIENT_ID : 7;
+    const columnsToGet = clientIdCol - firstNameCol + 1;
+    
+    const data = sheet.getRange(2, firstNameCol, numRows, columnsToGet).getValues();
     
     let message = 'Sample Client IDs from Roster:\n\n';
     for (let i = 0; i < data.length; i++) {
-      const firstName = data[i][0];
-      const lastName = data[i][1];
-      const clientId = data[i][ROSTER.COLUMNS.CLIENT_ID - ROSTER.COLUMNS.FIRST_NAME];
+      const firstName = data[i][0];  // First column in range
+      const lastName = data[i][1];   // Second column in range
+      const clientId = data[i][clientIdCol - firstNameCol];  // Adjusted index
       if (clientId) {
         message += `${i + 1}. ${clientId} - ${firstName} ${lastName}\n`;
       }
