@@ -324,6 +324,185 @@ function onOpen() {
 }
 
 /**
+ * Import test authentication functions (make them available globally)
+ * Note: In Google Apps Script, all .gs/.js files share the same global scope
+ * but we need to ensure the functions are defined
+ */
+
+/**
+ * Test authentication system - wrapper function
+ */
+function runAllAuthTests() {
+  // This function is defined in TestAuthentication.js
+  // If it's not loading, we'll provide a fallback here
+  try {
+    if (typeof TestAuthentication !== 'undefined' && TestAuthentication.runAllAuthTests) {
+      return TestAuthentication.runAllAuthTests();
+    }
+    // Fallback: Run basic test
+    return testAuthenticationSystem();
+  } catch (error) {
+    SpreadsheetApp.getUi().alert('Error', 'Authentication test error: ' + error.toString(), SpreadsheetApp.getUi().ButtonSet.OK);
+  }
+}
+
+/**
+ * Basic authentication system test
+ */
+function testAuthenticationSystem() {
+  const results = {
+    timestamp: new Date(),
+    tests: {}
+  };
+  
+  try {
+    // Test 1: Check if roster sheet is accessible
+    const sheet = getRosterSheet();
+    results.tests.rosterAccess = {
+      success: !!sheet,
+      sheetName: sheet ? sheet.getName() : 'Not found'
+    };
+    
+    // Test 2: Check column headers if sheet exists
+    if (sheet && sheet.getLastRow() > 0) {
+      const headers = sheet.getRange(1, 1, 1, Math.min(10, sheet.getLastColumn())).getValues()[0];
+      results.tests.headers = headers;
+    }
+    
+    // Test 3: Try to get a sample Client ID
+    if (sheet && sheet.getLastRow() > 1) {
+      const sampleId = sheet.getRange(2, ROSTER.COLUMNS.CLIENT_ID).getValue();
+      results.tests.sampleId = sampleId || 'No Client ID found';
+      
+      // Test 4: Try lookup if we have a sample
+      if (sampleId) {
+        results.tests.lookupTest = lookupClientById(sampleId);
+      }
+    }
+    
+    // Show results
+    const ui = SpreadsheetApp.getUi();
+    let summary = 'Authentication Test Results:\n\n';
+    summary += `✓ Roster Access: ${results.tests.rosterAccess.success ? 'Connected' : 'Failed'}\n`;
+    summary += `✓ Sheet Name: ${results.tests.rosterAccess.sheetName}\n`;
+    if (results.tests.headers) {
+      summary += `✓ Headers Found: ${results.tests.headers.length} columns\n`;
+    }
+    if (results.tests.sampleId) {
+      summary += `✓ Sample Client ID: ${results.tests.sampleId}\n`;
+    }
+    if (results.tests.lookupTest) {
+      summary += `✓ Lookup Test: ${results.tests.lookupTest.success ? 'Success' : 'Failed'}\n`;
+      if (results.tests.lookupTest.success) {
+        summary += `  - Name: ${results.tests.lookupTest.firstName} ${results.tests.lookupTest.lastName}\n`;
+      }
+    }
+    
+    ui.alert('Authentication System Test', summary, ui.ButtonSet.OK);
+    return results;
+    
+  } catch (error) {
+    SpreadsheetApp.getUi().alert('Test Error', error.toString(), SpreadsheetApp.getUi().ButtonSet.OK);
+    return { error: error.toString() };
+  }
+}
+
+/**
+ * Test roster connection specifically
+ */
+function testRosterConnection() {
+  try {
+    const sheet = getRosterSheet();
+    if (sheet) {
+      const info = {
+        name: sheet.getName(),
+        rows: sheet.getLastRow(),
+        columns: sheet.getLastColumn(),
+        id: sheet.getSheetId()
+      };
+      
+      SpreadsheetApp.getUi().alert(
+        'Roster Connection Test',
+        `✅ Successfully connected to roster!\n\nSheet: ${info.name}\nRows: ${info.rows}\nColumns: ${info.columns}\nGID: ${info.id}`,
+        SpreadsheetApp.getUi().ButtonSet.OK
+      );
+      
+      return { success: true, info: info };
+    } else {
+      throw new Error('Could not access roster sheet');
+    }
+  } catch (error) {
+    SpreadsheetApp.getUi().alert(
+      'Roster Connection Failed',
+      `❌ ${error.toString()}\n\nCheck Authentication.js configuration`,
+      SpreadsheetApp.getUi().ButtonSet.OK
+    );
+    return { success: false, error: error.toString() };
+  }
+}
+
+/**
+ * Get sample Client IDs from roster
+ */
+function getSampleClientIds() {
+  try {
+    const sheet = getRosterSheet();
+    if (!sheet || sheet.getLastRow() < 2) {
+      SpreadsheetApp.getUi().alert('No Data', 'No client data found in roster', SpreadsheetApp.getUi().ButtonSet.OK);
+      return;
+    }
+    
+    // Get first 5 Client IDs
+    const numRows = Math.min(5, sheet.getLastRow() - 1);
+    const data = sheet.getRange(2, ROSTER.COLUMNS.FIRST_NAME, numRows, 
+      ROSTER.COLUMNS.CLIENT_ID - ROSTER.COLUMNS.FIRST_NAME + 1).getValues();
+    
+    let message = 'Sample Client IDs from Roster:\n\n';
+    for (let i = 0; i < data.length; i++) {
+      const firstName = data[i][0];
+      const lastName = data[i][1];
+      const clientId = data[i][ROSTER.COLUMNS.CLIENT_ID - ROSTER.COLUMNS.FIRST_NAME];
+      if (clientId) {
+        message += `${i + 1}. ${clientId} - ${firstName} ${lastName}\n`;
+      }
+    }
+    
+    SpreadsheetApp.getUi().alert('Sample Client IDs', message, SpreadsheetApp.getUi().ButtonSet.OK);
+    
+  } catch (error) {
+    SpreadsheetApp.getUi().alert('Error', error.toString(), SpreadsheetApp.getUi().ButtonSet.OK);
+  }
+}
+
+/**
+ * Test session creation
+ */
+function testSessionCreation() {
+  try {
+    const mockClient = {
+      clientId: 'TEST-' + Math.floor(Math.random() * 1000),
+      firstName: 'Test',
+      lastName: 'User',
+      email: 'test@example.com'
+    };
+    
+    const session = createUserSession(mockClient);
+    const isValid = verifySession(session.sessionId, session.clientId);
+    
+    const message = `Session Creation Test:\n\n` +
+      `Client ID: ${session.clientId}\n` +
+      `Session ID: ${session.sessionId}\n` +
+      `Created: ${session.loginTime}\n` +
+      `Valid: ${isValid ? '✅ Yes' : '❌ No'}`;
+    
+    SpreadsheetApp.getUi().alert('Session Test', message, SpreadsheetApp.getUi().ButtonSet.OK);
+    
+  } catch (error) {
+    SpreadsheetApp.getUi().alert('Error', error.toString(), SpreadsheetApp.getUi().ButtonSet.OK);
+  }
+}
+
+/**
  * Open Admin Panel in browser
  */
 function openAdminPanel() {
