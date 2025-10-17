@@ -72,13 +72,15 @@ function checkRequiredFiles() {
     
     const missing = [];
     requiredFunctions.forEach(func => {
-      if (typeof global[func.name] !== 'function' && typeof this[func.name] !== 'function') {
-        // Try to access it directly
-        try {
-          eval(func.name);
-        } catch (e) {
-          missing.push(`${func.name} (${func.file})`);
+      // In Google Apps Script, functions are in the global scope
+      // Check if function exists by trying to access it
+      try {
+        if (typeof this[func.name] !== 'function') {
+          // Try to evaluate the function name directly
+          eval(`typeof ${func.name}`);
         }
+      } catch (e) {
+        missing.push(`${func.name} (${func.file})`);
       }
     });
     

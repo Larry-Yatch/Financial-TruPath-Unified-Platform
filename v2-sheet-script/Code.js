@@ -4,7 +4,7 @@
  */
 
 /**
- * Main router for web application
+ * Main entry point for web application
  * @param {Object} e - Event object with parameters
  * @returns {HtmlOutput} The appropriate HTML page
  */
@@ -12,36 +12,224 @@ function doGet(e) {
   try {
     // Get route from URL parameters
     const route = e.parameter.route || 'login';
-    const toolId = e.parameter.tool;
-    const clientId = e.parameter.client;
-    const sessionId = e.parameter.session;
     
-    // Route to appropriate handler
-    switch(route) {
-      case 'login':
-        return handleLoginRoute();
-        
-      case 'dashboard':
-        return handleDashboardRoute(clientId, sessionId);
-        
-      case 'tool':
-        return handleToolRoute(toolId, clientId, sessionId);
-        
-      case 'report':
-        return handleReportRoute(clientId, sessionId);
-        
-      case 'admin':
-        return handleAdminRoute(e.parameter.key);
-        
-      default:
-        // Default to login for unknown routes
-        return handleLoginRoute();
+    // For now, show the login page or the tool based on route
+    if (route === 'tool' || route === 'orientation') {
+      // Show Tool 1 (existing index.html)
+      const template = HtmlService.createTemplateFromFile('index');
+      template.userId = e.parameter.client || 'USER_' + Utilities.getUuid();
+      template.sessionId = e.parameter.session || Utilities.getUuid();
+      template.currentWeek = getCurrentWeek();
+      template.config = CONFIG;
+      
+      return template.evaluate()
+        .setTitle('Financial TruPath V2.0 - Orientation Assessment')
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+        .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
     }
+    
+    // Default: Show login page (inline HTML)
+    return createLoginPage();
     
   } catch (error) {
     console.error('Router error:', error);
     return createErrorPage(error.toString());
   }
+}
+
+/**
+ * Create login page
+ */
+function createLoginPage() {
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Financial TruPath V2.0 - Login</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .login-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 450px;
+      padding: 40px;
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .logo h1 {
+      color: #AD9168;
+      font-size: 28px;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+    .logo p {
+      color: #666;
+      font-size: 14px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      color: #333;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+    }
+    .alert {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .alert.error {
+      background: #fee;
+      color: #c33;
+      border: 1px solid #fcc;
+    }
+    .alert.success {
+      background: #efe;
+      color: #3c3;
+      border: 1px solid #cfc;
+    }
+    .test-info {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f0f0f0;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #666;
+    }
+    #loadingSpinner {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo">
+      <h1>FINANCIAL TRUPATH</h1>
+      <p>Version 2.0 - Student Portal</p>
+    </div>
+    
+    <div id="alertBox" class="alert"></div>
+    
+    <form id="loginForm" onsubmit="handleLogin(event); return false;">
+      <div class="form-group">
+        <label for="clientId">Enter Your Student ID</label>
+        <input type="text" id="clientId" name="clientId" required 
+               placeholder="Enter your Student ID" autocomplete="off">
+      </div>
+      <button type="submit" class="btn-primary">Sign In</button>
+    </form>
+    
+    <div id="loadingSpinner">
+      <p>Verifying...</p>
+    </div>
+    
+    <div class="test-info">
+      <strong>Test Mode:</strong><br>
+      To test, click "Get Sample Client IDs" from the spreadsheet menu to get valid IDs.<br><br>
+      Or go directly to Tool 1:<br>
+      <a href="${ScriptApp.getService().getUrl()}?route=tool">Skip Login (Test)</a>
+    </div>
+  </div>
+
+  <script>
+    function showAlert(message, type) {
+      const alertBox = document.getElementById('alertBox');
+      alertBox.textContent = message;
+      alertBox.className = 'alert ' + type;
+      alertBox.style.display = 'block';
+      setTimeout(() => {
+        alertBox.style.display = 'none';
+      }, 5000);
+    }
+    
+    function handleLogin(event) {
+      event.preventDefault();
+      const clientId = document.getElementById('clientId').value.trim();
+      
+      if (!clientId) {
+        showAlert('Please enter your Student ID', 'error');
+        return;
+      }
+      
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('loadingSpinner').style.display = 'block';
+      
+      // Try to authenticate
+      google.script.run
+        .withSuccessHandler(function(result) {
+          if (result.success) {
+            // Redirect to Tool 1
+            window.location.href = '${ScriptApp.getService().getUrl()}?route=tool&client=' + 
+              encodeURIComponent(result.clientId);
+            showAlert('Login successful!', 'success');
+          } else {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('loadingSpinner').style.display = 'none';
+            showAlert(result.error || 'Invalid Student ID', 'error');
+          }
+        })
+        .withFailureHandler(function(error) {
+          document.getElementById('loginForm').style.display = 'block';
+          document.getElementById('loadingSpinner').style.display = 'none';
+          showAlert('System error. Please try again.', 'error');
+          console.error(error);
+        })
+        .lookupClientById(clientId);
+    }
+  </script>
+</body>
+</html>
+  `;
+  
+  return HtmlService.createHtmlOutput(html)
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 /**
@@ -293,38 +481,7 @@ function getAvailableTools() {
   }));
 }
 
-/**
- * Create menu in spreadsheet (for testing/admin)
- */
-function onOpen() {
-  const ui = SpreadsheetApp.getUi();
-  ui.createMenu('Financial TruPath V2.0')
-    .addItem('🚀 Initialize Platform', 'initializePlatform')
-    .addItem('✅ Verify Complete Setup', 'verifyCompleteSetup')
-    .addItem('🔍 Quick Diagnostic', 'quickDiagnostic')
-    .addSeparator()
-    .addItem('Create Data Sheets', 'createDataSheets')
-    .addSeparator()
-    .addSubMenu(ui.createMenu('🔐 Authentication')
-      .addItem('Test Authentication System', 'runAllAuthTests')
-      .addItem('Test Roster Connection', 'testRosterConnection')
-      .addItem('Get Sample Client IDs', 'getSampleClientIds')
-      .addItem('Test Session Management', 'testSessionCreation'))
-    .addSubMenu(ui.createMenu('🧪 Testing')
-      .addItem('Run All Tests', 'runAllTests')
-      .addItem('Validate Before Deploy', 'validateBeforeDeployment')
-      .addItem('Test Data Saving', 'testDataSaving')
-      .addItem('Test Web App', 'testWebApp'))
-    .addSubMenu(ui.createMenu('🔍 Debug')
-      .addItem('System Health Check', 'showSystemHealth')
-      .addItem('Check Common Issues', 'showCommonIssues')
-      .addItem('Clear Test Data', 'clearTestData'))
-    .addSeparator()
-    .addItem('View Logs', 'viewLogs')
-    .addItem('View Tool 1 Data', 'viewTool1Data')
-    .addItem('Open Admin Panel', 'openAdminPanel')
-    .addToUi();
-}
+// Menu moved to SimpleMenu.js to fix loading issues
 
 /**
  * Import test authentication functions (make them available globally)

@@ -25,7 +25,7 @@ const TOOLS_REGISTRY = {
     id: 'orientation',
     name: 'Orientation Assessment',
     week: 1,
-    handler: Tool1_Orientation,
+    handler: null, // Tool1_Orientation - removed reference to avoid error
     available: true,
     description: 'Comprehensive 25-field assessment for financial and mindset profiling'
   },
