@@ -39,35 +39,35 @@ const DataHub = {
   },
   
   /**
-   * Save tool data for a student
+   * Save tool data for a student with versioning support
    * @param {string} userId - Student's unique ID
    * @param {string} toolId - Tool identifier
    * @param {Object} data - Data to save
+   * @param {Object} options - Save options (updateExisting, createNew)
    * @returns {Object} Save result with insights
    */
-  saveToolData(userId, toolId, data) {
+  saveToolData(userId, toolId, data, options = {}) {
+    const sheetName = this.getSheetNameForTool(toolId);
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    let sheetName = '';
-    
-    switch(toolId) {
-      case 'orientation':
-        sheetName = CONFIG.SHEETS.TOOL1_ORIENTATION;
-        break;
-      case 'financial-clarity':
-        sheetName = CONFIG.SHEETS.TOOL2_FINANCIAL_CLARITY;
-        break;
-      default:
-        throw new Error(`Unknown tool: ${toolId}`);
-    }
     
     let sheet = ss.getSheetByName(sheetName);
     if (!sheet) {
       sheet = this.createToolSheet(sheetName, toolId);
     }
     
-    // Add timestamp and user ID
-    data.timestamp = new Date();
-    data.userId = userId;
+    // Check if user has existing data
+    const existingData = this.loadToolData(userId, sheetName);
+    
+    // Handle versioning
+    const versionedData = this.applyVersioning(data, existingData, options);
+    
+    // Archive if updating existing
+    if (existingData && options.updateExisting) {
+      this.archiveToolData(userId, toolId, existingData);
+    }
+    
+    // Add user ID
+    versionedData.userId = userId;
     
     // Calculate scores for orientation data
     if (toolId === 'orientation') {
@@ -373,6 +373,172 @@ const DataHub = {
     sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
     sheet.setFrozenRows(1);
     return sheet;
+  },
+  
+  /**
+   * Get sheet name for a given tool ID
+   * @param {string} toolId - Tool identifier
+   * @returns {string} Sheet name
+   */
+  getSheetNameForTool(toolId) {
+    const toolSheetMap = {
+      'orientation': CONFIG.SHEETS.TOOL1_ORIENTATION,
+      'financial-clarity': CONFIG.SHEETS.TOOL2_FINANCIAL_CLARITY,
+      'control-fear': 'Tool3_ControlFear',
+      'freedom-framework': 'Tool4_FreedomFramework',
+      'false-self-view': 'Tool5_FalseSelfView',
+      'retirement-blueprint': 'Tool6_RetirementBlueprint',
+      'issues-showing-love': 'Tool7_IssuesShowingLove',
+      'investment-tool': 'Tool8_InvestmentTool'
+    };
+    
+    const sheetName = toolSheetMap[toolId];
+    if (!sheetName) {
+      throw new Error(`Unknown tool: ${toolId}`);
+    }
+    return sheetName;
+  },
+  
+  /**
+   * Apply versioning to data
+   * @param {Object} data - New data to save
+   * @param {Object} existingData - Existing data if any
+   * @param {Object} options - Save options
+   * @returns {Object} Versioned data
+   */
+  applyVersioning(data, existingData, options = {}) {
+    const versionedData = {...data};
+    
+    if (existingData && options.updateExisting) {
+      // Updating existing entry
+      versionedData.originalTimestamp = existingData.originalTimestamp || existingData.timestamp;
+      versionedData.lastModified = new Date();
+      versionedData.version = (existingData.version || 1) + 1;
+      versionedData.updateCount = (existingData.updateCount || 0) + 1;
+    } else if (existingData && options.createNew) {
+      // Creating new attempt
+      versionedData.timestamp = new Date();
+      versionedData.originalTimestamp = new Date();
+      versionedData.version = 1;
+      versionedData.attemptNumber = this.getAttemptCount(data.userId, data.toolId) + 1;
+    } else {
+      // First time completion
+      versionedData.timestamp = new Date();
+      versionedData.originalTimestamp = new Date();
+      versionedData.version = 1;
+      versionedData.updateCount = 0;
+    }
+    
+    return versionedData;
+  },
+  
+  /**
+   * Archive tool data to history sheet
+   * @param {string} userId - Student's unique ID
+   * @param {string} toolId - Tool identifier
+   * @param {Object} data - Data to archive
+   */
+  archiveToolData(userId, toolId, data) {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const historySheetName = `${this.getSheetNameForTool(toolId)}_History`;
+    
+    let historySheet = ss.getSheetByName(historySheetName);
+    if (!historySheet) {
+      historySheet = this.createHistorySheet(historySheetName);
+    }
+    
+    // Add archive metadata
+    const archiveData = {
+      ...data,
+      archivedAt: new Date(),
+      archivedReason: 'User updated answers'
+    };
+    
+    // Convert to array for appending
+    const headers = historySheet.getRange(1, 1, 1, historySheet.getLastColumn()).getValues()[0];
+    const row = headers.map(header => {
+      const key = this.headerToKey(header);
+      return archiveData[key] || '';
+    });
+    
+    historySheet.appendRow(row);
+  },
+  
+  /**
+   * Create history sheet for archiving
+   * @param {string} sheetName - Name for the history sheet
+   * @returns {Sheet} The created sheet
+   */
+  createHistorySheet(sheetName) {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.insertSheet(sheetName);
+    
+    // Add standard headers plus archive metadata
+    const headers = [
+      'Archived At', 'Archived Reason', 'User ID', 'Version', 
+      'Original Timestamp', 'Last Modified', 'Update Count'
+    ];
+    
+    // Add tool-specific headers (we'll append them as needed)
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+    
+    return sheet;
+  },
+  
+  /**
+   * Get attempt count for a user and tool
+   * @param {string} userId - Student's unique ID
+   * @param {string} toolId - Tool identifier
+   * @returns {number} Number of attempts
+   */
+  getAttemptCount(userId, toolId) {
+    const sheetName = this.getSheetNameForTool(toolId);
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName(sheetName);
+    
+    if (!sheet || sheet.getLastRow() < 2) return 0;
+    
+    const data = sheet.getDataRange().getValues();
+    const userIdCol = data[0].indexOf('User ID');
+    
+    if (userIdCol === -1) return 0;
+    
+    let count = 0;
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][userIdCol] === userId) {
+        count++;
+      }
+    }
+    
+    return count;
+  },
+  
+  /**
+   * Check if student has completed a tool
+   * @param {string} userId - Student's unique ID
+   * @param {string} toolId - Tool identifier
+   * @returns {Object} Completion status with details
+   */
+  checkToolCompletion(userId, toolId) {
+    const sheetName = this.getSheetNameForTool(toolId);
+    const data = this.loadToolData(userId, sheetName);
+    
+    if (!data) {
+      return {
+        completed: false,
+        data: null
+      };
+    }
+    
+    return {
+      completed: true,
+      completedAt: data.originalTimestamp || data.timestamp,
+      lastModified: data.lastModified,
+      version: data.version || 1,
+      data: data
+    };
   },
   
   /**

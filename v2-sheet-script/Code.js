@@ -12,15 +12,30 @@ function doGet(e) {
   try {
     // Get route from URL parameters
     const route = e.parameter.route || 'login';
+    const clientId = e.parameter.client;
+    const action = e.parameter.action; // view, edit, or new
     
     // For now, show the login page or the tool based on route
     if (route === 'tool' || route === 'orientation') {
+      const toolId = e.parameter.tool || 'orientation';
+      
+      // Check if student has existing data
+      if (clientId && !action) {
+        const completion = DataHub.checkToolCompletion(clientId, toolId);
+        if (completion.completed) {
+          // Show welcome back screen
+          return createWelcomeBackPage(clientId, toolId, completion);
+        }
+      }
+      
       // Show Tool 1 (existing index.html)
       const template = HtmlService.createTemplateFromFile('index');
-      template.userId = e.parameter.client || 'USER_' + Utilities.getUuid();
+      template.userId = clientId || 'USER_' + Utilities.getUuid();
       template.sessionId = e.parameter.session || Utilities.getUuid();
       template.currentWeek = getCurrentWeek();
       template.config = CONFIG;
+      template.action = action || 'new';
+      template.existingData = action === 'edit' ? DataHub.checkToolCompletion(clientId, toolId).data : null;
       
       return template.evaluate()
         .setTitle('Financial TruPath V2.0 - Orientation Assessment')
@@ -233,6 +248,166 @@ function createLoginPage() {
 }
 
 /**
+ * Create welcome back page for returning students
+ */
+function createWelcomeBackPage(clientId, toolId, completion) {
+  const completedDate = new Date(completion.completedAt).toLocaleDateString();
+  const lastModified = completion.lastModified ? new Date(completion.lastModified).toLocaleDateString() : null;
+  const version = completion.version || 1;
+  
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome Back - Financial TruPath V2.0</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .welcome-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 600px;
+      padding: 40px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      color: #333;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    .status-box {
+      background: #f0f9ff;
+      border-left: 4px solid #3b82f6;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+    .status-box h3 {
+      color: #1e40af;
+      margin-bottom: 10px;
+    }
+    .status-info {
+      color: #64748b;
+      line-height: 1.6;
+    }
+    .status-info strong {
+      color: #334155;
+    }
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .action-card {
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .action-card:hover {
+      border-color: #667eea;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+      transform: translateY(-2px);
+    }
+    .action-card h4 {
+      color: #1e293b;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .action-card p {
+      color: #64748b;
+      font-size: 14px;
+    }
+    .icon {
+      font-size: 24px;
+    }
+    .note {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #92400e;
+    }
+  </style>
+</head>
+<body>
+  <div class="welcome-container">
+    <div class="header">
+      <h1>Welcome Back!</h1>
+      <p style="color: #64748b;">You've already completed this assessment</p>
+    </div>
+    
+    <div class="status-box">
+      <h3>Your Assessment Status</h3>
+      <div class="status-info">
+        <p><strong>Originally Completed:</strong> ${completedDate}</p>
+        ${lastModified ? '<p><strong>Last Updated:</strong> ' + lastModified + '</p>' : ''}
+        <p><strong>Version:</strong> ${version}</p>
+        <p><strong>Tool:</strong> Orientation Assessment</p>
+      </div>
+    </div>
+    
+    <div class="actions">
+      <a href="${ScriptApp.getService().getUrl()}?route=tool&client=${clientId}&action=view" class="action-card">
+        <h4><span class="icon">📊</span> View Your Report</h4>
+        <p>See your assessment results and download your PDF report</p>
+      </a>
+      
+      <a href="${ScriptApp.getService().getUrl()}?route=tool&client=${clientId}&action=edit" class="action-card">
+        <h4><span class="icon">✏️</span> Update Your Answers</h4>
+        <p>Modify your existing responses (creates version ${version + 1})</p>
+      </a>
+      
+      <a href="${ScriptApp.getService().getUrl()}?route=tool&client=${clientId}&action=new" class="action-card">
+        <h4><span class="icon">🔄</span> Start Fresh</h4>
+        <p>Begin a completely new assessment (keeps previous as separate attempt)</p>
+      </a>
+    </div>
+    
+    <div class="note">
+      <strong>Note:</strong> Updating your answers will preserve your original completion date while tracking the changes you make. Starting fresh creates a new assessment alongside your existing one.
+    </div>
+  </div>
+</body>
+</html>
+  `;
+  
+  return HtmlService.createHtmlOutput(html)
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+/**
+ * Create error page
+ */
+function createErrorPage(errorMessage) {
+  const html = '<html><body><h1>Error</h1><p>' + errorMessage + '</p></body></html>';
+  return HtmlService.createHtmlOutput(html)
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+/**
  * Handle admin route (for testing/debugging)
  */
 function handleAdminRoute(adminKey) {
@@ -379,20 +554,30 @@ function getCurrentWeek() {
 }
 
 /**
- * Save user data to the master spreadsheet
+ * Save user data to the master spreadsheet with versioning
  * @param {string} userId - User ID
  * @param {string} toolId - Tool identifier
  * @param {Object} data - Data to save
+ * @param {string} saveMode - 'new', 'update', or 'fresh'
  * @returns {Object} Success status
  */
-function saveUserData(userId, toolId, data) {
+function saveUserData(userId, toolId, data, saveMode = 'new') {
   try {
-    const result = DataHub.saveToolData(userId, toolId, data);
+    // Set save options based on mode
+    const options = {};
+    if (saveMode === 'update') {
+      options.updateExisting = true;
+    } else if (saveMode === 'fresh') {
+      options.createNew = true;
+    }
+    
+    const result = DataHub.saveToolData(userId, toolId, data, options);
     
     // Log the save event
     logEvent('DATA_SAVED', {
       userId: userId,
       tool: toolId,
+      saveMode: saveMode,
       timestamp: new Date()
     });
     
@@ -414,6 +599,22 @@ function saveUserData(userId, toolId, data) {
       message: 'Failed to save data',
       error: error.toString()
     };
+  }
+}
+
+/**
+ * Load existing tool data for a user
+ * @param {string} userId - User ID
+ * @param {string} toolId - Tool identifier
+ * @returns {Object} Existing data or null
+ */
+function loadUserToolData(userId, toolId) {
+  try {
+    const completion = DataHub.checkToolCompletion(userId, toolId);
+    return completion.completed ? completion.data : null;
+  } catch (error) {
+    console.error('Error loading user data:', error);
+    return null;
   }
 }
 
