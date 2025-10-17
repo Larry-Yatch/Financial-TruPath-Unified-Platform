@@ -1053,40 +1053,88 @@
     </div>
 
     <div class="profile-card">
-      <div class="profile-emoji">\${reportData.profile.emoji || '🎯'}</div>
-      <div class="profile-type">\${reportData.profile.type}</div>
-      <p>\${reportData.profile.message}</p>
-      <p style="color: #94a3b8;">\${reportData.profile.focus}</p>
+      <div class="profile-emoji">${reportData.profile.emoji || '🎯'}</div>
+      <div class="profile-type">${reportData.profile.type}</div>
+      <p>${reportData.profile.message}</p>
+      <p style="color: #94a3b8;">${reportData.profile.focus}</p>
     </div>
 
     <div class="scores-container">
       <div class="score-box">
         <div class="score-label">Financial Health</div>
-        <div class="score-value \${reportData.healthScore >= 70 ? 'good' : reportData.healthScore >= 40 ? 'warning' : 'critical'}">
-          \${reportData.healthScore}
+        <div class="score-value ${reportData.healthScore >= 70 ? 'good' : reportData.healthScore >= 40 ? 'warning' : 'critical'}">
+          ${reportData.healthScore}
         </div>
       </div>
       
       <div class="score-box">
         <div class="score-label">Mindset Score</div>
-        <div class="score-value \${reportData.mindsetScore >= 3 ? 'good' : reportData.mindsetScore >= 0 ? 'warning' : 'critical'}">
-          \${reportData.mindsetScore > 0 ? '+' : ''}\${reportData.mindsetScore}
+        <div class="score-value ${reportData.mindsetScore >= 3 ? 'good' : reportData.mindsetScore >= 0 ? 'warning' : 'critical'}">
+          ${reportData.mindsetScore > 0 ? '+' : ''}${reportData.mindsetScore}
         </div>
       </div>
     </div>
 
     <div class="section">
-      <h3>Your Personalized Homework</h3>
-      <p>Complete these tasks before Tool 2 to maximize your success.</p>
+      <h3>📊 Key Insights</h3>
+      ${reportData.healthScore < 40 ? '<p style="color: #ef4444;">⚠️ <strong>Immediate attention needed:</strong> Your financial health score indicates areas requiring urgent focus.</p>' : ''}
+      ${reportData.mindsetScore < 0 ? '<p style="color: #f59e0b;">🧠 <strong>Mindset barriers detected:</strong> Your beliefs about money may be limiting your progress.</p>' : ''}
+      ${reportData.mindsetScore >= 6 ? '<p style="color: #22c55e;">✨ <strong>Exceptional mindset:</strong> Your positive outlook is a powerful asset for financial growth.</p>' : ''}
+      ${reportData.healthScore >= 70 ? '<p style="color: #22c55e;">💪 <strong>Strong foundation:</strong> You have a solid financial base to build upon.</p>' : ''}
     </div>
 
     <div class="section">
-      <h3>Next Steps</h3>
-      <ol>
-        <li>Review this report and complete your homework</li>
-        <li>Complete Tool 2: Financial Clarity (Week 2)</li>
-        <li>Track your progress weekly</li>
+      <h3>📚 Your Personalized Homework for Tool 2 Preparation</h3>
+      
+      ${reportData.healthScore < 40 || (reportData.data && reportData.data.totalDebt === 'over_100k') ? `
+      <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
+        <h4 style="color: #ef4444; margin-top: 0;">🔴 Priority 1: Debt & Cash Flow Review (Critical)</h4>
+        <ul style="color: #e2e8f0; list-style-type: none; padding-left: 0;">
+          <li style="padding: 5px 0;">☐ List all debts with balances, interest rates, and minimum payments</li>
+          <li style="padding: 5px 0;">☐ Calculate total monthly debt payments</li>
+          <li style="padding: 5px 0;">☐ Identify highest interest rate debts</li>
+          <li style="padding: 5px 0;">☐ Review last 3 months of bank statements</li>
+        </ul>
+      </div>
+      ` : ''}
+      
+      ${reportData.healthScore < 60 || (reportData.data && reportData.data.emergencyFund === 'none') ? `
+      <div style="background: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
+        <h4 style="color: #f59e0b; margin-top: 0;">🟡 Priority 2: Expense Tracking</h4>
+        <ul style="color: #e2e8f0; list-style-type: none; padding-left: 0;">
+          <li style="padding: 5px 0;">☐ Track all expenses for next 7 days</li>
+          <li style="padding: 5px 0;">☐ Identify top 3 spending categories</li>
+          <li style="padding: 5px 0;">☐ Find 3 expenses you could reduce</li>
+          <li style="padding: 5px 0;">☐ Calculate true monthly living costs</li>
+        </ul>
+      </div>
+      ` : ''}
+      
+      <div style="background: rgba(34, 197, 94, 0.1); border-left: 4px solid #22c55e; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
+        <h4 style="color: #22c55e; margin-top: 0;">🟢 Priority 3: Income & Assets Review</h4>
+        <ul style="color: #e2e8f0; list-style-type: none; padding-left: 0;">
+          <li style="padding: 5px 0;">☐ Gather last 2 pay stubs</li>
+          <li style="padding: 5px 0;">☐ List all income sources</li>
+          <li style="padding: 5px 0;">☐ Check all account balances</li>
+          <li style="padding: 5px 0;">☐ Review any investment accounts</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>🎯 Next Steps</h3>
+      <ol style="color: #e2e8f0;">
+        <li style="padding: 5px 0;">Complete your personalized homework tasks above</li>
+        <li style="padding: 5px 0;">Take Tool 2: Financial Clarity Assessment (Week 2)</li>
+        ${reportData.mindsetScore < 0 ? '<li style="padding: 5px 0;">Prepare for Tool 3: Control Fear Grounding (Week 3)</li>' : ''}
+        <li style="padding: 5px 0;">Track your progress weekly</li>
+        <li style="padding: 5px 0;">Celebrate small wins along your journey</li>
       </ol>
+    </div>
+    
+    <div class="section" style="text-align: center; background: linear-gradient(135deg, rgba(173, 145, 104, 0.2) 0%, rgba(30, 25, 43, 0.4) 100%);">
+      <p style="font-size: 18px; color: #AD9168; margin: 0;">Remember: Every financial journey starts with a single step.</p>
+      <p style="color: #94a3b8; margin-top: 10px;">You've taken that step today. Keep moving forward!</p>
     </div>
   </div>
 </body>
@@ -1098,7 +1146,7 @@
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `FinancialTruPath_Report_\${new Date().toISOString().split('T')[0]}.html`;
+        a.download = `FinancialTruPath_Report_${new Date().toISOString().split('T')[0]}.html`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
