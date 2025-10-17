@@ -429,7 +429,7 @@ function createDashboardPage(clientId) {
     </div>
     
     <div class="tools-grid">
-      ${toolStatuses.map(tool => {
+      ` + toolStatuses.map(tool => {
         const isClickable = tool.available;
         const href = isClickable ? 
           baseUrl + '?route=tool&tool=' + tool.id + '&client=' + clientId : 
@@ -450,7 +450,7 @@ function createDashboardPage(clientId) {
                 '<span class="locked-indicator">🔒 Coming soon</span>')) +
           '</div>' +
         '</a>';
-      }).join('')}
+      }).join('') + `
     </div>
   </div>
   
