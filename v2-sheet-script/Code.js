@@ -29,11 +29,16 @@ function doGet(e) {
       
       // Handle action=view to show the report
       if (action === 'view' && clientId) {
-        const completion = DataHub.checkToolCompletion(clientId, toolId);
-        if (completion.completed && completion.data) {
-          return createReportView(clientId, toolId, completion.data);
-        } else {
-          return createErrorPage('No completed assessment found for this user.');
+        try {
+          const completion = DataHub.checkToolCompletion(clientId, toolId);
+          if (completion.completed && completion.data) {
+            return createReportView(clientId, toolId, completion.data);
+          } else {
+            return createErrorPage('No completed assessment found for this user.');
+          }
+        } catch (error) {
+          console.error('Error in view action:', error);
+          return createErrorPage('Error loading report: ' + error.toString());
         }
       }
       
@@ -654,11 +659,34 @@ function createWelcomeBackPage(clientId, toolId, completion) {
  * Create report view page for displaying assessment results
  */
 function createReportView(clientId, toolId, data) {
-  const baseUrl = ScriptApp.getService().getUrl();
-  
-  // Calculate insights from data
-  const insights = Middleware.generateInsights(data);
-  const scoreData = insights && insights.scoreData ? insights.scoreData : {};
+  try {
+    const baseUrl = ScriptApp.getService().getUrl();
+    
+    // Ensure data exists
+    if (!data) {
+      return createErrorPage('No data available for this assessment.');
+    }
+    
+    // Calculate insights from data
+    let insights = [];
+    let scoreData = {};
+    try {
+      // The Middleware expects a profile object with demographics
+      const profile = {
+        demographics: data,
+        orientation: data
+      };
+      insights = Middleware.generateInsights(profile);
+      // Generate a simple score based on data
+      if (data.income) {
+        const incomeScore = data.income === 'Above $100k' ? 80 : data.income === '$50k-$100k' ? 60 : 40;
+        const savingsScore = data.savings === 'More than 6 months' ? 80 : data.savings === '3-6 months' ? 60 : 40;
+        scoreData.totalScore = (incomeScore + savingsScore) / 2;
+      }
+    } catch (insightError) {
+      console.error('Error generating insights:', insightError);
+      // Continue without insights
+    }
   
   const html = `
 <!DOCTYPE html>
@@ -873,8 +901,12 @@ function createReportView(clientId, toolId, data) {
 </html>
   `;
   
-  return HtmlService.createHtmlOutput(html)
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+    return HtmlService.createHtmlOutput(html)
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  } catch (error) {
+    console.error('Error in createReportView:', error);
+    return createErrorPage('Error creating report view: ' + error.toString());
+  }
 }
 
 /**
