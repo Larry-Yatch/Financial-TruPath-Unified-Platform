@@ -46,12 +46,14 @@ function createLoginPage() {
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Financial TruPath V2.0 - Login</title>
+  <title>TruPath Financial - Login</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Radley:wght@400&family=Rubik:wght@300;400;500;600;700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Rubik', Arial, sans-serif;
+      background: linear-gradient(135deg, #4b4166, #1e192b);
+      background-attachment: fixed;
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -59,9 +61,11 @@ function createLoginPage() {
       padding: 20px;
     }
     .login-container {
-      background: white;
+      background: rgba(20, 15, 35, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(173, 145, 104, 0.2);
       border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
       width: 100%;
       max-width: 450px;
       padding: 40px;
@@ -71,13 +75,15 @@ function createLoginPage() {
       margin-bottom: 30px;
     }
     .logo h1 {
-      color: #AD9168;
-      font-size: 28px;
+      font-family: 'Radley', serif;
+      color: #ad9168;
+      font-size: 32px;
       letter-spacing: 2px;
       margin-bottom: 10px;
+      font-weight: 400;
     }
     .logo p {
-      color: #666;
+      color: #94a3b8;
       font-size: 14px;
     }
     .form-group {
@@ -85,37 +91,42 @@ function createLoginPage() {
     }
     label {
       display: block;
-      color: #333;
+      color: #ffffff;
       margin-bottom: 8px;
       font-weight: 500;
     }
     input {
       width: 100%;
       padding: 12px;
-      border: 2px solid #e0e0e0;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(173, 145, 104, 0.3);
       border-radius: 8px;
       font-size: 16px;
+      color: #ffffff;
       transition: all 0.3s;
     }
     input:focus {
       outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      border-color: #ad9168;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 0 3px rgba(173, 145, 104, 0.1);
     }
     .btn-primary {
       width: 100%;
       padding: 14px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
+      background: #ad9168;
+      color: #1e192b;
       border: none;
       border-radius: 8px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: all 0.3s;
     }
     .btn-primary:hover {
+      background: #c4a877;
       transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(173, 145, 104, 0.3);
     }
     .alert {
       padding: 12px;
@@ -136,10 +147,20 @@ function createLoginPage() {
     .test-info {
       margin-top: 20px;
       padding: 15px;
-      background: #f0f0f0;
+      background: rgba(173, 145, 104, 0.1);
+      border: 1px solid rgba(173, 145, 104, 0.3);
       border-radius: 8px;
       font-size: 12px;
-      color: #666;
+      color: #94a3b8;
+    }
+    .test-info a {
+      color: #ad9168;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .test-info a:hover {
+      color: #c4a877;
+      text-decoration: underline;
     }
     #loadingSpinner {
       display: none;
@@ -151,8 +172,8 @@ function createLoginPage() {
 <body>
   <div class="login-container">
     <div class="logo">
-      <h1>FINANCIAL TRUPATH</h1>
-      <p>Version 2.0 - Student Portal</p>
+      <h1>TruPath Financial</h1>
+      <p>Investment Planning Platform V2.0</p>
     </div>
     
     <div id="alertBox" class="alert"></div>
