@@ -1,5 +1,20 @@
 # CLAUDE.md - Behavioral Directives
 
+## Google Sheets Access
+You can now debug and monitor Google Sheets directly from VSCode:
+```bash
+# Monitor changes in real-time
+node debug-sheets.js watch
+
+# Check database status
+node debug-sheets.js summary
+
+# View specific sheets
+node debug-sheets.js sessions
+node debug-sheets.js responses
+```
+Use this for debugging instead of console.log in Apps Script!
+
 ## Memory First
 ALWAYS before making decisions or after discovering anything:
 ```
