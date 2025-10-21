@@ -9,8 +9,9 @@
 function setupAllSheets() {
   console.log('Starting sheet setup for Financial TruPath V2...');
   
-  // Get the active spreadsheet
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  // Use the specific spreadsheet ID
+  const V2_SPREADSHEET_ID = '18qpjnCvFVYDXOAN14CKb3ceoiG6G_nIFc9n3ZO5St24';
+  const ss = SpreadsheetApp.openById(V2_SPREADSHEET_ID);
   
   // Check existing sheets
   const existingSheets = ss.getSheets().map(sheet => sheet.getName());
@@ -142,10 +143,36 @@ function createAndConfigureSheet(spreadsheet, sheetName, headers, columnWidths) 
 }
 
 /**
+ * Simple function to run from Apps Script editor
+ * Run this to create all sheets
+ */
+function runSheetSetup() {
+  console.log('=== Starting Sheet Setup ===');
+  
+  try {
+    const result = setupAllSheets();
+    console.log('✅ Setup completed successfully!');
+    console.log('Created sheets:', result.created.join(', ') || 'None (all existed)');
+    
+    // Verify all sheets exist
+    const V2_SPREADSHEET_ID = '18qpjnCvFVYDXOAN14CKb3ceoiG6G_nIFc9n3ZO5St24';
+    const ss = SpreadsheetApp.openById(V2_SPREADSHEET_ID);
+    const allSheets = ss.getSheets().map(s => s.getName());
+    console.log('All sheets in spreadsheet:', allSheets.join(', '));
+    
+    return 'Success';
+  } catch (error) {
+    console.error('❌ Setup failed:', error.toString());
+    return 'Failed: ' + error.toString();
+  }
+}
+
+/**
  * Check what sheets currently exist
  */
 function checkExistingSheets() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const V2_SPREADSHEET_ID = '18qpjnCvFVYDXOAN14CKb3ceoiG6G_nIFc9n3ZO5St24';
+  const ss = SpreadsheetApp.openById(V2_SPREADSHEET_ID);
   const sheets = ss.getSheets();
   
   console.log('Current sheets in spreadsheet:');
