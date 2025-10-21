@@ -1,19 +1,52 @@
 # CLAUDE.md - Behavioral Directives
 
-## Google Sheets Access
-You can now debug and monitor Google Sheets directly from VSCode:
+## 🚨 START OF EVERY SESSION - MONITORING
+**ALWAYS start development sessions by running the watcher:**
 ```bash
-# Monitor changes in real-time
+# Run this in background at session start:
 node debug-sheets.js watch
+# This monitors Google Sheets in real-time
+# Use run_in_background: true
+# Check output with BashOutput tool periodically
+```
 
+## Google Sheets Access & Monitoring
+You have debugging tools to monitor Google Sheets directly from VSCode:
+
+### REQUIRED SETUP (One-Time)
+**Prerequisites for monitoring to work:**
+1. **Google Sheets API Token**: Must exist at `~/.google-sheets-auth/token.json`
+2. **Node Package**: `googleapis` must be installed (`npm install googleapis`)
+3. **Files Required**:
+   - `sheets.js` - Core API access (in project root)
+   - `debug-sheets.js` - Monitoring commands (in project root)
+   - `check-sheets.js` - Quick verification (in project root)
+4. **Spreadsheet ID**: `18qpjnCvFVYDXOAN14CKb3ceoiG6G_nIFc9n3ZO5St24`
+
+### Real-Time Monitoring (ESSENTIAL FOR DEBUGGING)
+```bash
+# Start watcher in background (do this FIRST in every session)
+node debug-sheets.js watch  # Shows new sessions/responses as they're created
+
+# Check watcher output periodically using:
+BashOutput tool with the shell_id
+```
+
+### On-Demand Commands
+```bash
 # Check database status
 node debug-sheets.js summary
 
 # View specific sheets
 node debug-sheets.js sessions
 node debug-sheets.js responses
+node debug-sheets.js status
+
+# Quick verification
+node check-sheets.js
 ```
-Use this for debugging instead of console.log in Apps Script!
+
+**IMPORTANT:** The watcher shows when data is saved to sheets in real-time. This prevents debugging blind spots. If building session management or data operations, ALWAYS have the watcher running!
 
 ## Memory First
 ALWAYS before making decisions or after discovering anything:

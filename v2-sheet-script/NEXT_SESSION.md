@@ -7,7 +7,16 @@
 
 ---
 
+## 🚨 FIRST THING: START MONITORING
+```bash
+# Run this IMMEDIATELY at session start:
+node debug-sheets.js watch
+# (Use run_in_background: true)
+# This shows real-time changes to sheets
+```
+
 ## ✅ Pre-Session Checklist
+- [ ] **START SHEETS WATCHER** (node debug-sheets.js watch)
 - [ ] Review DEVELOPMENT_GUIDE.md
 - [ ] Review current broken state in Tomorrow.md
 - [ ] Have test Client IDs ready (TEST001, TEST002, TEST003)
