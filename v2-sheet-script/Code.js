@@ -15,13 +15,39 @@ function doGet(e) {
     
     // Handle different routes
     if (route === 'dashboard') {
-      // Show dashboard page
-      return createDashboardPage(e.parameter.client || '');
+      // Validate session before showing dashboard
+      const sessionId = e.parameter.session || '';
+      const clientId = e.parameter.client || '';
+      
+      if (sessionId) {
+        const validation = validateSession(sessionId);
+        if (!validation.valid) {
+          // Invalid session, redirect to login
+          return createLoginPage('Your session has expired. Please log in again.');
+        }
+        // Valid session, show dashboard
+        return createDashboardPage(validation.clientId, sessionId);
+      } else {
+        // No session, redirect to login
+        return createLoginPage('Please log in to access the dashboard.');
+      }
+      
     } else if (route === 'tool' || route === 'orientation') {
+      // Validate session for tool access
+      const sessionId = e.parameter.session || '';
+      const clientId = e.parameter.client || '';
+      
+      if (sessionId) {
+        const validation = validateSession(sessionId);
+        if (!validation.valid) {
+          return createLoginPage('Your session has expired. Please log in again.');
+        }
+      }
+      
       // Show Tool 1 (existing index.html)
       const template = HtmlService.createTemplateFromFile('index');
-      template.userId = e.parameter.client || 'USER_' + Utilities.getUuid();
-      template.sessionId = e.parameter.session || Utilities.getUuid();
+      template.userId = clientId || 'USER_' + Utilities.getUuid();
+      template.sessionId = sessionId || Utilities.getUuid();
       template.currentWeek = getCurrentWeek();
       template.config = CONFIG;
       
@@ -42,8 +68,25 @@ function doGet(e) {
 
 /**
  * Create login page
+ * @param {string} message - Optional message to display
  */
-function createLoginPage() {
+function createLoginPage(message) {
+  // Use the enhanced login page with backup authentication
+  const template = HtmlService.createTemplateFromFile('LoginEnhanced');
+  template.message = message || '';
+  template.baseUrl = ScriptApp.getService().getUrl();
+  
+  return template.evaluate()
+    .setTitle('TruPath Financial - Login')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
+}
+
+/**
+ * Create login page (inline version for fallback)
+ * @param {string} message - Optional message to display
+ */
+function createLoginPageInline(message) {
   const html = `
 <!DOCTYPE html>
 <html>
@@ -179,7 +222,7 @@ function createLoginPage() {
       <p>Investment Planning Platform V2.0</p>
     </div>
     
-    <div id="alertBox" class="alert"></div>
+    <div id="alertBox" class="alert" ${message ? 'style="display: block;"' : ''}>${message || ''}</div>
     
     <form id="loginForm" onsubmit="handleLogin(event); return false;">
       <div class="form-group">
@@ -225,21 +268,22 @@ function createLoginPage() {
       document.getElementById('loginForm').style.display = 'none';
       document.getElementById('loadingSpinner').style.display = 'block';
       
-      // Try to authenticate
+      // Try to authenticate and create session
       google.script.run
         .withSuccessHandler(function(result) {
           if (result.success) {
-            // Check if returning student
-            if (result.hasCompletedTools) {
-              // Show welcome back options
-              window.location.href = '${ScriptApp.getService().getUrl()}?route=dashboard&client=' + 
-                encodeURIComponent(result.clientId);
-            } else {
-              // New student - go to dashboard
-              window.location.href = '${ScriptApp.getService().getUrl()}?route=dashboard&client=' + 
-                encodeURIComponent(result.clientId);
-            }
+            // Session created successfully, navigate with session token
+            const baseUrl = '${ScriptApp.getService().getUrl()}';
+            const dashboardUrl = baseUrl + '?route=dashboard' +
+              '&client=' + encodeURIComponent(result.clientId) +
+              '&session=' + encodeURIComponent(result.sessionId);
+            
             showAlert('Login successful!', 'success');
+            
+            // Navigate to dashboard after a brief delay
+            setTimeout(function() {
+              window.location.href = dashboardUrl;
+            }, 500);
           } else {
             document.getElementById('loginForm').style.display = 'block';
             document.getElementById('loadingSpinner').style.display = 'none';
@@ -252,7 +296,7 @@ function createLoginPage() {
           showAlert('System error. Please try again.', 'error');
           console.error(error);
         })
-        .lookupClientById(clientId);
+        .authenticateAndCreateSession(clientId);
     }
   </script>
 </body>
@@ -265,8 +309,10 @@ function createLoginPage() {
 
 /**
  * Create dashboard page showing 8 tools
+ * @param {string} clientId - The client ID
+ * @param {string} sessionId - The session token
  */
-function createDashboardPage(clientId) {
+function createDashboardPage(clientId, sessionId) {
   // Check if user has completed any tools
   let completedTools = [];
   try {
@@ -570,18 +616,18 @@ function createDashboardPage(clientId) {
         if (confirm('This tool is already completed. Would you like to:\\n\\n• OK - View your report\\n• Cancel - Edit your answers')) {
           viewReport(toolId);
         } else {
-          // Navigate to tool with edit mode
-          window.location.href = '` + baseUrl + `?route=tool&tool=' + toolId + '&client=${clientId}&action=edit';
+          // Navigate to tool with edit mode and session
+          window.location.href = '` + baseUrl + `?route=tool&tool=' + toolId + '&client=${clientId}&session=${sessionId || ''}&action=edit';
         }
       } else {
-        // Navigate to tool
-        window.location.href = '` + baseUrl + `?route=tool&tool=' + toolId + '&client=${clientId}';
+        // Navigate to tool with session
+        window.location.href = '` + baseUrl + `?route=tool&tool=' + toolId + '&client=${clientId}&session=${sessionId || ''}';
       }
     }
     
     function viewReport(toolId) {
-      // For now, just navigate to tool in view mode
-      window.location.href = '` + baseUrl + `?route=tool&tool=' + toolId + '&client=${clientId}&action=view';
+      // For now, just navigate to tool in view mode with session
+      window.location.href = '` + baseUrl + `?route=tool&tool=' + toolId + '&client=${clientId}&session=${sessionId || ''}&action=view';
     }
     
     function getCurrentWeek() {
@@ -792,6 +838,56 @@ function getUserProfile(userId) {
   } catch (error) {
     console.error('Error getting profile:', error);
     return null;
+  }
+}
+
+/**
+ * Authenticate user and create session
+ * This is the main login function that combines authentication with session creation
+ * @param {string} clientId - The client ID to authenticate
+ * @returns {Object} Result with session info or error
+ */
+function authenticateAndCreateSession(clientId) {
+  try {
+    // Step 1: Authenticate the client ID
+    const authResult = lookupClientById(clientId);
+    
+    if (!authResult.success) {
+      return {
+        success: false,
+        error: authResult.error || 'Authentication failed'
+      };
+    }
+    
+    // Step 2: Create a session for the authenticated user
+    const sessionResult = createSession(authResult.clientId);
+    
+    if (!sessionResult.success) {
+      return {
+        success: false,
+        error: 'Failed to create session. Please try again.'
+      };
+    }
+    
+    // Step 3: Return combined result
+    return {
+      success: true,
+      clientId: authResult.clientId,
+      sessionId: sessionResult.sessionId,
+      firstName: authResult.firstName,
+      lastName: authResult.lastName,
+      email: authResult.email,
+      hasCompletedTools: authResult.hasCompletedTools,
+      loginTime: sessionResult.loginTime,
+      expiresAt: sessionResult.expiresAt
+    };
+    
+  } catch (error) {
+    console.error('Error in authenticateAndCreateSession:', error);
+    return {
+      success: false,
+      error: 'System error during login. Please try again.'
+    };
   }
 }
 
