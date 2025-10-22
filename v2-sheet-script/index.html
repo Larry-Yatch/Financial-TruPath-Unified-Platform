@@ -698,9 +698,23 @@
         // Call server function
         google.script.run
           .withSuccessHandler(function(result) {
-            // Generate and display the insights report
-            const report = generateLocalInsightsReport(data);
-            displayInsightsReport(report);
+            console.log('Save result:', result);
+            
+            // Check if save was successful
+            if (result && result.success) {
+              // Generate and display the insights report
+              const report = generateLocalInsightsReport(data);
+              // Add any server insights if available
+              if (result.insights && result.insights.length > 0) {
+                report.serverInsights = result.insights;
+              }
+              displayInsightsReport(report);
+            } else {
+              // Handle save failure
+              button.disabled = false;
+              button.textContent = '📊 Generate My Personalized Insights Report';
+              alert('Failed to save data: ' + (result.message || 'Unknown error'));
+            }
           })
           .withFailureHandler(function(error) {
             button.disabled = false;
@@ -708,7 +722,7 @@
             alert('Error saving data: ' + error);
             console.error('Save error:', error);
           })
-          .saveUserData(userId, 'orientation', data);
+          .saveUserData(userId, 'tool1', data);
       }
       
       // Generate Insights Report Locally

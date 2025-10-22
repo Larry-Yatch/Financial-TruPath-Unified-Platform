@@ -978,8 +978,12 @@ function getCurrentWeek() {
  */
 function saveUserData(userId, toolId, data) {
   try {
+    console.log(`saveUserData called - userId: ${userId}, toolId: ${toolId}, data fields: ${Object.keys(data).length}`);
+    
     // Use DataService for saving tool data
     const result = DataService.saveToolResponse(userId, toolId, data);
+    
+    console.log(`DataService.saveToolResponse result:`, result);
     
     // Log the save event
     logEvent('DATA_SAVED', {

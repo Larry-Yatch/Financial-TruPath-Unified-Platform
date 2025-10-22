@@ -36,6 +36,13 @@ const DataService = {
    */
   saveToolResponse(clientId, toolId, data) {
     try {
+      // Validate inputs
+      if (!clientId || !toolId || !data) {
+        throw new Error(`Invalid parameters: clientId=${clientId}, toolId=${toolId}, data exists=${!!data}`);
+      }
+      
+      console.log(`Saving Tool Response - Client: ${clientId}, Tool: ${toolId}`);
+      
       const ss = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
       const responseSheet = ss.getSheetByName(CONFIG.SHEETS.RESPONSES);
       
@@ -45,13 +52,20 @@ const DataService = {
       
       // Prepare response data
       const timestamp = new Date();
+      const sessionId = this.getCurrentSessionId();
+      
+      // Log warning if no session but continue saving
+      if (!sessionId) {
+        console.warn('No active session found, saving with no-session marker');
+      }
+      
       const responseRecord = {
         timestamp: timestamp.toISOString(),
         clientId: clientId,
         toolId: toolId,
         data: JSON.stringify(data),
         version: CONFIG.VERSION,
-        sessionId: this.getCurrentSessionId() || 'no-session'
+        sessionId: sessionId || 'no-session'
       };
       
       // Get headers or create them
