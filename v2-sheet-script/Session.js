@@ -49,6 +49,8 @@ function createSession(clientId) {
     if (existingSession) {
       // Update last activity of existing session
       updateSessionActivity(existingSession.sessionId);
+      // Ensure success flag is present
+      existingSession.success = true;
       return existingSession;
     }
     
@@ -178,6 +180,7 @@ function findActiveSession(clientId) {
       
       if (storedClientId === clientId && status === 'active' && now < expiresAt) {
         return {
+          success: true,  // Add success flag
           sessionId: sessionId,
           clientId: clientId,
           loginTime: row[2],
