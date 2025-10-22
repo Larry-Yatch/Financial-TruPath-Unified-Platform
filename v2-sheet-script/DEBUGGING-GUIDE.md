@@ -51,6 +51,22 @@ grep -n "const.*html" Code.js
 ```
 **Fix:** Rename to unique names (loginHtml, dashboardHtml, etc.)
 
+### 5. Iframe Navigation Issues (35-Minute Lesson!)
+**Symptom:** Dashboard navigation shows blank page, but direct URL works  
+**Console clue:** "dropping postMessage.. deserialize threw error"  
+**Real problem:** Google Apps Script HTML runs in sandboxed iframe  
+**Wrong approach:** Spent 35 min fixing code that wasn't broken  
+**Quick fix:**
+```javascript
+// WRONG - stays in iframe:
+window.location.href = toolUrl;
+
+// RIGHT - breaks out of iframe:
+window.top.location.href = toolUrl;
+```
+**Time saved:** 35 minutes and 6 unnecessary deployments!  
+**Lesson:** When something works one way but not another, debug the DIFFERENCE, not the shared code
+
 ## 📊 Real-Time Monitoring
 
 ### Always Start With Monitoring
@@ -108,6 +124,8 @@ Error occurs
 ├── Is it 403/permissions? → New deployment
 ├── Is it syntax error? → Check backticks/quotes
 ├── Is it null reference? → Add null checks
+├── Works one way but not another? → Debug the DIFFERENCE
+├── See "postMessage" errors? → Iframe issue (use window.top)
 ├── Still broken? → Check monitoring (debug-sheets.js)
 └── Really stuck? → Direct test URL with params
 ```
@@ -162,6 +180,8 @@ console.log('DEBUG: Result received:', result);
 2. **2024-10-21:** Deployment permissions are separate from code - new deployment = fresh start
 3. **2024-10-21:** Null checks prevent infinite loops - never trust callbacks to return data
 4. **2024-10-21:** Browser console reveals true errors - "Verifying..." usually means check console
+5. **2024-10-22:** Iframe navigation wasted 35 minutes - when direct URL works but navigation doesn't, it's window.top.location issue
+6. **2024-10-22:** "postMessage" errors = iframe communication failure, not code bug
 
 ## 🚦 Status Indicators
 
