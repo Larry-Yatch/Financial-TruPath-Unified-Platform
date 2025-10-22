@@ -281,7 +281,8 @@ function createSimpleDashboard(clientId, sessionId) {
       }
       
       console.log('Navigating to:', toolUrl);
-      window.location.href = toolUrl;
+      // Use window.top to break out of iframe sandbox
+      window.top.location.href = toolUrl;
     }
   </script>
 </body>

@@ -13,8 +13,9 @@ function doGet(e) {
     // Get route from URL parameters
     const route = e.parameter.route || 'login';
     
-    // Log the route for debugging
+    // Log ALL parameters for debugging
     console.log('Route requested:', route);
+    console.log('All parameters:', JSON.stringify(e.parameter));
     
     // Handle different routes
     if (route === 'dashboard') {
@@ -39,10 +40,11 @@ function doGet(e) {
       // Explicitly handle login route
       return createLoginPage();
       
-    } else if (route === 'tool' || route === 'orientation') {
+    } else if (route === 'tool' || route === 'orientation' || route === 'Tool1' || route === 'tool1') {
       // TEMPORARY: Simple HTML test to diagnose blank page issue
       const clientId = e.parameter.client || 'TEST001';
       const sessionId = e.parameter.session || 'test-session';
+      const toolId = e.parameter.tool || 'none';
       
       // Option 2: Simple HTML that definitely works
       const simpleHtml = `
@@ -59,6 +61,7 @@ function doGet(e) {
           <p>Client ID: ${clientId}</p>
           <p>Session: ${sessionId}</p>
           <p>Route: ${route}</p>
+          <p>Tool: ${toolId}</p>
           <hr>
           <h2>Quick Test Form</h2>
           <form onsubmit="testSave(event)">
