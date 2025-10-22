@@ -62,7 +62,59 @@ function doGet(e) {
     
   } catch (error) {
     console.error('Router error:', error);
-    return createErrorPage(error.toString());
+    // Return a simple error page since createErrorPage might not exist
+    const errorHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Error</title>
+        <style>
+          body { 
+            font-family: Arial, sans-serif; 
+            padding: 40px; 
+            background: #1e192b; 
+            color: #fff;
+          }
+          .error-box {
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid #ff3b30;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+          }
+          h1 { color: #ad9168; }
+          pre { 
+            background: #000; 
+            padding: 15px; 
+            overflow-x: auto;
+            border-radius: 5px;
+          }
+          a {
+            color: #ad9168;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: 1px solid #ad9168;
+            border-radius: 5px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="error-box">
+          <h1>An Error Occurred</h1>
+          <p>Route: ${e.parameter.route || 'login'}</p>
+          <p>Session: ${e.parameter.session || 'none'}</p>
+          <p>Client: ${e.parameter.client || 'none'}</p>
+          <pre>${error.toString()}\n\nStack:\n${error.stack || 'No stack trace'}</pre>
+          <a href="${ScriptApp.getService().getUrl()}">Back to Login</a>
+        </div>
+      </body>
+      </html>
+    `;
+    return HtmlService.createHtmlOutput(errorHtml)
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   }
 }
 
