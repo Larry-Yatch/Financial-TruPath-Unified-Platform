@@ -9,6 +9,9 @@
 function onOpen() {
   const ui = SpreadsheetApp.getUi();
   ui.createMenu('🚀 TruPath V2.0')
+    // Permissions
+    .addItem('🔐 Grant Permissions', 'grantSpreadsheetPermissions')
+    .addSeparator()
     // Testing Section
     .addItem('📋 Test Session Management', 'testSessionManagement')
     .addItem('🔑 Add Test Client IDs', 'addTestClientIds')
