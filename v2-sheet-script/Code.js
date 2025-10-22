@@ -26,7 +26,7 @@ function doGet(e) {
           return createLoginPage('Your session has expired. Please log in again.');
         }
         // Valid session, show dashboard
-        return createDashboardPage(validation.clientId, sessionId);
+        return createSimpleDashboard(validation.clientId, sessionId);
       } else {
         // No session, redirect to login
         return createLoginPage('Please log in to access the dashboard.');
