@@ -12,94 +12,201 @@ function doGet(e) {
   try {
     // Get route from URL parameters
     const route = e.parameter.route || 'login';
-    const clientId = e.parameter.client;
-    const action = e.parameter.action; // view, edit, or new
     
-    // Handle dashboard route
+    // Log ALL parameters for debugging
+    console.log('Route requested:', route);
+    console.log('All parameters:', JSON.stringify(e.parameter));
+    
+    // Handle different routes
     if (route === 'dashboard') {
-      if (!clientId) {
-        return createLoginPage(); // Redirect to login if no client ID
-      }
-      return createDashboardPage(clientId);
-    }
-    
-    // Handle tool route
-    if (route === 'tool' || route === 'orientation') {
-      const toolId = e.parameter.tool || 'orientation';
+      // Validate session before showing dashboard
+      const sessionId = e.parameter.session || '';
+      const clientId = e.parameter.client || '';
       
-      // Handle action=view to show the report
-      if (action === 'view' && clientId) {
-        // SIMPLIFIED TEST - just return a basic HTML page
-        const testHtml = `<!DOCTYPE html>
-<html>
-<head>
-  <title>Test Report View</title>
-</head>
-<body style="background: #4b4166; color: white; padding: 40px; font-family: Arial;">
-  <h1>Simple Test Page</h1>
-  <p>If you can see this, the routing is working!</p>
-  <p>Client ID: ${clientId}</p>
-  <p>Tool ID: ${toolId}</p>
-  <p>Action: ${action}</p>
-  <hr>
-  <p>The issue is in the createReportView function or data loading.</p>
-  <a href="${ScriptApp.getService().getUrl()}?route=dashboard&client=${clientId}" style="color: #ad9168;">Back to Dashboard</a>
-</body>
-</html>`;
-        return HtmlService.createHtmlOutput(testHtml)
-          .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+      if (sessionId) {
+        const validation = validateSession(sessionId);
+        if (!validation.valid) {
+          // Invalid session, redirect to login
+          return createLoginPage('Your session has expired. Please log in again.');
+        }
+        // Valid session, show dashboard
+        return createSimpleDashboard(validation.clientId, sessionId);
+      } else {
+        // No session, redirect to login
+        return createLoginPage('Please log in to access the dashboard.');
       }
       
-      // Check if student has existing data ONLY when no action is specified
-      if (clientId && !action) {
-        const completion = DataHub.checkToolCompletion(clientId, toolId);
-        if (completion.completed) {
-          // Show welcome back screen for THIS specific tool
-          return createWelcomeBackPage(clientId, toolId, completion);
+    } else if (route === 'login') {
+      // Explicitly handle login route
+      return createLoginPage();
+      
+    } else if (route === 'tool' || route === 'orientation' || route === 'Tool1' || route === 'tool1') {
+      // TEMPORARY: Simple HTML test to diagnose blank page issue
+      const clientId = e.parameter.client || 'TEST001';
+      const sessionId = e.parameter.session || 'test-session';
+      const toolId = e.parameter.tool || 'none';
+      
+      // Option 2: Simple HTML that definitely works
+      const simpleHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <base target="_top">
+          <title>Tool1 Test</title>
+        </head>
+        <body>
+          <h1>Tool1 Simple Test</h1>
+          <p>If you see this, routing works!</p>
+          <hr>
+          <p>Client ID: ${clientId}</p>
+          <p>Session: ${sessionId}</p>
+          <p>Route: ${route}</p>
+          <p>Tool: ${toolId}</p>
+          <hr>
+          <h2>Quick Test Form</h2>
+          <form onsubmit="testSave(event)">
+            <input type="text" id="testName" placeholder="Enter name" required>
+            <button type="submit">Test Save</button>
+          </form>
+          <div id="result"></div>
+          
+          <script>
+            console.log('Simple HTML loaded successfully');
+            console.log('Client:', '${clientId}');
+            console.log('Session:', '${sessionId}');
+            
+            function testSave(e) {
+              e.preventDefault();
+              const name = document.getElementById('testName').value;
+              document.getElementById('result').innerHTML = 'Saving...';
+              
+              google.script.run
+                .withSuccessHandler(function(result) {
+                  console.log('Save result:', result);
+                  document.getElementById('result').innerHTML = 
+                    '<p style="color:green">Success: ' + JSON.stringify(result) + '</p>';
+                })
+                .withFailureHandler(function(error) {
+                  console.error('Save error:', error);
+                  document.getElementById('result').innerHTML = 
+                    '<p style="color:red">Error: ' + error + '</p>';
+                })
+                .saveUserData('${clientId}', 'tool1', {name: name, test: true});
+            }
+          </script>
+        </body>
+        </html>
+      `;
+      
+      return HtmlService.createHtmlOutput(simpleHtml)
+        .setTitle('Tool1 Simple Test')
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+        
+      /* COMMENTED OUT - Complex template causing issues
+      // Validate session for tool access
+      const sessionId = e.parameter.session || '';
+      const clientId = e.parameter.client || '';
+      
+      if (sessionId) {
+        const validation = validateSession(sessionId);
+        if (!validation.valid) {
+          return createLoginPage('Your session has expired. Please log in again.');
         }
       }
       
       // Show Tool 1 (existing index.html)
       const template = HtmlService.createTemplateFromFile('index');
       template.userId = clientId || 'USER_' + Utilities.getUuid();
-      template.sessionId = e.parameter.session || Utilities.getUuid();
+      template.sessionId = sessionId || Utilities.getUuid();
       template.currentWeek = getCurrentWeek();
       template.config = CONFIG;
-      template.action = action || 'new';
-      template.existingData = action === 'edit' ? DataHub.checkToolCompletion(clientId, toolId).data : null;
       
       return template.evaluate()
         .setTitle('Financial TruPath V2.0 - Orientation Assessment')
         .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
         .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
+      */
     }
     
-    // Default: Show login page
+    // Default: Show login page (inline HTML)
     return createLoginPage();
     
   } catch (error) {
     console.error('Router error:', error);
-    return createErrorPage(error.toString());
+    // Return a simple error page since createErrorPage might not exist
+    const errorHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Error</title>
+        <style>
+          body { 
+            font-family: Arial, sans-serif; 
+            padding: 40px; 
+            background: #1e192b; 
+            color: #fff;
+          }
+          .error-box {
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid #ff3b30;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+          }
+          h1 { color: #ad9168; }
+          pre { 
+            background: #000; 
+            padding: 15px; 
+            overflow-x: auto;
+            border-radius: 5px;
+          }
+          a {
+            color: #ad9168;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: 1px solid #ad9168;
+            border-radius: 5px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="error-box">
+          <h1>An Error Occurred</h1>
+          <p>Route: ${e.parameter.route || 'login'}</p>
+          <p>Session: ${e.parameter.session || 'none'}</p>
+          <p>Client: ${e.parameter.client || 'none'}</p>
+          <pre>${error.toString()}\n\nStack:\n${error.stack || 'No stack trace'}</pre>
+          <a href="${ScriptApp.getService().getUrl()}">Back to Login</a>
+        </div>
+      </body>
+      </html>
+    `;
+    return HtmlService.createHtmlOutput(errorHtml)
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   }
 }
 
 /**
  * Create login page
+ * @param {string} message - Optional message to display
  */
-function createLoginPage() {
-  const baseUrl = ScriptApp.getService().getUrl();
-  const html = `
+function createLoginPage(message) {
+  const loginHtml = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TruPath Financial V2.0 - Login</title>
+  <title>TruPath Financial - Login</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Radley:wght@400&family=Rubik:wght@300;400;500;600;700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Rubik', Arial, sans-serif;
       background: linear-gradient(135deg, #4b4166, #1e192b);
+      background-attachment: fixed;
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -107,9 +214,11 @@ function createLoginPage() {
       padding: 20px;
     }
     .login-container {
-      background: white;
+      background: rgba(20, 15, 35, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(173, 145, 104, 0.2);
       border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
       width: 100%;
       max-width: 450px;
       padding: 40px;
@@ -121,13 +230,13 @@ function createLoginPage() {
     .logo h1 {
       font-family: 'Radley', serif;
       color: #ad9168;
-      font-size: 28px;
+      font-size: 32px;
       letter-spacing: 2px;
       margin-bottom: 10px;
       font-weight: 400;
     }
     .logo p {
-      color: #666;
+      color: #94a3b8;
       font-size: 14px;
     }
     .form-group {
@@ -135,37 +244,42 @@ function createLoginPage() {
     }
     label {
       display: block;
-      color: #333;
+      color: #ffffff;
       margin-bottom: 8px;
       font-weight: 500;
     }
     input {
       width: 100%;
       padding: 12px;
-      border: 2px solid #e0e0e0;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(173, 145, 104, 0.3);
       border-radius: 8px;
       font-size: 16px;
+      color: #ffffff;
       transition: all 0.3s;
     }
     input:focus {
       outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      border-color: #ad9168;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 0 3px rgba(173, 145, 104, 0.1);
     }
     .btn-primary {
       width: 100%;
       padding: 14px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
+      background: #ad9168;
+      color: #1e192b;
       border: none;
       border-radius: 8px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: all 0.3s;
     }
     .btn-primary:hover {
+      background: #c4a877;
       transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(173, 145, 104, 0.3);
     }
     .alert {
       padding: 12px;
@@ -186,10 +300,20 @@ function createLoginPage() {
     .test-info {
       margin-top: 20px;
       padding: 15px;
-      background: #f0f0f0;
+      background: rgba(173, 145, 104, 0.1);
+      border: 1px solid rgba(173, 145, 104, 0.3);
       border-radius: 8px;
       font-size: 12px;
-      color: #666;
+      color: #94a3b8;
+    }
+    .test-info a {
+      color: #ad9168;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .test-info a:hover {
+      color: #c4a877;
+      text-decoration: underline;
     }
     #loadingSpinner {
       display: none;
@@ -205,26 +329,59 @@ function createLoginPage() {
       <p>Investment Planning Platform V2.0</p>
     </div>
     
-    <div id="alertBox" class="alert"></div>
+    <div id="alertBox" class="alert" ${message ? 'style="display: block;"' : ''}>${message || ''}</div>
     
-    <form id="loginForm" onsubmit="handleLogin(event); return false;">
-      <div class="form-group">
-        <label for="clientId">Enter Your Student ID</label>
-        <input type="text" id="clientId" name="clientId" required 
-               placeholder="Enter your Student ID" autocomplete="off">
+    <!-- Primary Login Form -->
+    <div id="primaryLogin">
+      <form id="loginForm" onsubmit="handleLogin(event); return false;">
+        <div class="form-group">
+          <label for="clientId">Enter Your Student ID</label>
+          <input type="text" id="clientId" name="clientId" required 
+                 placeholder="Enter your Student ID" autocomplete="off">
+        </div>
+        <button type="submit" class="btn-primary">Sign In</button>
+      </form>
+      
+      <div id="loadingSpinner">
+        <p style="color: #ad9168; font-size: 16px; margin-top: 10px;">Verifying...</p>
       </div>
-      <button type="submit" class="btn-primary">Sign In</button>
-    </form>
-    
-    <div id="loadingSpinner">
-      <p>Verifying...</p>
+      
+      <div style="text-align: center; margin: 20px 0; color: #94a3b8;">
+        <small>— OR —</small>
+      </div>
+      
+      <button type="button" class="btn-primary" style="background: transparent; border: 2px solid #ad9168; color: #ad9168;" 
+              onclick="showBackupLogin()">Can't Remember Your ID?</button>
     </div>
     
-    <div class="test-info">
-      <strong>Test Mode:</strong><br>
-      To test, click "Get Sample Client IDs" from the spreadsheet menu to get valid IDs.<br><br>
-      Or go directly to Tool 1:<br>
-      <a href="` + baseUrl + `?route=tool">Skip Login (Test)</a>
+    <!-- Backup Login Form -->
+    <div id="backupLogin" style="display: none;">
+      <button onclick="showPrimaryLogin()" style="background: none; border: none; color: #ad9168; cursor: pointer; margin-bottom: 20px;">
+        ← Back to Student ID login
+      </button>
+      
+      <form id="backupForm" onsubmit="handleBackupLogin(event); return false;">
+        <p style="color: #94a3b8; margin-bottom: 20px; font-size: 14px;">
+          Enter at least 2 of the following fields:
+        </p>
+        
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" name="firstName" placeholder="Your first name">
+        </div>
+        
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" name="lastName" placeholder="Your last name">
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="Your email address">
+        </div>
+        
+        <button type="submit" class="btn-primary">Look Up My Account</button>
+      </form>
     </div>
   </div>
 
@@ -234,9 +391,23 @@ function createLoginPage() {
       alertBox.textContent = message;
       alertBox.className = 'alert ' + type;
       alertBox.style.display = 'block';
-      setTimeout(() => {
-        alertBox.style.display = 'none';
-      }, 5000);
+      if (type !== 'error') {
+        setTimeout(() => {
+          alertBox.style.display = 'none';
+        }, 5000);
+      }
+    }
+    
+    function showPrimaryLogin() {
+      document.getElementById('primaryLogin').style.display = 'block';
+      document.getElementById('backupLogin').style.display = 'none';
+      document.getElementById('alertBox').style.display = 'none';
+    }
+    
+    function showBackupLogin() {
+      document.getElementById('primaryLogin').style.display = 'none';
+      document.getElementById('backupLogin').style.display = 'block';
+      document.getElementById('alertBox').style.display = 'none';
     }
     
     function handleLogin(event) {
@@ -251,14 +422,30 @@ function createLoginPage() {
       document.getElementById('loginForm').style.display = 'none';
       document.getElementById('loadingSpinner').style.display = 'block';
       
-      // Try to authenticate
+      // Try to authenticate and create session
       google.script.run
         .withSuccessHandler(function(result) {
+          // Check if result is null or undefined
+          if (!result) {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('loadingSpinner').style.display = 'none';
+            showAlert('No response from server. Please refresh and try again.', 'error');
+            return;
+          }
+          
           if (result.success) {
-            // Redirect to Dashboard (not directly to tool)
-            window.location.href = '` + baseUrl + `?route=dashboard&client=' + 
-              encodeURIComponent(result.clientId);
+            // Session created successfully, navigate with session token
+            const baseUrl = '${ScriptApp.getService().getUrl()}';
+            const dashboardUrl = baseUrl + '?route=dashboard' +
+              '&client=' + encodeURIComponent(result.clientId) +
+              '&session=' + encodeURIComponent(result.sessionId);
+            
             showAlert('Login successful!', 'success');
+            
+            // Navigate to dashboard after a brief delay
+            setTimeout(function() {
+              window.location.href = dashboardUrl;
+            }, 500);
           } else {
             document.getElementById('loginForm').style.display = 'block';
             document.getElementById('loadingSpinner').style.display = 'none';
@@ -271,463 +458,150 @@ function createLoginPage() {
           showAlert('System error. Please try again.', 'error');
           console.error(error);
         })
-        .lookupClientById(clientId);
+        .authenticateAndCreateSession(clientId);
     }
-  </script>
-</body>
-</html>
-  `;
-  
-  return HtmlService.createHtmlOutput(html)
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-}
-
-/**
- * Create dashboard page showing all available tools
- */
-function createDashboardPage(clientId) {
-  const baseUrl = ScriptApp.getService().getUrl();
-  
-  // Get user's completion status for all tools
-  const tools = [
-    { id: 'orientation', name: 'Tool 1: Orientation Assessment', week: 1, available: true },
-    { id: 'financial-clarity', name: 'Tool 2: Financial Clarity', week: 2, available: false },
-    { id: 'control-fear', name: 'Tool 3: Control Fear Grounding', week: 3, available: false },
-    { id: 'freedom-framework', name: 'Tool 4: Freedom Framework', week: 4, available: false },
-    { id: 'false-self-view', name: 'Tool 5: False Self View', week: 5, available: false },
-    { id: 'retirement-blueprint', name: 'Tool 6: Retirement Blueprint', week: 6, available: false },
-    { id: 'issues-showing-love', name: 'Tool 7: Issues Showing Love', week: 7, available: false },
-    { id: 'investment-tool', name: 'Tool 8: Investment Tool', week: 8, available: false }
-  ];
-  
-  // Check completion status for each tool
-  const toolStatuses = tools.map(tool => {
-    const completion = DataHub.checkToolCompletion(clientId, tool.id);
-    return {
-      ...tool,
-      completed: completion.completed,
-      completedAt: completion.completedAt,
-      version: completion.version
-    };
-  });
-  
-  const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - TruPath Financial V2.0</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Radley:wght@400&family=Rubik:wght@300;400;500;600;700&display=swap');
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Rubik', Arial, sans-serif;
-      background: linear-gradient(135deg, #4b4166, #1e192b);
-      min-height: 100vh;
-      padding: 20px;
-    }
-    .dashboard-container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .header {
-      background: rgba(20, 15, 35, 0.9);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(173, 145, 104, 0.2);
-      border-radius: 15px;
-      padding: 30px;
-      margin-bottom: 30px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-    }
-    .header h1 {
-      font-family: 'Radley', serif;
-      color: #ad9168;
-      font-size: 32px;
-      letter-spacing: 2px;
-      margin-bottom: 5px;
-      font-weight: 400;
-    }
-    .header .subtitle {
-      color: #94a3b8;
-      font-size: 14px;
-      margin-bottom: 20px;
-    }
-    .header p {
-      color: #94a3b8;
-      font-size: 16px;
-    }
-    .tools-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
-    }
-    .tool-card {
-      background: rgba(20, 15, 35, 0.9);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(173, 145, 104, 0.2);
-      border-radius: 12px;
-      padding: 25px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-      transition: all 0.3s;
-      position: relative;
-      cursor: pointer;
-      text-decoration: none;
-      color: inherit;
-      display: block;
-    }
-    .tool-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-    }
-    .tool-card.unavailable {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    .tool-card.unavailable:hover {
-      transform: none;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    .week-badge {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      background: #667eea;
-      color: white;
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-    .week-badge.completed {
-      background: #22c55e;
-    }
-    .tool-name {
-      font-size: 18px;
-      font-weight: 600;
-      color: #ffffff;
-      margin-bottom: 10px;
-    }
-    .tool-status {
-      color: #94a3b8;
-      font-size: 14px;
-      margin-top: 15px;
-    }
-    .completed-indicator {
-      color: #22c55e;
-      font-weight: 600;
-    }
-    .locked-indicator {
-      color: #999;
-      font-style: italic;
-    }
-    .btn-logout {
-      background: #dc3545;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      float: right;
-    }
-    .btn-logout:hover {
-      background: #c82333;
-    }
-    .progress-bar {
-      background: #e0e0e0;
-      height: 8px;
-      border-radius: 4px;
-      margin: 20px 0;
-      overflow: hidden;
-    }
-    .progress-fill {
-      background: linear-gradient(90deg, #667eea, #764ba2);
-      height: 100%;
-      transition: width 0.5s;
-    }
-  </style>
-</head>
-<body>
-  <div class="dashboard-container">
-    <div class="header">
-      <button class="btn-logout" onclick="logout()">Logout</button>
-      <h1>TruPath Financial</h1>
-      <p class="subtitle">Investment Planning Platform V2.0</p>
-      <p>Student ID: ` + clientId + `</p>
-      
-      <div class="progress-bar">
-        <div class="progress-fill" style="width: ` + ((toolStatuses.filter(t => t.completed).length / 8) * 100) + `%"></div>
-      </div>
-      <p>` + toolStatuses.filter(t => t.completed).length + ` of 8 tools completed</p>
-    </div>
     
-    <div class="tools-grid">
-      ` + toolStatuses.map(tool => {
-        const isClickable = tool.available;
-        const href = isClickable ? 
-          baseUrl + '?route=tool&tool=' + tool.id + '&client=' + clientId : 
-          '#';
-        const className = 'tool-card' + (!tool.available ? ' unavailable' : '');
-        const badgeClass = 'week-badge' + (tool.completed ? ' completed' : '');
-        
-        return '<a href="' + href + '" class="' + className + '" ' + 
-          (!isClickable ? 'onclick="event.preventDefault();"' : '') + '>' +
-          '<span class="' + badgeClass + '">Week ' + tool.week + '</span>' +
-          '<div class="tool-name">' + tool.name + '</div>' +
-          '<div class="tool-status">' +
-            (tool.completed ? 
-              '<span class="completed-indicator">✅ Completed' + 
-              (tool.version > 1 ? ' (v' + tool.version + ')' : '') + '</span>' :
-              (tool.available ? 
-                '<span>📝 Ready to start</span>' : 
-                '<span class="locked-indicator">🔒 Coming soon</span>')) +
-          '</div>' +
-        '</a>';
-      }).join('') + `
-    </div>
-  </div>
-  
-  <script>
-    function logout() {
-      if (confirm('Are you sure you want to logout?')) {
-        window.location.href = '` + baseUrl + `';
+    function handleBackupLogin(event) {
+      event.preventDefault();
+      
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName = document.getElementById('lastName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      
+      // Count how many fields were provided
+      let fieldCount = 0;
+      if (firstName) fieldCount++;
+      if (lastName) fieldCount++;
+      if (email) fieldCount++;
+      
+      if (fieldCount < 2) {
+        showAlert('Please provide at least 2 fields to look up your account', 'error');
+        return;
       }
+      
+      document.getElementById('backupLogin').style.display = 'none';
+      document.getElementById('loadingSpinner').style.display = 'block';
+      
+      // Try backup authentication
+      google.script.run
+        .withSuccessHandler(function(result) {
+          // Check if result is null or undefined
+          if (!result) {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            showBackupLogin();
+            showAlert('No response from server. Please refresh and try again.', 'error');
+            return;
+          }
+          
+          if (result.success) {
+            // Found account, now create session
+            showAlert('Account found! Logging you in...', 'success');
+            
+            // Create session with the found client ID
+            google.script.run
+              .withSuccessHandler(function(sessionResult) {
+                // Check if sessionResult is null or undefined
+                if (!sessionResult) {
+                  document.getElementById('loadingSpinner').style.display = 'none';
+                  showBackupLogin();
+                  showAlert('Session creation failed. Please refresh and try again.', 'error');
+                  return;
+                }
+                
+                if (sessionResult.success) {
+                  // Session created, navigate to dashboard
+                  const baseUrl = '${ScriptApp.getService().getUrl()}';
+                  const dashboardUrl = baseUrl + '?route=dashboard' +
+                    '&client=' + encodeURIComponent(sessionResult.clientId) +
+                    '&session=' + encodeURIComponent(sessionResult.sessionId);
+                  
+                  setTimeout(function() {
+                    window.location.href = dashboardUrl;
+                  }, 500);
+                } else {
+                  document.getElementById('loadingSpinner').style.display = 'none';
+                  showBackupLogin();
+                  showAlert('Failed to create session. Please try again.', 'error');
+                }
+              })
+              .withFailureHandler(function(error) {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                showBackupLogin();
+                showAlert('System error. Please try again.', 'error');
+                console.error(error);
+              })
+              .authenticateAndCreateSession(result.clientId);
+              
+          } else {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            showBackupLogin();
+            showAlert(result.error || 'No matching account found', 'error');
+          }
+        })
+        .withFailureHandler(function(error) {
+          document.getElementById('loadingSpinner').style.display = 'none';
+          showBackupLogin();
+          showAlert('System error. Please try again.', 'error');
+          console.error(error);
+        })
+        .lookupClientByDetails({
+          firstName: firstName,
+          lastName: lastName,
+          email: email
+        });
     }
   </script>
 </body>
 </html>
   `;
   
-  return HtmlService.createHtmlOutput(html)
+  return HtmlService.createHtmlOutput(loginHtml)
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 /**
- * Create welcome back page for returning students
+ * Create a simple, working dashboard page
+ * @param {string} clientId - The client ID
+ * @param {string} sessionId - The session token
  */
-function createWelcomeBackPage(clientId, toolId, completion) {
+function createSimpleDashboard(clientId, sessionId) {
   const baseUrl = ScriptApp.getService().getUrl();
-  const completedDate = new Date(completion.completedAt).toLocaleDateString();
-  const lastModified = completion.lastModified ? new Date(completion.lastModified).toLocaleDateString() : null;
-  const version = completion.version || 1;
   
-  const html = `
+  // Simple HTML dashboard
+  const dashboardHtml = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome Back - TruPath Financial V2.0</title>
+  <title>TruPath Financial - Dashboard</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Radley:wght@400&family=Rubik:wght@300;400;500;600;700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    
     body {
       font-family: 'Rubik', Arial, sans-serif;
       background: linear-gradient(135deg, #4b4166, #1e192b);
       background-attachment: fixed;
       min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       padding: 20px;
     }
-    .welcome-container {
-      background: rgba(20, 15, 35, 0.9);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(173, 145, 104, 0.2);
-      border-radius: 20px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-      width: 100%;
-      max-width: 600px;
-      padding: 40px;
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    .header h1 {
-      font-family: 'Radley', serif;
-      color: #ad9168;
-      font-size: 28px;
-      margin-bottom: 10px;
-      font-weight: 400;
-    }
-    .status-box {
-      background: rgba(173, 145, 104, 0.1);
-      border-left: 4px solid #ad9168;
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 30px;
-    }
-    .status-box h3 {
-      font-family: 'Radley', serif;
-      color: #ad9168;
-      margin-bottom: 10px;
-    }
-    .status-info {
-      color: #94a3b8;
-      line-height: 1.6;
-    }
-    .status-info strong {
-      color: #ffffff;
-    }
-    .actions {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-    .action-card {
-      border: 2px solid rgba(173, 145, 104, 0.2);
-      background: rgba(173, 145, 104, 0.05);
-      border-radius: 12px;
-      padding: 20px;
-      cursor: pointer;
-      transition: all 0.3s;
-      text-decoration: none;
-      color: inherit;
-      display: block;
-    }
-    .action-card:hover {
-      border-color: #ad9168;
-      background: rgba(173, 145, 104, 0.1);
-      box-shadow: 0 4px 12px rgba(173, 145, 104, 0.25);
-      transform: translateY(-2px);
-    }
-    .action-card h4 {
-      color: #ffffff;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .action-card p {
-      color: #94a3b8;
-      font-size: 14px;
-    }
-    .icon {
-      font-size: 24px;
-    }
-    .note {
-      background: rgba(173, 145, 104, 0.1);
-      border-left: 4px solid #ad9168;
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 20px;
-      font-size: 14px;
-      color: #94a3b8;
-    }
-  </style>
-</head>
-<body>
-  <div class="welcome-container">
-    <div class="header">
-      <h1>TruPath Financial</h1>
-      <p style="color: #94a3b8;">Welcome Back - You've already completed this assessment</p>
-    </div>
     
-    <div class="status-box">
-      <h3>Your Assessment Status</h3>
-      <div class="status-info">
-        <p><strong>Originally Completed:</strong> ` + completedDate + `</p>
-        ` + (lastModified ? '<p><strong>Last Updated:</strong> ' + lastModified + '</p>' : '') + `
-        <p><strong>Version:</strong> ` + version + `</p>
-        <p><strong>Tool:</strong> Orientation Assessment</p>
-      </div>
-    </div>
-    
-    <div class="actions">
-      <a href="` + baseUrl + `?route=tool&tool=` + toolId + `&client=` + clientId + `&action=view" class="action-card">
-        <h4><span class="icon">📊</span> View Your Report</h4>
-        <p>See your assessment results and download your PDF report</p>
-      </a>
-      
-      <a href="` + baseUrl + `?route=tool&tool=` + toolId + `&client=` + clientId + `&action=edit" class="action-card">
-        <h4><span class="icon">✏️</span> Update Your Answers</h4>
-        <p>Modify your existing responses (creates version ` + (version + 1) + `)</p>
-      </a>
-      
-      <a href="` + baseUrl + `?route=tool&tool=` + toolId + `&client=` + clientId + `&action=new" class="action-card">
-        <h4><span class="icon">🔄</span> Start Fresh</h4>
-        <p>Begin a completely new assessment (keeps previous as separate attempt)</p>
-      </a>
-    </div>
-    
-    <div class="note">
-      <strong>Note:</strong> Updating your answers will preserve your original completion date while tracking the changes you make. Starting fresh creates a new assessment alongside your existing one.
-    </div>
-  </div>
-</body>
-</html>
-  `;
-  
-  return HtmlService.createHtmlOutput(html)
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-}
-
-/**
- * Create report view page for displaying assessment results
- */
-function createReportView(clientId, toolId, data) {
-  try {
-    const baseUrl = ScriptApp.getService().getUrl();
-    
-    // Ensure data exists
-    if (!data) {
-      return createErrorPage('No data available for this assessment.');
-    }
-    
-    // Calculate insights from data
-    let insights = [];
-    let scoreData = {};
-    try {
-      // The Middleware expects a profile object with demographics
-      const profile = {
-        demographics: data,
-        orientation: data
-      };
-      insights = Middleware.generateInsights(profile);
-      // Generate a simple score based on data
-      if (data.income) {
-        const incomeScore = data.income === 'Above $100k' ? 80 : data.income === '$50k-$100k' ? 60 : 40;
-        const savingsScore = data.savings === 'More than 6 months' ? 80 : data.savings === '3-6 months' ? 60 : 40;
-        scoreData.totalScore = (incomeScore + savingsScore) / 2;
-      }
-    } catch (insightError) {
-      console.error('Error generating insights:', insightError);
-      // Continue without insights
-    }
-  
-  const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Assessment Report - TruPath Financial V2.0</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Radley:wght@400&family=Rubik:wght@300;400;500;600;700&display=swap');
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Rubik', Arial, sans-serif;
-      background: linear-gradient(135deg, #4b4166, #1e192b);
-      min-height: 100vh;
-      padding: 20px;
-    }
-    .report-container {
-      max-width: 900px;
+    .container {
+      max-width: 1200px;
       margin: 0 auto;
+    }
+    
+    .header {
       background: rgba(20, 15, 35, 0.9);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(173, 145, 104, 0.2);
       border-radius: 20px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-      padding: 40px;
-    }
-    .header {
+      padding: 30px;
       text-align: center;
-      margin-bottom: 40px;
-      border-bottom: 3px solid #AD9168;
-      padding-bottom: 30px;
+      margin-bottom: 30px;
     }
-    .header h1 {
+    
+    .logo {
       font-family: 'Radley', serif;
       color: #ad9168;
       font-size: 36px;
@@ -735,195 +609,283 @@ function createReportView(clientId, toolId, data) {
       margin-bottom: 10px;
       font-weight: 400;
     }
-    .header .subtitle {
+    
+    .subtitle {
       color: #94a3b8;
-      font-size: 14px;
-      margin-bottom: 20px;
+      font-size: 16px;
     }
-    .score-section {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 30px;
-      border-radius: 15px;
+    
+    .welcome {
+      color: #fff;
+      font-size: 20px;
+      margin-top: 20px;
+    }
+    
+    .info-box {
+      background: rgba(173, 145, 104, 0.1);
+      border: 1px solid rgba(173, 145, 104, 0.3);
+      border-radius: 10px;
+      padding: 20px;
       margin-bottom: 30px;
-      text-align: center;
+      color: #fff;
     }
-    .score-value {
-      font-size: 72px;
-      font-weight: bold;
-      margin: 10px 0;
-    }
-    .score-label {
-      font-size: 18px;
-      opacity: 0.9;
-    }
-    .data-section {
-      margin: 30px 0;
-    }
-    .data-section h3 {
+    
+    .info-box h3 {
       color: #ad9168;
-      font-family: 'Radley', serif;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid rgba(173, 145, 104, 0.2);
+      margin-bottom: 10px;
     }
-    .data-row {
+    
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .tool-card {
+      background: rgba(20, 15, 35, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(173, 145, 104, 0.2);
+      border-radius: 15px;
+      padding: 25px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    
+    .tool-card:hover {
+      transform: translateY(-5px);
+      border-color: #ad9168;
+      box-shadow: 0 10px 30px rgba(173, 145, 104, 0.2);
+    }
+    
+    .tool-card.locked {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .tool-card.locked:hover {
+      transform: none;
+      border-color: rgba(173, 145, 104, 0.2);
+    }
+    
+    .tool-header {
       display: flex;
       justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid #f0f0f0;
+      align-items: flex-start;
+      margin-bottom: 15px;
     }
-    .data-label {
-      color: #94a3b8;
-      font-weight: 500;
-    }
-    .data-value {
-      color: #ffffff;
-      text-align: right;
-    }
-    .actions {
+    
+    .tool-number {
+      background: #ad9168;
+      color: #1e192b;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
       display: flex;
-      gap: 15px;
-      margin-top: 40px;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
     }
-    .btn {
-      flex: 1;
-      padding: 15px 25px;
+    
+    .tool-status {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .status-available {
+      background: #ad9168;
+      color: #1e192b;
+    }
+    
+    .status-locked {
+      background: rgba(148, 163, 184, 0.2);
+      color: #94a3b8;
+    }
+    
+    .tool-title {
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .tool-description {
+      color: #94a3b8;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+    
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #ad9168;
+      color: #1e192b;
       border: none;
       border-radius: 8px;
-      font-size: 16px;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s;
-      text-align: center;
       text-decoration: none;
-      display: inline-block;
+      transition: all 0.3s;
     }
-    .btn-primary {
-      background: #667eea;
-      color: white;
-    }
-    .btn-primary:hover {
-      background: #5a67d8;
+    
+    .button:hover {
+      background: #c4a877;
       transform: translateY(-2px);
     }
-    .btn-secondary {
-      background: #e0e0e0;
-      color: #333;
+    
+    .button.secondary {
+      background: transparent;
+      color: #ad9168;
+      border: 2px solid #ad9168;
     }
-    .btn-secondary:hover {
-      background: #d0d0d0;
+    
+    .button.secondary:hover {
+      background: #ad9168;
+      color: #1e192b;
     }
-    .btn-success {
-      background: #22c55e;
-      color: white;
-    }
-    .btn-success:hover {
-      background: #16a34a;
+    
+    .logout-container {
+      text-align: center;
+      margin-top: 30px;
     }
   </style>
 </head>
 <body>
-  <div class="report-container">
+  <div class="container">
     <div class="header">
-      <h1>TruPath Financial</h1>
-      <p class="subtitle">Investment Planning Platform V2.0</p>
-      <h2 style="color: #ffffff; font-family: 'Radley', serif;">Orientation Assessment Report</h2>
-      <p style="color: #94a3b8;">Student ID: ` + clientId + `</p>
+      <h1 class="logo">TruPath Financial</h1>
+      <p class="subtitle">Your Journey to Financial Freedom</p>
+      <p class="welcome">Welcome! You are logged in as: <strong>${clientId || 'Guest'}</strong></p>
     </div>
     
-    ` + (scoreData.totalScore ? `
-    <div class="score-section">
-      <div class="score-label">Financial Foundation Score</div>
-      <div class="score-value">` + Math.round(scoreData.totalScore) + `%</div>
-      <div class="score-label">` + (scoreData.totalScore >= 70 ? 'Strong Foundation' : scoreData.totalScore >= 40 ? 'Developing Foundation' : 'Needs Attention') + `</div>
-    </div>
-    ` : '') + `
-    
-    <div class="data-section">
-      <h3>Personal Information</h3>
-      <div class="data-row">
-        <span class="data-label">Name:</span>
-        <span class="data-value">` + (data.firstName || '') + ` ` + (data.lastName || '') + `</span>
-      </div>
-      <div class="data-row">
-        <span class="data-label">Email:</span>
-        <span class="data-value">` + (data.email || 'Not provided') + `</span>
-      </div>
-      <div class="data-row">
-        <span class="data-label">Age:</span>
-        <span class="data-value">` + (data.age || 'Not provided') + `</span>
-      </div>
+    <div class="info-box">
+      <h3>Session Information</h3>
+      <p>Client ID: ${clientId || 'Not set'}</p>
+      <p>Session Token: ${sessionId ? sessionId.substring(0, 8) + '...' : 'Not set'}</p>
+      <p>Status: Active</p>
     </div>
     
-    <div class="data-section">
-      <h3>Financial Situation</h3>
-      <div class="data-row">
-        <span class="data-label">Income Level:</span>
-        <span class="data-value">` + (data.income || 'Not provided') + `</span>
+    <div class="tools-grid">
+      <!-- Tool 1 - Always Available -->
+      <div class="tool-card" onclick="navigateToTool('orientation')">
+        <div class="tool-header">
+          <span class="tool-number">1</span>
+          <span class="tool-status status-available">AVAILABLE</span>
+        </div>
+        <h3 class="tool-title">Orientation Assessment</h3>
+        <p class="tool-description">Complete your comprehensive financial profile and receive personalized insights.</p>
+        <span class="button">Start Now</span>
       </div>
-      <div class="data-row">
-        <span class="data-label">Savings:</span>
-        <span class="data-value">` + (data.savings || 'Not provided') + `</span>
+      
+      <!-- Tool 2 - Coming Soon -->
+      <div class="tool-card locked">
+        <div class="tool-header">
+          <span class="tool-number">2</span>
+          <span class="tool-status status-locked">COMING SOON</span>
+        </div>
+        <h3 class="tool-title">Financial Clarity</h3>
+        <p class="tool-description">Deep dive into your income, expenses, and cash flow.</p>
       </div>
-      <div class="data-row">
-        <span class="data-label">Debt:</span>
-        <span class="data-value">` + (data.debt || 'Not provided') + `</span>
+      
+      <!-- Tool 3 - Coming Soon -->
+      <div class="tool-card locked">
+        <div class="tool-header">
+          <span class="tool-number">3</span>
+          <span class="tool-status status-locked">COMING SOON</span>
+        </div>
+        <h3 class="tool-title">Control Fear Grounding</h3>
+        <p class="tool-description">Master your emotions around money.</p>
       </div>
-    </div>
-    
-    <div class="data-section">
-      <h3>Assessment Details</h3>
-      <div class="data-row">
-        <span class="data-label">Completed:</span>
-        <span class="data-value">` + (data.originalTimestamp ? new Date(data.originalTimestamp).toLocaleDateString() : 'N/A') + `</span>
-      </div>
-      <div class="data-row">
-        <span class="data-label">Last Modified:</span>
-        <span class="data-value">` + (data.lastModified ? new Date(data.lastModified).toLocaleDateString() : 'Never') + `</span>
-      </div>
-      <div class="data-row">
-        <span class="data-label">Version:</span>
-        <span class="data-value">` + (data.version || 1) + `</span>
+      
+      <!-- Tool 4 - Coming Soon -->
+      <div class="tool-card locked">
+        <div class="tool-header">
+          <span class="tool-number">4</span>
+          <span class="tool-status status-locked">COMING SOON</span>
+        </div>
+        <h3 class="tool-title">SMART Goals</h3>
+        <p class="tool-description">Transform dreams into actionable goals.</p>
       </div>
     </div>
     
-    <div class="actions">
-      <button class="btn btn-success" onclick="generatePDF()">📄 Download PDF Report</button>
-      <a href="` + baseUrl + `?route=tool&client=` + clientId + `&action=edit" class="btn btn-primary">✏️ Edit Answers</a>
-      <a href="` + baseUrl + `?route=dashboard&client=` + clientId + `" class="btn btn-secondary">🏠 Back to Dashboard</a>
+    <div class="logout-container">
+      <button onclick="window.top.location.href = '${baseUrl}'" class="button secondary">Sign Out</button>
     </div>
   </div>
   
   <script>
-    function generatePDF() {
-      google.script.run.withSuccessHandler(function(result) {
-        if (result && result.url) {
-          window.open(result.url, '_blank');
-        } else {
-          alert('Could not generate PDF. Please try again.');
-        }
-      }).generatePDFReport('` + clientId + `', '` + toolId + `');
+    function navigateToTool(toolId) {
+      const baseUrl = '${baseUrl}';
+      const toolUrl = baseUrl + '?route=tool' + 
+        '&tool=' + toolId + 
+        '&client=${clientId || ''}' +
+        '&session=${sessionId || ''}';
+      window.location.href = toolUrl;
     }
   </script>
 </body>
 </html>
   `;
   
-    return HtmlService.createHtmlOutput(html)
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-  } catch (error) {
-    console.error('Error in createReportView:', error);
-    return createErrorPage('Error creating report view: ' + error.toString());
-  }
+  return HtmlService.createHtmlOutput(dashboardHtml)
+    .setTitle('TruPath Financial - Dashboard')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 /**
+ * Create dashboard page - redirects to simple dashboard
+ */
+function createDashboardPage(clientId, sessionId) {
+  // Using the simple dashboard implementation
+  return createSimpleDashboard(clientId, sessionId);
+}
+
+// Old complex dashboard implementation has been removed to avoid conflicts
+// The createSimpleDashboard function above is now used for all dashboard rendering
+/**
  * Create error page
  */
-function createErrorPage(errorMessage) {
-  const html = '<html><body><h1>Error</h1><p>' + errorMessage + '</p></body></html>';
-  return HtmlService.createHtmlOutput(html)
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+function createErrorPage(message) {
+  const errorPageHtml = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Error</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          margin: 0;
+          background: #f5f5f5;
+        }
+        .error-box {
+          background: white;
+          padding: 40px;
+          border-radius: 10px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+          text-align: center;
+        }
+        h1 { color: #e74c3c; }
+        p { color: #666; }
+      </style>
+    </head>
+    <body>
+      <div class="error-box">
+        <h1>Error</h1>
+        <p>${message}</p>
+      </div>
+    </body>
+    </html>
+  `;
+  return HtmlService.createHtmlOutput(errorPageHtml);
 }
 
 /**
@@ -935,11 +897,8 @@ function handleAdminRoute(adminKey) {
     return createErrorPage('Unauthorized');
   }
   
-  const baseUrl = ScriptApp.getService().getUrl();
-  
-  // For now, show the test interface
-  const html = `
-    <!DOCTYPE html>
+  // Show the test interface
+  const adminHtml = `<!DOCTYPE html>
     <html>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1000,8 +959,8 @@ function handleAdminRoute(adminKey) {
           
           <div class="section">
             <h3>Quick Links</h3>
-            <a href="` + baseUrl + `" class="btn">Login Page</a>
-            <a href="` + baseUrl + `?route=dashboard&client=TEST-001&session=test" class="btn">
+            <a href="${ScriptApp.getService().getUrl()}" class="btn">Login Page</a>
+            <a href="${ScriptApp.getService().getUrl()}?route=dashboard&client=TEST-001&session=test" class="btn">
               Test Dashboard
             </a>
           </div>
@@ -1032,7 +991,7 @@ function handleAdminRoute(adminKey) {
     </html>
   `;
   
-  return HtmlService.createHtmlOutput(html)
+  return HtmlService.createHtmlOutput(adminHtml)
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
@@ -1075,38 +1034,43 @@ function getCurrentWeek() {
 }
 
 /**
- * Save user data to the master spreadsheet with versioning
+ * Save user data to the master spreadsheet
  * @param {string} userId - User ID
  * @param {string} toolId - Tool identifier
  * @param {Object} data - Data to save
- * @param {string} saveMode - 'new', 'update', or 'fresh'
  * @returns {Object} Success status
  */
-function saveUserData(userId, toolId, data, saveMode = 'new') {
+function saveUserData(userId, toolId, data) {
   try {
-    // Set save options based on mode
-    const options = {};
-    if (saveMode === 'update') {
-      options.updateExisting = true;
-    } else if (saveMode === 'fresh') {
-      options.createNew = true;
-    }
+    console.log(`saveUserData called - userId: ${userId}, toolId: ${toolId}, data fields: ${Object.keys(data).length}`);
     
-    const result = DataHub.saveToolData(userId, toolId, data, options);
+    // Use DataService for saving tool data
+    const result = DataService.saveToolResponse(userId, toolId, data);
+    
+    console.log(`DataService.saveToolResponse result:`, result);
     
     // Log the save event
     logEvent('DATA_SAVED', {
       userId: userId,
       tool: toolId,
-      saveMode: saveMode,
-      timestamp: new Date()
+      timestamp: new Date(),
+      success: result.success
     });
     
-    return {
-      success: true,
-      message: 'Data saved successfully',
-      insights: result.insights
-    };
+    if (result.success) {
+      return {
+        success: true,
+        message: result.message || 'Data saved successfully',
+        insights: result.insights || [],
+        timestamp: result.timestamp
+      };
+    } else {
+      return {
+        success: false,
+        message: result.error || 'Failed to save data',
+        error: result.error
+      };
+    }
   } catch (error) {
     console.error('Error saving data:', error);
     logEvent('SAVE_ERROR', {
@@ -1124,22 +1088,6 @@ function saveUserData(userId, toolId, data, saveMode = 'new') {
 }
 
 /**
- * Load existing tool data for a user
- * @param {string} userId - User ID
- * @param {string} toolId - Tool identifier
- * @returns {Object} Existing data or null
- */
-function loadUserToolData(userId, toolId) {
-  try {
-    const completion = DataHub.checkToolCompletion(userId, toolId);
-    return completion.completed ? completion.data : null;
-  } catch (error) {
-    console.error('Error loading user data:', error);
-    return null;
-  }
-}
-
-/**
  * Get user profile data
  * @param {string} userId - User ID
  * @returns {Object} User profile data
@@ -1150,6 +1098,56 @@ function getUserProfile(userId) {
   } catch (error) {
     console.error('Error getting profile:', error);
     return null;
+  }
+}
+
+/**
+ * Authenticate user and create session
+ * This is the main login function that combines authentication with session creation
+ * @param {string} clientId - The client ID to authenticate
+ * @returns {Object} Result with session info or error
+ */
+function authenticateAndCreateSession(clientId) {
+  try {
+    // Step 1: Authenticate the client ID
+    const authResult = lookupClientById(clientId);
+    
+    if (!authResult.success) {
+      return {
+        success: false,
+        error: authResult.error || 'Authentication failed'
+      };
+    }
+    
+    // Step 2: Create a session for the authenticated user
+    const sessionResult = createSession(authResult.clientId);
+    
+    if (!sessionResult.success) {
+      return {
+        success: false,
+        error: 'Failed to create session. Please try again.'
+      };
+    }
+    
+    // Step 3: Return combined result
+    return {
+      success: true,
+      clientId: authResult.clientId,
+      sessionId: sessionResult.sessionId,
+      firstName: authResult.firstName,
+      lastName: authResult.lastName,
+      email: authResult.email,
+      hasCompletedTools: authResult.hasCompletedTools,
+      loginTime: sessionResult.loginTime,
+      expiresAt: sessionResult.expiresAt
+    };
+    
+  } catch (error) {
+    console.error('Error in authenticateAndCreateSession:', error);
+    return {
+      success: false,
+      error: 'System error during login. Please try again.'
+    };
   }
 }
 
@@ -1397,7 +1395,7 @@ function openAdminPanel() {
   }
   
   const adminUrl = url + '?route=admin&key=admin2024';
-  const html = `
+  const adminUrlHtml = `
     <div style="padding: 20px; font-family: Arial, sans-serif;">
       <h3>Admin Panel URL</h3>
       <p>Click the link below to open the admin panel:</p>
@@ -1411,7 +1409,7 @@ function openAdminPanel() {
   `;
   
   SpreadsheetApp.getUi().showModalDialog(
-    HtmlService.createHtmlOutput(html).setWidth(500).setHeight(250),
+    HtmlService.createHtmlOutput(adminUrlHtml).setWidth(500).setHeight(250),
     'Open Admin Panel'
   );
 }
@@ -1794,7 +1792,7 @@ function testWebApp() {
     </div>
   ` : `<p>Web App URL: <a href="${url}" target="_blank">${url}</a></p>`;
   
-  const html = `
+  const statusHtml = `
     <div style="padding: 20px; font-family: Arial, sans-serif;">
       <h2>Financial TruPath V2.0 - Platform Status</h2>
       ${deploymentInstructions}
@@ -1815,7 +1813,7 @@ function testWebApp() {
   `;
   
   SpreadsheetApp.getUi().showModalDialog(
-    HtmlService.createHtmlOutput(html).setWidth(450).setHeight(400),
+    HtmlService.createHtmlOutput(statusHtml).setWidth(450).setHeight(400),
     'Platform Test'
   );
 }

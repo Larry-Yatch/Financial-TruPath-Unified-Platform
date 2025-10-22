@@ -3,6 +3,41 @@
  * Single source of truth for all student data across tools
  */
 
+// Temporary Middleware stub until InsightEngine.js is built in Session 4
+const Middleware = {
+  generateInsights(profile) {
+    // Basic insight generation until full InsightEngine is implemented
+    const insights = [];
+    
+    if (profile && profile.demographics) {
+      // Add basic demographic insights
+      if (profile.demographics.age > 50) {
+        insights.push({
+          type: 'age-based',
+          priority: 'high',
+          message: 'Consider retirement planning focus'
+        });
+      }
+    }
+    
+    return insights;
+  },
+  
+  generateOrientationReport(data) {
+    // Basic report structure
+    return {
+      summary: 'Orientation assessment completed',
+      timestamp: new Date(),
+      data: data
+    };
+  },
+  
+  recommendNextTool(profile) {
+    // Simple next tool recommendation
+    return 'tool2';
+  }
+};
+
 const DataHub = {
   /**
    * Get unified profile for a student

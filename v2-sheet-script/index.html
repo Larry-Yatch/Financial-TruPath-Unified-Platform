@@ -281,41 +281,40 @@
 
     <script>
       // Platform configuration from server
-      const userId = '<?!= userId ?>' || 'user-' + Date.now();
-      const currentWeek = <?!= currentWeek ?> || 1;
-      const action = '<?!= action ?>' || 'new';
-      const existingData = <?!= JSON.stringify(existingData || {}) ?>;
+      const userId = '<?!= userId || "" ?>' || 'user-' + Date.now();
+      const currentWeek = <?!= currentWeek || 1 ?>;
+      const sessionId = '<?!= sessionId || "" ?>' || '';
       
-      // Update week display and load existing data if in edit mode
+      // Debug info
+      console.log('Tool1 Page Loaded - userId:', userId, 'sessionId:', sessionId, 'currentWeek:', currentWeek);
+      
+      // Update week display and check for auto-load
       document.addEventListener('DOMContentLoaded', function() {
         const weekSpan = document.getElementById('current-week');
         if (weekSpan) {
           weekSpan.textContent = currentWeek;
         }
         
-        // Load existing data if in edit mode
-        if (action === 'edit' && existingData && Object.keys(existingData).length > 0) {
-          console.log('Loading existing data for editing...');
-          
-          // Populate form fields with existing data
-          const fields = ['firstName', 'lastName', 'email', 'phone', 'age', 'gender', 
-                         'income', 'savings', 'debt', 'goals', 'challenges', 'risk_tolerance'];
-          
-          fields.forEach(field => {
-            const element = document.querySelector(`[name="${field}"]`);
-            if (element && existingData[field]) {
-              element.value = existingData[field];
-            }
-          });
-          
-          // Show a notice that they're editing
-          const toolContainer = document.getElementById('tool-container');
-          if (toolContainer) {
-            const editNotice = document.createElement('div');
-            editNotice.className = 'edit-notice';
-            editNotice.style.cssText = 'background: #fef3c7; color: #92400e; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #f59e0b;';
-            editNotice.innerHTML = '<strong>Edit Mode:</strong> You are updating your existing assessment. Your original completion date will be preserved.';
-            toolContainer.insertBefore(editNotice, toolContainer.firstChild);
+        // Check URL parameters for tool auto-load
+        const urlParams = new URLSearchParams(window.location.search);
+        const route = urlParams.get('route');
+        const toolParam = urlParams.get('tool');
+        
+        console.log('DOMContentLoaded - route:', route, 'tool:', toolParam);
+        
+        // Auto-load tool if coming from dashboard
+        if (route === 'tool' || route === 'orientation') {
+          console.log('Auto-loading orientation tool...');
+          // Hide the dashboard hub and show tool directly
+          const dashboardHub = document.querySelector('.card h2');
+          if (dashboardHub && dashboardHub.textContent.includes('Course Tools Hub')) {
+            console.log('Found dashboard hub, loading tool...');
+            setTimeout(() => {
+              loadTool('orientation');
+            }, 100);
+          } else {
+            // If no dashboard hub, load tool immediately
+            loadTool('orientation');
           }
         }
       });
@@ -697,14 +696,25 @@
         button.textContent = 'Analyzing your profile...';
         
         // Call server function
-        // Determine save mode based on action
-        const saveMode = action === 'edit' ? 'update' : 'new';
-        
         google.script.run
           .withSuccessHandler(function(result) {
-            // Generate and display the insights report
-            const report = generateLocalInsightsReport(data);
-            displayInsightsReport(report);
+            console.log('Save result:', result);
+            
+            // Check if save was successful
+            if (result && result.success) {
+              // Generate and display the insights report
+              const report = generateLocalInsightsReport(data);
+              // Add any server insights if available
+              if (result.insights && result.insights.length > 0) {
+                report.serverInsights = result.insights;
+              }
+              displayInsightsReport(report);
+            } else {
+              // Handle save failure
+              button.disabled = false;
+              button.textContent = '📊 Generate My Personalized Insights Report';
+              alert('Failed to save data: ' + (result.message || 'Unknown error'));
+            }
           })
           .withFailureHandler(function(error) {
             button.disabled = false;
@@ -712,7 +722,7 @@
             alert('Error saving data: ' + error);
             console.error('Save error:', error);
           })
-          .saveUserData(userId, 'orientation', data, saveMode);
+          .saveUserData(userId, 'tool1', data);
       }
       
       // Generate Insights Report Locally
@@ -927,7 +937,7 @@
                   Continue to Tool 2
                 </button>
               ` : ''}
-              <button onclick="location.reload()" class="btn-secondary" style="background: var(--card-bg); color: var(--text);">
+              <button onclick="window.location.href = '${window.location.origin}${window.location.pathname}?route=dashboard&client=${userId}'" class="btn-secondary" style="background: var(--card-bg); color: var(--text);">
                 Return to Dashboard
               </button>
             </div>

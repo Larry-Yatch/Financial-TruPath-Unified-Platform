@@ -17,30 +17,32 @@ const Tool1_Orientation = {
         ...formData,
         userId: clientId,
         timestamp: new Date(),
-        toolId: 'orientation'
+        toolId: 'tool1'
       };
       
-      // Save to DataHub
-      const saveResult = DataHub.saveToolData(clientId, 'orientation', data);
+      // Save to DataService (new implementation)
+      const saveResult = DataService.saveToolResponse(clientId, 'tool1', data);
       
       if (!saveResult.success) {
         return {
           success: false,
-          error: 'Failed to save assessment data'
+          error: saveResult.error || 'Failed to save assessment data'
         };
       }
       
-      // Generate comprehensive report
-      const report = Middleware.generateOrientationReport(data);
+      // Generate basic report (Middleware will be connected in Session 4)
+      const report = this.generateBasicReport(data);
+      
+      // Get any insights generated
+      const insights = saveResult.insights || [];
       
       return {
         success: true,
         report: report,
-        insights: saveResult.insights,
-        nextTool: Middleware.recommendNextTool({ 
-          metadata: { completedTools: ['orientation'] },
-          demographics: data 
-        })
+        insights: insights,
+        message: saveResult.message,
+        timestamp: saveResult.timestamp,
+        nextTool: 'tool2' // Will be dynamic later
       };
       
     } catch (error) {
@@ -59,12 +61,48 @@ const Tool1_Orientation = {
    */
   getExistingData(clientId) {
     try {
-      const profile = DataHub.getUnifiedProfile(clientId);
-      return profile.demographics || null;
+      // Use DataService to get existing Tool 1 data
+      const response = DataService.getToolResponse(clientId, 'tool1');
+      return response ? response.data : null;
     } catch (error) {
       console.error('Error loading orientation data:', error);
       return null;
     }
+  },
+  
+  /**
+   * Generate basic report from orientation data
+   * @param {Object} data - Orientation form data
+   * @returns {Object} Basic report structure
+   */
+  generateBasicReport(data) {
+    const report = {
+      summary: {
+        name: `${data.firstName || ''} ${data.lastName || ''}`,
+        age: data.age,
+        status: data.maritalStatus,
+        dependents: data.dependents || 0
+      },
+      financial: {
+        income: data.income,
+        employmentStatus: data.employmentStatus,
+        primaryConcern: data.primaryFinancialConcern,
+        debtLevel: data.totalDebt
+      },
+      goals: {
+        shortTerm: data.shortTermGoals,
+        longTerm: data.longTermGoals,
+        retirementTarget: data.retirementAge
+      },
+      readiness: {
+        confidenceLevel: data.financialConfidence,
+        knowledgeLevel: data.financialKnowledge,
+        stressLevel: data.financialStress
+      },
+      timestamp: new Date().toISOString()
+    };
+    
+    return report;
   },
   
   /**

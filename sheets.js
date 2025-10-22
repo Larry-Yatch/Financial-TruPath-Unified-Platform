@@ -25,12 +25,17 @@ const TOKEN_SEARCH_PATHS = [
 
 // Your commonly used sheets (add more as needed)
 const SHEETS = {
-  // Investment Tool
+  // Investment Tool (V1)
   scenarios: '1_c4JB4VG4q-fekL2T1s6nUo83Ko1nZbAkSkDfFM1X0M',
   roster: '104pHxIgsGAcOrktL75Hi7WlEd8j0BoeadntLR9PrGYo',
   
-  // Add your other project sheets here
-  // myProject: 'sheet-id-here',
+  // Financial TruPath V2 - Main Database
+  v2_data: '18qpjnCvFVYDXOAN14CKb3ceoiG6G_nIFc9n3ZO5St24',
+  
+  // Quick access to specific V2 sheets
+  sessions: '18qpjnCvFVYDXOAN14CKb3ceoiG6G_nIFc9n3ZO5St24',
+  responses: '18qpjnCvFVYDXOAN14CKb3ceoiG6G_nIFc9n3ZO5St24',
+  tool_status: '18qpjnCvFVYDXOAN14CKb3ceoiG6G_nIFc9n3ZO5St24',
 };
 
 // Cache auth to avoid re-reading token

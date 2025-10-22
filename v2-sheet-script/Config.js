@@ -15,11 +15,21 @@ const CONFIG = {
   
   // Sheet Names
   SHEETS: {
+    // Original sheets
     STUDENTS: 'Students',
     TOOL1_ORIENTATION: 'Tool1_Orientation',
     TOOL2_FINANCIAL_CLARITY: 'Tool2_FinancialClarity',
     INSIGHTS: 'CrossToolInsights',
-    LOGS: 'SystemLogs'
+    LOGS: 'SystemLogs',
+    
+    // V2 System sheets
+    SESSIONS: 'SESSIONS',
+    RESPONSES: 'RESPONSES',
+    TOOL_STATUS: 'TOOL_STATUS',
+    TOOL_ACCESS: 'TOOL_ACCESS',
+    ACTIVITY_LOG: 'ACTIVITY_LOG',
+    ADMINS: 'ADMINS',
+    CONFIG: 'CONFIG'
   }
 };
 
@@ -29,11 +39,14 @@ const CONFIG = {
 function initializePlatform() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   
-  // Create sheets if they don't exist
+  // Create original sheets if they don't exist
   createSheetIfNotExists(CONFIG.SHEETS.STUDENTS);
   createSheetIfNotExists(CONFIG.SHEETS.TOOL1_ORIENTATION);
   createSheetIfNotExists(CONFIG.SHEETS.INSIGHTS);
   createSheetIfNotExists(CONFIG.SHEETS.LOGS);
+  
+  // Create V2 system sheets with proper configuration
+  setupAllSheets();
   
   console.log('Platform initialized successfully');
 }
