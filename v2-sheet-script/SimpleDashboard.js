@@ -265,10 +265,22 @@ function createSimpleDashboard(clientId, sessionId) {
   <script>
     function navigateToTool(toolId) {
       const baseUrl = '${baseUrl}';
-      const toolUrl = baseUrl + '?route=tool' + 
-        '&tool=' + toolId + 
-        '&client=${clientId || ''}' +
-        '&session=${sessionId || ''}';
+      // Build URL with only non-empty parameters
+      let toolUrl = baseUrl + '?route=tool&tool=' + toolId;
+      
+      // Add client ID if available
+      const clientId = '${clientId || ''}';
+      if (clientId) {
+        toolUrl += '&client=' + clientId;
+      }
+      
+      // Add session if available
+      const sessionId = '${sessionId || ''}';
+      if (sessionId) {
+        toolUrl += '&session=' + sessionId;
+      }
+      
+      console.log('Navigating to:', toolUrl);
       window.location.href = toolUrl;
     }
   </script>

@@ -40,6 +40,66 @@ function doGet(e) {
       return createLoginPage();
       
     } else if (route === 'tool' || route === 'orientation') {
+      // TEMPORARY: Simple HTML test to diagnose blank page issue
+      const clientId = e.parameter.client || 'TEST001';
+      const sessionId = e.parameter.session || 'test-session';
+      
+      // Option 2: Simple HTML that definitely works
+      const simpleHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <base target="_top">
+          <title>Tool1 Test</title>
+        </head>
+        <body>
+          <h1>Tool1 Simple Test</h1>
+          <p>If you see this, routing works!</p>
+          <hr>
+          <p>Client ID: ${clientId}</p>
+          <p>Session: ${sessionId}</p>
+          <p>Route: ${route}</p>
+          <hr>
+          <h2>Quick Test Form</h2>
+          <form onsubmit="testSave(event)">
+            <input type="text" id="testName" placeholder="Enter name" required>
+            <button type="submit">Test Save</button>
+          </form>
+          <div id="result"></div>
+          
+          <script>
+            console.log('Simple HTML loaded successfully');
+            console.log('Client:', '${clientId}');
+            console.log('Session:', '${sessionId}');
+            
+            function testSave(e) {
+              e.preventDefault();
+              const name = document.getElementById('testName').value;
+              document.getElementById('result').innerHTML = 'Saving...';
+              
+              google.script.run
+                .withSuccessHandler(function(result) {
+                  console.log('Save result:', result);
+                  document.getElementById('result').innerHTML = 
+                    '<p style="color:green">Success: ' + JSON.stringify(result) + '</p>';
+                })
+                .withFailureHandler(function(error) {
+                  console.error('Save error:', error);
+                  document.getElementById('result').innerHTML = 
+                    '<p style="color:red">Error: ' + error + '</p>';
+                })
+                .saveUserData('${clientId}', 'tool1', {name: name, test: true});
+            }
+          </script>
+        </body>
+        </html>
+      `;
+      
+      return HtmlService.createHtmlOutput(simpleHtml)
+        .setTitle('Tool1 Simple Test')
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+        
+      /* COMMENTED OUT - Complex template causing issues
       // Validate session for tool access
       const sessionId = e.parameter.session || '';
       const clientId = e.parameter.client || '';
@@ -62,6 +122,7 @@ function doGet(e) {
         .setTitle('Financial TruPath V2.0 - Orientation Assessment')
         .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
         .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
+      */
     }
     
     // Default: Show login page (inline HTML)
