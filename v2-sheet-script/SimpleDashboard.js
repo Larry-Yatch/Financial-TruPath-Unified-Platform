@@ -258,7 +258,7 @@ function createSimpleDashboard(clientId, sessionId) {
     </div>
     
     <div class="logout-container">
-      <a href="${baseUrl}" class="button secondary">Sign Out</a>
+      <button onclick="window.location.replace('${baseUrl}')" class="button secondary">Sign Out</button>
     </div>
   </div>
   
