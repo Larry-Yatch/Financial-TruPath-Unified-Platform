@@ -978,20 +978,31 @@ function getCurrentWeek() {
  */
 function saveUserData(userId, toolId, data) {
   try {
-    const result = DataHub.saveToolData(userId, toolId, data);
+    // Use DataService for saving tool data
+    const result = DataService.saveToolResponse(userId, toolId, data);
     
     // Log the save event
     logEvent('DATA_SAVED', {
       userId: userId,
       tool: toolId,
-      timestamp: new Date()
+      timestamp: new Date(),
+      success: result.success
     });
     
-    return {
-      success: true,
-      message: 'Data saved successfully',
-      insights: result.insights
-    };
+    if (result.success) {
+      return {
+        success: true,
+        message: result.message || 'Data saved successfully',
+        insights: result.insights || [],
+        timestamp: result.timestamp
+      };
+    } else {
+      return {
+        success: false,
+        message: result.error || 'Failed to save data',
+        error: result.error
+      };
+    }
   } catch (error) {
     console.error('Error saving data:', error);
     logEvent('SAVE_ERROR', {

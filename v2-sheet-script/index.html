@@ -281,14 +281,41 @@
 
     <script>
       // Platform configuration from server
-      const userId = '<?!= userId ?>' || 'user-' + Date.now();
-      const currentWeek = <?!= currentWeek ?> || 1;
+      const userId = '<?= userId ?>' || 'user-' + Date.now();
+      const currentWeek = <?= currentWeek ?> || 1;
+      const sessionId = '<?= sessionId ?>' || '';
       
-      // Update week display
+      // Debug info
+      console.log('Tool1 Page Loaded - userId:', userId, 'sessionId:', sessionId, 'currentWeek:', currentWeek);
+      
+      // Update week display and check for auto-load
       document.addEventListener('DOMContentLoaded', function() {
         const weekSpan = document.getElementById('current-week');
         if (weekSpan) {
           weekSpan.textContent = currentWeek;
+        }
+        
+        // Check URL parameters for tool auto-load
+        const urlParams = new URLSearchParams(window.location.search);
+        const route = urlParams.get('route');
+        const toolParam = urlParams.get('tool');
+        
+        console.log('DOMContentLoaded - route:', route, 'tool:', toolParam);
+        
+        // Auto-load tool if coming from dashboard
+        if (route === 'tool' || route === 'orientation') {
+          console.log('Auto-loading orientation tool...');
+          // Hide the dashboard hub and show tool directly
+          const dashboardHub = document.querySelector('.card h2');
+          if (dashboardHub && dashboardHub.textContent.includes('Course Tools Hub')) {
+            console.log('Found dashboard hub, loading tool...');
+            setTimeout(() => {
+              loadTool('orientation');
+            }, 100);
+          } else {
+            // If no dashboard hub, load tool immediately
+            loadTool('orientation');
+          }
         }
       });
       
