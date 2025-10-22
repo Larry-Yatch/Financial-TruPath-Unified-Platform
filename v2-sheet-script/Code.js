@@ -13,6 +13,9 @@ function doGet(e) {
     // Get route from URL parameters
     const route = e.parameter.route || 'login';
     
+    // Log the route for debugging
+    console.log('Route requested:', route);
+    
     // Handle different routes
     if (route === 'dashboard') {
       // Validate session before showing dashboard
@@ -31,6 +34,10 @@ function doGet(e) {
         // No session, redirect to login
         return createLoginPage('Please log in to access the dashboard.');
       }
+      
+    } else if (route === 'login') {
+      // Explicitly handle login route
+      return createLoginPage();
       
     } else if (route === 'tool' || route === 'orientation') {
       // Validate session for tool access
