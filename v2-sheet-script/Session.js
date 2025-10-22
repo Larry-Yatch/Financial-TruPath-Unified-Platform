@@ -16,8 +16,8 @@ function getSessionsSheet() {
     if (!sheet) {
       // Create sheet if it doesn't exist
       sheet = ss.insertSheet('SESSIONS');
-      // Set headers: Session ID, Client ID, Login Time, Last Activity, Expires At, Status
-      const headers = ['Session ID', 'Client ID', 'Login Time', 'Last Activity', 'Expires At', 'Status'];
+      // Set headers to match existing structure
+      const headers = ['Session_Token', 'Client_ID', 'Created_At', 'Expires_At', 'Last_Activity', 'IP_Address'];
       sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
       sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
       sheet.setFrozenRows(1);
@@ -52,14 +52,14 @@ function createSession(clientId) {
       return existingSession;
     }
     
-    // Create new session record
+    // Create new session record (matching sheet columns)
     const sessionData = [
-      sessionId,
-      clientId,
-      now,
-      now,
-      expiresAt,
-      'active'
+      sessionId,        // Session_Token
+      clientId,         // Client_ID
+      now,             // Created_At
+      expiresAt,       // Expires_At
+      now,             // Last_Activity
+      'active'         // IP_Address (using for status)
     ];
     
     // Append to sheet
@@ -106,10 +106,10 @@ function validateSession(sessionId) {
     // Skip header row
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
-      const storedSessionId = row[0];
-      const clientId = row[1];
-      const expiresAt = new Date(row[4]);
-      const status = row[5];
+      const storedSessionId = row[0];  // Session_Token
+      const clientId = row[1];          // Client_ID
+      const expiresAt = new Date(row[3]); // Expires_At (column 4)
+      const status = row[5];             // IP_Address (column 6, using for status)
       
       if (storedSessionId === sessionId) {
         // Check if session is active
@@ -171,10 +171,10 @@ function findActiveSession(clientId) {
     // Skip header row
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
-      const sessionId = row[0];
-      const storedClientId = row[1];
-      const expiresAt = new Date(row[4]);
-      const status = row[5];
+      const sessionId = row[0];           // Session_Token
+      const storedClientId = row[1];      // Client_ID
+      const expiresAt = new Date(row[3]); // Expires_At
+      const status = row[5];             // IP_Address (using for status)
       
       if (storedClientId === clientId && status === 'active' && now < expiresAt) {
         return {

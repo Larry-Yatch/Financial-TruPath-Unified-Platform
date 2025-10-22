@@ -258,7 +258,7 @@ function createLoginPage(message) {
     </div>
     
     <div id="loadingSpinner">
-      <p>Verifying...</p>
+      <p style="color: #ad9168; font-size: 16px; margin-top: 10px;">Verifying...</p>
     </div>
     
     <div class="test-info">
