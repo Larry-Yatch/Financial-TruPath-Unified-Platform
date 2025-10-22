@@ -281,9 +281,9 @@
 
     <script>
       // Platform configuration from server
-      const userId = '<?= userId ?>' || 'user-' + Date.now();
-      const currentWeek = <?= currentWeek ?> || 1;
-      const sessionId = '<?= sessionId ?>' || '';
+      const userId = '<?!= userId || "" ?>' || 'user-' + Date.now();
+      const currentWeek = <?!= currentWeek || 1 ?>;
+      const sessionId = '<?!= sessionId || "" ?>' || '';
       
       // Debug info
       console.log('Tool1 Page Loaded - userId:', userId, 'sessionId:', sessionId, 'currentWeek:', currentWeek);
