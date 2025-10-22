@@ -71,22 +71,6 @@ function doGet(e) {
  * @param {string} message - Optional message to display
  */
 function createLoginPage(message) {
-  // Use the enhanced login page with backup authentication
-  const template = HtmlService.createTemplateFromFile('LoginEnhanced');
-  template.message = message || '';
-  template.baseUrl = ScriptApp.getService().getUrl();
-  
-  return template.evaluate()
-    .setTitle('TruPath Financial - Login')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
-}
-
-/**
- * Create login page (inline version for fallback)
- * @param {string} message - Optional message to display
- */
-function createLoginPageInline(message) {
   const html = `
 <!DOCTYPE html>
 <html>
@@ -224,14 +208,54 @@ function createLoginPageInline(message) {
     
     <div id="alertBox" class="alert" ${message ? 'style="display: block;"' : ''}>${message || ''}</div>
     
-    <form id="loginForm" onsubmit="handleLogin(event); return false;">
-      <div class="form-group">
-        <label for="clientId">Enter Your Student ID</label>
-        <input type="text" id="clientId" name="clientId" required 
-               placeholder="Enter your Student ID" autocomplete="off">
+    <!-- Primary Login Form -->
+    <div id="primaryLogin">
+      <form id="loginForm" onsubmit="handleLogin(event); return false;">
+        <div class="form-group">
+          <label for="clientId">Enter Your Student ID</label>
+          <input type="text" id="clientId" name="clientId" required 
+                 placeholder="Enter your Student ID" autocomplete="off">
+        </div>
+        <button type="submit" class="btn-primary">Sign In</button>
+      </form>
+      
+      <div style="text-align: center; margin: 20px 0; color: #94a3b8;">
+        <small>— OR —</small>
       </div>
-      <button type="submit" class="btn-primary">Sign In</button>
-    </form>
+      
+      <button type="button" class="btn-primary" style="background: transparent; border: 2px solid #ad9168; color: #ad9168;" 
+              onclick="showBackupLogin()">Can't Remember Your ID?</button>
+    </div>
+    
+    <!-- Backup Login Form -->
+    <div id="backupLogin" style="display: none;">
+      <button onclick="showPrimaryLogin()" style="background: none; border: none; color: #ad9168; cursor: pointer; margin-bottom: 20px;">
+        ← Back to Student ID login
+      </button>
+      
+      <form id="backupForm" onsubmit="handleBackupLogin(event); return false;">
+        <p style="color: #94a3b8; margin-bottom: 20px; font-size: 14px;">
+          Enter at least 2 of the following fields:
+        </p>
+        
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" name="firstName" placeholder="Your first name">
+        </div>
+        
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" name="lastName" placeholder="Your last name">
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="Your email address">
+        </div>
+        
+        <button type="submit" class="btn-primary">Look Up My Account</button>
+      </form>
+    </div>
     
     <div id="loadingSpinner">
       <p>Verifying...</p>
@@ -251,9 +275,23 @@ function createLoginPageInline(message) {
       alertBox.textContent = message;
       alertBox.className = 'alert ' + type;
       alertBox.style.display = 'block';
-      setTimeout(() => {
-        alertBox.style.display = 'none';
-      }, 5000);
+      if (type !== 'error') {
+        setTimeout(() => {
+          alertBox.style.display = 'none';
+        }, 5000);
+      }
+    }
+    
+    function showPrimaryLogin() {
+      document.getElementById('primaryLogin').style.display = 'block';
+      document.getElementById('backupLogin').style.display = 'none';
+      document.getElementById('alertBox').style.display = 'none';
+    }
+    
+    function showBackupLogin() {
+      document.getElementById('primaryLogin').style.display = 'none';
+      document.getElementById('backupLogin').style.display = 'block';
+      document.getElementById('alertBox').style.display = 'none';
     }
     
     function handleLogin(event) {
@@ -297,6 +335,80 @@ function createLoginPageInline(message) {
           console.error(error);
         })
         .authenticateAndCreateSession(clientId);
+    }
+    
+    function handleBackupLogin(event) {
+      event.preventDefault();
+      
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName = document.getElementById('lastName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      
+      // Count how many fields were provided
+      let fieldCount = 0;
+      if (firstName) fieldCount++;
+      if (lastName) fieldCount++;
+      if (email) fieldCount++;
+      
+      if (fieldCount < 2) {
+        showAlert('Please provide at least 2 fields to look up your account', 'error');
+        return;
+      }
+      
+      document.getElementById('backupLogin').style.display = 'none';
+      document.getElementById('loadingSpinner').style.display = 'block';
+      
+      // Try backup authentication
+      google.script.run
+        .withSuccessHandler(function(result) {
+          if (result.success) {
+            // Found account, now create session
+            showAlert('Account found! Logging you in...', 'success');
+            
+            // Create session with the found client ID
+            google.script.run
+              .withSuccessHandler(function(sessionResult) {
+                if (sessionResult.success) {
+                  // Session created, navigate to dashboard
+                  const baseUrl = '${ScriptApp.getService().getUrl()}';
+                  const dashboardUrl = baseUrl + '?route=dashboard' +
+                    '&client=' + encodeURIComponent(sessionResult.clientId) +
+                    '&session=' + encodeURIComponent(sessionResult.sessionId);
+                  
+                  setTimeout(function() {
+                    window.location.href = dashboardUrl;
+                  }, 500);
+                } else {
+                  document.getElementById('loadingSpinner').style.display = 'none';
+                  showBackupLogin();
+                  showAlert('Failed to create session. Please try again.', 'error');
+                }
+              })
+              .withFailureHandler(function(error) {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                showBackupLogin();
+                showAlert('System error. Please try again.', 'error');
+                console.error(error);
+              })
+              .authenticateAndCreateSession(result.clientId);
+              
+          } else {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            showBackupLogin();
+            showAlert(result.error || 'No matching account found', 'error');
+          }
+        })
+        .withFailureHandler(function(error) {
+          document.getElementById('loadingSpinner').style.display = 'none';
+          showBackupLogin();
+          showAlert('System error. Please try again.', 'error');
+          console.error(error);
+        })
+        .lookupClientByDetails({
+          firstName: firstName,
+          lastName: lastName,
+          email: email
+        });
     }
   </script>
 </body>
