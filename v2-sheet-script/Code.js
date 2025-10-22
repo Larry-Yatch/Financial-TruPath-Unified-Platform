@@ -278,6 +278,10 @@ function createLoginPage(message) {
         <button type="submit" class="btn-primary">Sign In</button>
       </form>
       
+      <div id="loadingSpinner">
+        <p style="color: #ad9168; font-size: 16px; margin-top: 10px;">Verifying...</p>
+      </div>
+      
       <div style="text-align: center; margin: 20px 0; color: #94a3b8;">
         <small>— OR —</small>
       </div>
@@ -314,17 +318,6 @@ function createLoginPage(message) {
         
         <button type="submit" class="btn-primary">Look Up My Account</button>
       </form>
-    </div>
-    
-    <div id="loadingSpinner">
-      <p style="color: #ad9168; font-size: 16px; margin-top: 10px;">Verifying...</p>
-    </div>
-    
-    <div class="test-info">
-      <strong>Test Mode:</strong><br>
-      To test, click "Get Sample Client IDs" from the spreadsheet menu to get valid IDs.<br><br>
-      Or go directly to Tool 1:<br>
-      <a href="${ScriptApp.getService().getUrl()}?route=tool">Skip Login (Test)</a>
     </div>
   </div>
 
