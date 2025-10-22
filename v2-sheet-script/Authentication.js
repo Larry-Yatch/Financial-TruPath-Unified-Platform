@@ -5,9 +5,9 @@
 
 // ====== ROSTER CONFIGURATION ======
 const ROSTER = {
-  SPREADSHEET_ID: '104pHxIgsGAcOrktL75Hi7WlEd8j0BoeadntLR9PrGYo', // Same roster as investment tool
-  SHEET_NAME: 'Financial v2 (24SEPT25 start)',  // Tab for V2 platform starting Sept 24, 2025
-  SHEET_GID: 753820167,  // GID from the URL you provided
+  SPREADSHEET_ID: '18qpjnCvFVYDXOAN14CKb3ceoiG6G_nIFc9n3ZO5St24', // Using local Students sheet
+  SHEET_NAME: 'Students',  // Local sheet with test users
+  SHEET_GID: null,  // Not needed for local sheet
   COLUMNS: {
     FIRST_NAME: 3,  // C - First Name
     LAST_NAME: 4,   // D - Last Name
