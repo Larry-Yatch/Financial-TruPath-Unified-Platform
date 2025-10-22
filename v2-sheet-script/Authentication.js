@@ -186,11 +186,13 @@ function lookupClientByDetails(params) {
     
     for (let i = 0; i < data.length; i++) {
       const row = data[i];
-      const rowFirst = String(row[0] || '').trim().toLowerCase();
-      const rowLast = String(row[1] || '').trim().toLowerCase();
-      const rowEmail = String(row[2] || '').trim().toLowerCase();
-      const rowClientId = String(row[4] || '').trim(); // Column F (index 4)
-      const rowStatus = String(row[6] || '').trim(); // Column H (index 6)
+      // Correct column indices (0-based from the data range which starts at column C)
+      const rowFirst = String(row[0] || '').trim().toLowerCase();  // Column C - First Name
+      const rowLast = String(row[1] || '').trim().toLowerCase();   // Column D - Last Name
+      const rowPhone = String(row[2] || '').trim();                // Column E - Phone
+      const rowEmail = String(row[3] || '').trim().toLowerCase();  // Column F - Email
+      const rowClientId = String(row[4] || '').trim();             // Column G - Client ID
+      const rowStatus = String(row[5] || '').trim();               // Column H - Status
       
       // Skip inactive accounts
       if (rowStatus.toLowerCase() === 'inactive') continue;
@@ -215,9 +217,9 @@ function lookupClientByDetails(params) {
       if (matchCount >= 2 && rowClientId) {
         matches.push({
           clientId: normalizeId(rowClientId),
-          firstName: String(row[0] || '').trim(),
-          lastName: String(row[1] || '').trim(),
-          email: String(row[2] || '').trim(),
+          firstName: String(row[0] || '').trim(),  // Column C - First Name
+          lastName: String(row[1] || '').trim(),   // Column D - Last Name
+          email: String(row[3] || '').trim(),      // Column F - Email (index 3)
           fullName: `${row[0]} ${row[1]}`.trim(),
           matchedOn: matchTypes.join(' & ')
         });
