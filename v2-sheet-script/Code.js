@@ -361,6 +361,14 @@ function createLoginPage(message) {
       // Try to authenticate and create session
       google.script.run
         .withSuccessHandler(function(result) {
+          // Check if result is null or undefined
+          if (!result) {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('loadingSpinner').style.display = 'none';
+            showAlert('No response from server. Please refresh and try again.', 'error');
+            return;
+          }
+          
           if (result.success) {
             // Session created successfully, navigate with session token
             const baseUrl = '${ScriptApp.getService().getUrl()}';
@@ -413,6 +421,14 @@ function createLoginPage(message) {
       // Try backup authentication
       google.script.run
         .withSuccessHandler(function(result) {
+          // Check if result is null or undefined
+          if (!result) {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            showBackupLogin();
+            showAlert('No response from server. Please refresh and try again.', 'error');
+            return;
+          }
+          
           if (result.success) {
             // Found account, now create session
             showAlert('Account found! Logging you in...', 'success');
@@ -420,6 +436,14 @@ function createLoginPage(message) {
             // Create session with the found client ID
             google.script.run
               .withSuccessHandler(function(sessionResult) {
+                // Check if sessionResult is null or undefined
+                if (!sessionResult) {
+                  document.getElementById('loadingSpinner').style.display = 'none';
+                  showBackupLogin();
+                  showAlert('Session creation failed. Please refresh and try again.', 'error');
+                  return;
+                }
+                
                 if (sessionResult.success) {
                   // Session created, navigate to dashboard
                   const baseUrl = '${ScriptApp.getService().getUrl()}';
