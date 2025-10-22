@@ -72,6 +72,8 @@ This is the foundation for cross-tool data flow:
 ### 3. Connect Tool1 to DataService
 Once DataService is ready, update Tool1_Orientation.js to use it instead of the stub DataHub.
 
+⚠️ **IMPORTANT NOTE**: The `Tool1_Orientation` sheet tab in Google Sheets is from old work and will need to be updated when implementing Tool1. Don't chase your tail debugging old data - create a fresh sheet structure for Tool1 responses.
+
 ### 4. Test Data Flow
 - Complete Tool 1 assessment
 - Verify data saves to RESPONSES sheet

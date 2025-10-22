@@ -90,11 +90,15 @@ Each tool will:
 - Validated insights
 - Personalized action plan
 
+## ⚠️ Important Notes
+
+**Tool1_Orientation Sheet Tab**: The existing `Tool1_Orientation` tab in the Google Sheet is from old work and contains outdated structure. When implementing Tool1 data saving, create a fresh sheet structure in the RESPONSES sheet rather than using the old tab. This prevents confusion with legacy data.
+
 ## 🚀 Implementation Plan
 
 ### Session 3 (DataService):
 1. Build DataService.js
-2. Connect Tool 1 to save data
+2. Connect Tool 1 to save data (use RESPONSES sheet, not old Tool1_Orientation tab)
 3. Test data flow
 
 ### Session 4 (InsightEngine):
