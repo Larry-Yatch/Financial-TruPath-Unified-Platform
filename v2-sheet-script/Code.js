@@ -123,7 +123,7 @@ function doGet(e) {
  * @param {string} message - Optional message to display
  */
 function createLoginPage(message) {
-  const html = `
+  const loginHtml = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -467,30 +467,20 @@ function createLoginPage(message) {
 </html>
   `;
   
-  return HtmlService.createHtmlOutput(html)
+  return HtmlService.createHtmlOutput(loginHtml)
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 /**
- * Create dashboard page showing 8 tools
+ * Create a simple, working dashboard page
  * @param {string} clientId - The client ID
  * @param {string} sessionId - The session token
  */
-function createDashboardPage(clientId, sessionId) {
-  // Check if user has completed any tools
-  let completedTools = [];
-  try {
-    const profile = DataHub.getUnifiedProfile(clientId);
-    if (profile && profile.metadata) {
-      completedTools = profile.metadata.completedTools || [];
-    }
-  } catch (error) {
-    console.error('Error loading profile:', error);
-  }
-  
+function createSimpleDashboard(clientId, sessionId) {
   const baseUrl = ScriptApp.getService().getUrl();
   
-  const html = `
+  // Simple HTML dashboard
+  const dashboardHtml = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -499,6 +489,7 @@ function createDashboardPage(clientId, sessionId) {
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Radley:wght@400&family=Rubik:wght@300;400;500;600;700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    
     body {
       font-family: 'Rubik', Arial, sans-serif;
       background: linear-gradient(135deg, #4b4166, #1e192b);
@@ -506,10 +497,12 @@ function createDashboardPage(clientId, sessionId) {
       min-height: 100vh;
       padding: 20px;
     }
+    
     .container {
       max-width: 1200px;
       margin: 0 auto;
     }
+    
     .header {
       background: rgba(20, 15, 35, 0.9);
       backdrop-filter: blur(10px);
@@ -519,6 +512,7 @@ function createDashboardPage(clientId, sessionId) {
       text-align: center;
       margin-bottom: 30px;
     }
+    
     .logo {
       font-family: 'Radley', serif;
       color: #ad9168;
@@ -527,21 +521,39 @@ function createDashboardPage(clientId, sessionId) {
       margin-bottom: 10px;
       font-weight: 400;
     }
+    
     .subtitle {
       color: #94a3b8;
       font-size: 16px;
     }
+    
     .welcome {
       color: #fff;
       font-size: 20px;
       margin-top: 20px;
     }
+    
+    .info-box {
+      background: rgba(173, 145, 104, 0.1);
+      border: 1px solid rgba(173, 145, 104, 0.3);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 30px;
+      color: #fff;
+    }
+    
+    .info-box h3 {
+      color: #ad9168;
+      margin-bottom: 10px;
+    }
+    
     .tools-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 20px;
       margin-bottom: 30px;
     }
+    
     .tool-card {
       background: rgba(20, 15, 35, 0.9);
       backdrop-filter: blur(10px);
@@ -550,32 +562,31 @@ function createDashboardPage(clientId, sessionId) {
       padding: 25px;
       transition: all 0.3s;
       cursor: pointer;
-      position: relative;
-      overflow: hidden;
     }
+    
     .tool-card:hover {
       transform: translateY(-5px);
       border-color: #ad9168;
       box-shadow: 0 10px 30px rgba(173, 145, 104, 0.2);
     }
-    .tool-card.completed {
-      border-color: #22c55e;
-      background: rgba(34, 197, 94, 0.05);
-    }
+    
     .tool-card.locked {
       opacity: 0.6;
       cursor: not-allowed;
     }
+    
     .tool-card.locked:hover {
       transform: none;
       border-color: rgba(173, 145, 104, 0.2);
     }
+    
     .tool-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
       margin-bottom: 15px;
     }
+    
     .tool-number {
       background: #ad9168;
       color: #1e192b;
@@ -588,43 +599,38 @@ function createDashboardPage(clientId, sessionId) {
       font-weight: bold;
       font-size: 14px;
     }
+    
     .tool-status {
       padding: 4px 12px;
       border-radius: 20px;
       font-size: 12px;
       font-weight: 600;
     }
-    .status-completed {
-      background: #22c55e;
-      color: white;
-    }
+    
     .status-available {
       background: #ad9168;
       color: #1e192b;
     }
+    
     .status-locked {
       background: rgba(148, 163, 184, 0.2);
       color: #94a3b8;
     }
+    
     .tool-title {
       color: #ffffff;
       font-size: 18px;
       font-weight: 600;
       margin-bottom: 10px;
     }
+    
     .tool-description {
       color: #94a3b8;
       font-size: 14px;
       line-height: 1.5;
       margin-bottom: 15px;
     }
-    .tool-week {
-      color: #ad9168;
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
+    
     .button {
       display: inline-block;
       padding: 10px 20px;
@@ -637,21 +643,24 @@ function createDashboardPage(clientId, sessionId) {
       cursor: pointer;
       text-decoration: none;
       transition: all 0.3s;
-      margin-top: 10px;
     }
+    
     .button:hover {
       background: #c4a877;
       transform: translateY(-2px);
     }
+    
     .button.secondary {
       background: transparent;
       color: #ad9168;
       border: 2px solid #ad9168;
     }
+    
     .button.secondary:hover {
       background: #ad9168;
       color: #1e192b;
     }
+    
     .logout-container {
       text-align: center;
       margin-top: 30px;
@@ -663,147 +672,132 @@ function createDashboardPage(clientId, sessionId) {
     <div class="header">
       <h1 class="logo">TruPath Financial</h1>
       <p class="subtitle">Your Journey to Financial Freedom</p>
-      <p class="welcome">Welcome back! Select a tool to continue your journey.</p>
+      <p class="welcome">Welcome! You are logged in as: <strong>${clientId || 'Guest'}</strong></p>
+    </div>
+    
+    <div class="info-box">
+      <h3>Session Information</h3>
+      <p>Client ID: ${clientId || 'Not set'}</p>
+      <p>Session Token: ${sessionId ? sessionId.substring(0, 8) + '...' : 'Not set'}</p>
+      <p>Status: Active</p>
     </div>
     
     <div class="tools-grid">
-      <!-- Tool 1 -->
-      <div class="tool-card ${completedTools.includes('orientation') ? 'completed' : ''}" 
-           onclick="navigateToTool('orientation', ${completedTools.includes('orientation')})">
+      <!-- Tool 1 - Always Available -->
+      <div class="tool-card" onclick="navigateToTool('orientation')">
         <div class="tool-header">
           <span class="tool-number">1</span>
-          <span class="tool-status ${completedTools.includes('orientation') ? 'status-completed' : 'status-available'}">
-            ${completedTools.includes('orientation') ? 'COMPLETED' : 'AVAILABLE'}
-          </span>
+          <span class="tool-status status-available">AVAILABLE</span>
         </div>
         <h3 class="tool-title">Orientation Assessment</h3>
-        <p class="tool-description">Complete your comprehensive financial profile and receive personalized insights about your financial health.</p>
-        <p class="tool-week">Week 1</p>
-        ${completedTools.includes('orientation') ? 
-          '<a href="#" class="button secondary" onclick="event.stopPropagation(); viewReport(\'orientation\'); return false;">View Report</a>' : 
-          '<span class="button">Start Now</span>'}
+        <p class="tool-description">Complete your comprehensive financial profile and receive personalized insights.</p>
+        <span class="button">Start Now</span>
       </div>
       
-      <!-- Tool 2 -->
-      <div class="tool-card ${completedTools.includes('financial-clarity') ? 'completed' : getCurrentWeek() < 2 ? 'locked' : ''}"
-           onclick="${getCurrentWeek() >= 2 ? 'navigateToTool(\'financial-clarity\', ' + completedTools.includes('financial-clarity') + ')' : ''}">
+      <!-- Tool 2 - Coming Soon -->
+      <div class="tool-card locked">
         <div class="tool-header">
           <span class="tool-number">2</span>
-          <span class="tool-status ${completedTools.includes('financial-clarity') ? 'status-completed' : getCurrentWeek() >= 2 ? 'status-available' : 'status-locked'}">
-            ${completedTools.includes('financial-clarity') ? 'COMPLETED' : getCurrentWeek() >= 2 ? 'AVAILABLE' : 'WEEK 2'}
-          </span>
+          <span class="tool-status status-locked">COMING SOON</span>
         </div>
         <h3 class="tool-title">Financial Clarity</h3>
-        <p class="tool-description">Deep dive into your income, expenses, and cash flow to gain crystal-clear visibility of your finances.</p>
-        <p class="tool-week">Week 2</p>
+        <p class="tool-description">Deep dive into your income, expenses, and cash flow.</p>
       </div>
       
-      <!-- Tool 3 -->
-      <div class="tool-card ${getCurrentWeek() < 3 ? 'locked' : ''}"
-           onclick="${getCurrentWeek() >= 3 ? 'navigateToTool(\'control-fear\')' : ''}">
+      <!-- Tool 3 - Coming Soon -->
+      <div class="tool-card locked">
         <div class="tool-header">
           <span class="tool-number">3</span>
-          <span class="tool-status ${getCurrentWeek() >= 3 ? 'status-available' : 'status-locked'}">
-            ${getCurrentWeek() >= 3 ? 'AVAILABLE' : 'WEEK 3'}
-          </span>
+          <span class="tool-status status-locked">COMING SOON</span>
         </div>
         <h3 class="tool-title">Control Fear Grounding</h3>
-        <p class="tool-description">Master your emotions around money and develop a resilient mindset for financial success.</p>
-        <p class="tool-week">Week 3</p>
+        <p class="tool-description">Master your emotions around money.</p>
       </div>
       
-      <!-- Tool 4 -->
+      <!-- Tool 4 - Coming Soon -->
       <div class="tool-card locked">
         <div class="tool-header">
           <span class="tool-number">4</span>
-          <span class="tool-status status-locked">WEEK 4</span>
+          <span class="tool-status status-locked">COMING SOON</span>
         </div>
         <h3 class="tool-title">SMART Goals</h3>
-        <p class="tool-description">Transform your dreams into actionable, measurable financial goals with clear timelines.</p>
-        <p class="tool-week">Week 4</p>
-      </div>
-      
-      <!-- Tool 5 -->
-      <div class="tool-card locked">
-        <div class="tool-header">
-          <span class="tool-number">5</span>
-          <span class="tool-status status-locked">WEEK 5</span>
-        </div>
-        <h3 class="tool-title">Debt Strategy</h3>
-        <p class="tool-description">Create a personalized plan to eliminate debt efficiently and permanently.</p>
-        <p class="tool-week">Week 5</p>
-      </div>
-      
-      <!-- Tool 6 -->
-      <div class="tool-card locked">
-        <div class="tool-header">
-          <span class="tool-number">6</span>
-          <span class="tool-status status-locked">WEEK 6</span>
-        </div>
-        <h3 class="tool-title">Emergency Fund Builder</h3>
-        <p class="tool-description">Design your safety net and build financial security for life's unexpected moments.</p>
-        <p class="tool-week">Week 6</p>
-      </div>
-      
-      <!-- Tool 7 -->
-      <div class="tool-card locked">
-        <div class="tool-header">
-          <span class="tool-number">7</span>
-          <span class="tool-status status-locked">WEEK 7</span>
-        </div>
-        <h3 class="tool-title">Retirement Roadmap</h3>
-        <p class="tool-description">Calculate your retirement needs and create a strategic plan for your golden years.</p>
-        <p class="tool-week">Week 7</p>
-      </div>
-      
-      <!-- Tool 8 -->
-      <div class="tool-card locked">
-        <div class="tool-header">
-          <span class="tool-number">8</span>
-          <span class="tool-status status-locked">WEEK 8</span>
-        </div>
-        <h3 class="tool-title">Investment Calculator</h3>
-        <p class="tool-description">Model your wealth-building journey and see the power of compound interest in action.</p>
-        <p class="tool-week">Week 8</p>
+        <p class="tool-description">Transform dreams into actionable goals.</p>
       </div>
     </div>
     
     <div class="logout-container">
-      <a href="` + baseUrl + `" class="button secondary">Sign Out</a>
+      <a href="${baseUrl}" class="button secondary">Sign Out</a>
     </div>
   </div>
   
   <script>
-    function navigateToTool(toolId, isCompleted) {
-      if (isCompleted) {
-        // Show options for completed tool
-        if (confirm('This tool is already completed. Would you like to:\\n\\n• OK - View your report\\n• Cancel - Edit your answers')) {
-          viewReport(toolId);
-        } else {
-          // Navigate to tool with edit mode and session
-          window.location.href = '` + baseUrl + `?route=tool&tool=' + toolId + '&client=${clientId}&session=${sessionId || ''}&action=edit';
-        }
-      } else {
-        // Navigate to tool with session
-        window.location.href = '` + baseUrl + `?route=tool&tool=' + toolId + '&client=${clientId}&session=${sessionId || ''}';
-      }
-    }
-    
-    function viewReport(toolId) {
-      // For now, just navigate to tool in view mode with session
-      window.location.href = '` + baseUrl + `?route=tool&tool=' + toolId + '&client=${clientId}&session=${sessionId || ''}&action=view';
-    }
-    
-    function getCurrentWeek() {
-      return ${getCurrentWeek()};
+    function navigateToTool(toolId) {
+      const baseUrl = '${baseUrl}';
+      const toolUrl = baseUrl + '?route=tool' + 
+        '&tool=' + toolId + 
+        '&client=${clientId || ''}' +
+        '&session=${sessionId || ''}';
+      window.location.href = toolUrl;
     }
   </script>
 </body>
 </html>
   `;
   
-  return HtmlService.createHtmlOutput(html)
+  return HtmlService.createHtmlOutput(dashboardHtml)
+    .setTitle('TruPath Financial - Dashboard')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+/**
+ * Create dashboard page - redirects to simple dashboard
+ */
+function createDashboardPage(clientId, sessionId) {
+  // Using the simple dashboard implementation
+  return createSimpleDashboard(clientId, sessionId);
+}
+
+// Old complex dashboard implementation has been removed to avoid conflicts
+// The createSimpleDashboard function above is now used for all dashboard rendering
+/**
+ * Create error page
+ */
+function createErrorPage(message) {
+  const errorPageHtml = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Error</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          margin: 0;
+          background: #f5f5f5;
+        }
+        .error-box {
+          background: white;
+          padding: 40px;
+          border-radius: 10px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+          text-align: center;
+        }
+        h1 { color: #e74c3c; }
+        p { color: #666; }
+      </style>
+    </head>
+    <body>
+      <div class="error-box">
+        <h1>Error</h1>
+        <p>${message}</p>
+      </div>
+    </body>
+    </html>
+  `;
+  return HtmlService.createHtmlOutput(errorPageHtml);
 }
 
 /**
@@ -815,9 +809,8 @@ function handleAdminRoute(adminKey) {
     return createErrorPage('Unauthorized');
   }
   
-  // For now, show the test interface
-  const html = `
-    <!DOCTYPE html>
+  // Show the test interface
+  const adminHtml = `<!DOCTYPE html>
     <html>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -910,7 +903,7 @@ function handleAdminRoute(adminKey) {
     </html>
   `;
   
-  return HtmlService.createHtmlOutput(html)
+  return HtmlService.createHtmlOutput(adminHtml)
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
@@ -1299,7 +1292,7 @@ function openAdminPanel() {
   }
   
   const adminUrl = url + '?route=admin&key=admin2024';
-  const html = `
+  const adminUrlHtml = `
     <div style="padding: 20px; font-family: Arial, sans-serif;">
       <h3>Admin Panel URL</h3>
       <p>Click the link below to open the admin panel:</p>
@@ -1313,7 +1306,7 @@ function openAdminPanel() {
   `;
   
   SpreadsheetApp.getUi().showModalDialog(
-    HtmlService.createHtmlOutput(html).setWidth(500).setHeight(250),
+    HtmlService.createHtmlOutput(adminUrlHtml).setWidth(500).setHeight(250),
     'Open Admin Panel'
   );
 }
@@ -1696,7 +1689,7 @@ function testWebApp() {
     </div>
   ` : `<p>Web App URL: <a href="${url}" target="_blank">${url}</a></p>`;
   
-  const html = `
+  const statusHtml = `
     <div style="padding: 20px; font-family: Arial, sans-serif;">
       <h2>Financial TruPath V2.0 - Platform Status</h2>
       ${deploymentInstructions}
@@ -1717,7 +1710,7 @@ function testWebApp() {
   `;
   
   SpreadsheetApp.getUi().showModalDialog(
-    HtmlService.createHtmlOutput(html).setWidth(450).setHeight(400),
+    HtmlService.createHtmlOutput(statusHtml).setWidth(450).setHeight(400),
     'Platform Test'
   );
 }
