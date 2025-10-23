@@ -2,7 +2,7 @@
 
 ## 📊 All 8 Tools Overview
 
-### 🔄 Tool 1: Orientation - Demographics Tool
+### 🔄 Tool 1: Orientation - Demographics Grounding
 - **Status**: Exists as a Google Form and connected Google Spreadsheet
 - **Current Location**: Form: https://docs.google.com/forms/d/1A_FjAQbk9fqqWrW7jKXeYl1xJX7EtwCERAjvKY9Xeys/edit
                          Spreadsheet Script ID: 1S3ujOblMA1pRX4e3YEWGjj03r3yqD7PpbttcohslVuDPx8-KS3HdV60H
@@ -38,7 +38,7 @@ Emotional Assessment Sheet:   https://docs.google.com/spreadsheets/d/1YcfCafs1_E
                            External Validation:  1IHvqydiwlP8qXNuqNwBbqf5Pz5cCtziZdv51yRI9jxs3NaSs_dUmJdxM
 - **Special Features**: 
 
-### 🔄 Tool 4: Financial Freedom Framework / Allocation Calculator 
+### 🔄 Tool 4: Financial Freedom Framework / Allocation Calculator Tool
 - **Status**: Exists but not in code folder / Planned
 - **Current Location**: https://drive.google.com/drive/u/0/folders/1xLYj7xH1NRQN_HlW3pLV9tVehe_B6NBV
 - **Type**: Google Apps Script / at least a hybrid web app / Google Script
@@ -63,7 +63,7 @@ This app not only identifies the percentage distribution of each dollar into tho
 - **Google Scripts ID**:   1RSVTQqeI-1oKlFdJAHxKEcZmvmOVO6kQw2tfxhfwRC5o2VaPGbmUrJMH
 - **Special Features**: [Any special features]
 
-### ✅ Tool 6:  Retirement Blueprint Creator
+### ✅ Tool 6:  Retirement Blueprint Creator Tool
 - **Status**: Exists - Needs debugging
 - **Current Location**: `/Users/Larry/code/retirement-blueprint/`. Google Drive folder: https://drive.google.com/drive/u/0/folders/1bfqekS_hBzKcW0RIzTYDyDd6evSPzqUp
 - **Type**: Google Apps Script / I think all should transition into hybrid web app / google script
