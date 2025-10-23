@@ -204,6 +204,11 @@ const DataService = {
       const responseDataCol = headers.indexOf('Response_Data');
       const timestampCol = headers.indexOf('Timestamp');
       
+      if (clientIdCol === -1 || toolIdCol === -1 || responseDataCol === -1) {
+        console.error('Required columns not found in RESPONSES sheet');
+        return {};
+      }
+      
       const responses = {};
       
       for (let i = 1; i < data.length; i++) {
@@ -328,6 +333,11 @@ const DataService = {
       const clientIdCol = headers.indexOf('Client_ID');
       const toolIdCol = headers.indexOf('Tool_ID');
       const statusCol = headers.indexOf('Status');
+      
+      if (clientIdCol === -1 || toolIdCol === -1 || statusCol === -1) {
+        console.error('Required columns not found in TOOL_STATUS sheet');
+        return {};
+      }
       
       const statuses = {};
       
@@ -462,6 +472,12 @@ const DataService = {
       const insightCol = headers.indexOf('Insight');
       const priorityCol = headers.indexOf('Priority');
       const usedByCol = headers.indexOf('Used_By_Tool');
+      
+      if (clientIdCol === -1 || sourceToolCol === -1 || insightTypeCol === -1 || 
+          insightCol === -1 || priorityCol === -1 || usedByCol === -1) {
+        console.error('Required columns not found in CrossToolInsights sheet');
+        return [];
+      }
       
       const insights = [];
       

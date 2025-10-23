@@ -5,13 +5,23 @@
 
 const Tool1_Orientation = {
   /**
-   * Process and save orientation form submission
+   * Process and save orientation form submission using ToolFramework
    * @param {Object} formData - Data from the orientation form
    * @param {string} clientId - Validated client ID
    * @returns {Object} Result with report data and insights
    */
   processSubmission(formData, clientId) {
     try {
+      // Validate input data
+      const config = this.getFormConfig();
+      const validation = ToolFramework.validateData('tool1', formData, config);
+      if (!validation.valid) {
+        return {
+          success: false,
+          error: 'Validation failed: ' + validation.errors.join(', ')
+        };
+      }
+      
       // Add metadata
       const data = {
         ...formData,
@@ -20,29 +30,28 @@ const Tool1_Orientation = {
         toolId: 'tool1'
       };
       
-      // Save to DataService (new implementation)
-      const saveResult = DataService.saveToolResponse(clientId, 'tool1', data);
+      // Use ToolFramework for completion processing
+      const frameworkResult = ToolFramework.completeToolSubmission('tool1', clientId, data);
       
-      if (!saveResult.success) {
+      if (!frameworkResult.success) {
         return {
           success: false,
-          error: saveResult.error || 'Failed to save assessment data'
+          error: frameworkResult.error || 'Failed to process submission'
         };
       }
       
-      // Generate basic report (Middleware will be connected in Session 4)
-      const report = this.generateBasicReport(data);
-      
-      // Get any insights generated
-      const insights = saveResult.insights || [];
+      // Generate comprehensive report using ToolFramework scoring
+      const scores = ToolFramework.calculateScores('tool1', data);
+      const report = this.generateFrameworkReport(data, scores);
       
       return {
         success: true,
         report: report,
-        insights: insights,
-        message: saveResult.message,
-        timestamp: saveResult.timestamp,
-        nextTool: 'tool2' // Will be dynamic later
+        insights: frameworkResult.insights,
+        scores: scores,
+        nextTool: frameworkResult.nextTool,
+        message: frameworkResult.message,
+        timestamp: new Date()
       };
       
     } catch (error) {
@@ -71,7 +80,48 @@ const Tool1_Orientation = {
   },
   
   /**
-   * Generate basic report from orientation data
+   * Generate comprehensive report using ToolFramework
+   * @param {Object} data - Orientation form data
+   * @param {Object} scores - Calculated scores from ToolFramework
+   * @returns {Object} Enhanced report structure
+   */
+  generateFrameworkReport(data, scores) {
+    const report = {
+      summary: {
+        name: `${data.firstName || ''} ${data.lastName || ''}`,
+        age: data.age,
+        status: data.maritalStatus,
+        dependents: data.dependents || 0
+      },
+      financial: {
+        income: data.annualIncome,
+        employmentStatus: data.employmentStatus,
+        primaryGoal: data.primaryGoal,
+        debtLevel: data.totalDebt,
+        emergencyFund: data.emergencyFund
+      },
+      mindset: {
+        financialSituation: data.financialSituation,
+        moneyRelationship: data.moneyRelationship,
+        scarcityAbundance: data.scarcityAbundance,
+        goalConfidence: data.goalConfidence,
+        financialAmbition: data.financialAmbition
+      },
+      scores: {
+        financialHealth: scores.financialHealth || 0,
+        mindset: scores.mindset || 0,
+        overall: scores.overall || 0
+      },
+      profile: this.determineUserProfile(scores),
+      recommendations: this.generateRecommendations(data, scores),
+      timestamp: new Date().toISOString()
+    };
+    
+    return report;
+  },
+  
+  /**
+   * Generate basic report from orientation data (legacy method)
    * @param {Object} data - Orientation form data
    * @returns {Object} Basic report structure
    */
@@ -103,6 +153,87 @@ const Tool1_Orientation = {
     };
     
     return report;
+  },
+  
+  /**
+   * Determine user profile based on scores
+   */
+  determineUserProfile(scores) {
+    const healthScore = scores.financialHealth || 0;
+    const mindsetScore = scores.mindset || 0;
+    
+    if (healthScore >= 70 && mindsetScore >= 3) {
+      return {
+        type: 'Thriving Optimizer',
+        emoji: '🚀',
+        message: 'Strong financial position with positive mindset',
+        focus: 'Wealth optimization strategies'
+      };
+    } else if (healthScore >= 70 && mindsetScore < 3) {
+      return {
+        type: 'Cautious Success',
+        emoji: '🛡️',
+        message: 'Financially stable but mindset needs work',
+        focus: 'Aligning mindset with financial reality'
+      };
+    } else if (healthScore >= 40 && mindsetScore >= 0) {
+      return {
+        type: 'Emerging Builder',
+        emoji: '🌱',
+        message: 'On the right path with growth potential',
+        focus: 'Systematic improvement and confidence building'
+      };
+    } else if (healthScore < 40 && mindsetScore >= 0) {
+      return {
+        type: 'Optimistic Striver',
+        emoji: '💪',
+        message: 'Positive mindset is your greatest asset',
+        focus: 'Converting optimism into concrete actions'
+      };
+    } else {
+      return {
+        type: 'Foundation Builder',
+        emoji: '🏗️',
+        message: 'Ready to build from the ground up',
+        focus: 'Building basics and celebrating small wins'
+      };
+    }
+  },
+  
+  /**
+   * Generate personalized recommendations
+   */
+  generateRecommendations(data, scores) {
+    const recommendations = [];
+    
+    if (scores.financialHealth < 50) {
+      recommendations.push({
+        priority: 1,
+        action: 'Complete Financial Clarity Assessment next',
+        reason: 'Understanding your complete financial picture is critical',
+        urgency: 'high'
+      });
+    }
+    
+    if (scores.mindset < 0) {
+      recommendations.push({
+        priority: 2,
+        action: 'Begin mindset work in Tool 3',
+        reason: 'Negative money beliefs are limiting your progress',
+        urgency: 'high'
+      });
+    }
+    
+    if (data.primaryGoal === 'Eliminate Debt') {
+      recommendations.push({
+        priority: 1,
+        action: 'Focus on debt elimination strategies',
+        reason: 'Debt is your primary concern',
+        urgency: 'critical'
+      });
+    }
+    
+    return recommendations.slice(0, 3);
   },
   
   /**
