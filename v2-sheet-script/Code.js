@@ -901,10 +901,10 @@ function handleAdminRoute(adminKey) {
           
           <div class="section">
             <h3>Test Functions</h3>
-            <button class="btn" onclick="google.script.run.withSuccessHandler(showResult).createDataSheets()">
+            <button class="btn" onclick="google.script.run.withSuccessHandler(showResult).withFailureHandler(showResult).createDataSheets()">
               Create Data Sheets
             </button>
-            <button class="btn" onclick="google.script.run.withSuccessHandler(showResult).testDataSaving()">
+            <button class="btn" onclick="google.script.run.withSuccessHandler(showResult).withFailureHandler(showResult).testDataSaving()">
               Test Data Saving
             </button>
             <button class="btn" onclick="testAuth()">
