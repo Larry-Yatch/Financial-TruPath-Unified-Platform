@@ -420,6 +420,42 @@ const DataService = {
   },
   
   /**
+   * Get all draft versions for a tool (used by ToolWrapper Load button)
+   * @param {string} clientId - Student's unique ID
+   * @param {string} toolId - Tool identifier
+   * @returns {Object} Object with versions array and metadata
+   */
+  getAllDraftVersions(clientId, toolId) {
+    try {
+      // Use the existing getToolDraft function with getAllVersions=true
+      return this.getToolDraft(clientId, toolId, true);
+    } catch (error) {
+      console.error('Error getting all draft versions:', error);
+      return {
+        versions: [],
+        count: 0,
+        latest: null
+      };
+    }
+  },
+  
+  /**
+   * Get a specific draft by ID (used by ToolWrapper Load button)
+   * @param {string} draftId - Draft ID
+   * @param {string} clientId - Student's unique ID
+   * @param {string} toolId - Tool identifier
+   * @returns {Object} Specific draft or null
+   */
+  getSpecificDraft(draftId, clientId, toolId) {
+    try {
+      return this.getSpecificDraftVersion(clientId, toolId, draftId);
+    } catch (error) {
+      console.error('Error getting specific draft:', error);
+      return null;
+    }
+  },
+  
+  /**
    * Get tool response data for a client
    * @param {string} clientId - Student's unique ID
    * @param {string} toolId - Tool identifier (tool1, tool2, etc.)

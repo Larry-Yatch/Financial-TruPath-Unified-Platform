@@ -309,7 +309,7 @@ const ToolWrapper = {
             this.showNotification('Saved locally (offline mode)', 'warning');
           }
         })
-        .saveToolDraft(userId, toolId, data, progress, 'DRAFT');
+        .saveToolDraft(userId, toolId, draft);
     } else {
       // Offline mode
       this.updateSaveIndicator('local');
@@ -518,7 +518,7 @@ const ToolWrapper = {
             }
           }
         })
-        .getToolDraft(userId, toolId);
+        .getToolDraft(userId, toolId, false);
     }
   },
   
