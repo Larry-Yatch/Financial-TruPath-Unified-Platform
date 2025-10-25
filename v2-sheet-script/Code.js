@@ -399,7 +399,7 @@ function createLoginPage(message) {
             
             // Navigate to dashboard after a brief delay
             setTimeout(function() {
-              window.top.location.href = dashboardUrl;
+              window.location.href = dashboardUrl;
             }, 500);
           } else {
             document.getElementById('loginForm').style.display = 'block';
