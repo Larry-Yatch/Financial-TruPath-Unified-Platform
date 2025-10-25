@@ -399,34 +399,46 @@ const ToolWrapper = {
    * Restore tool state from draft
    */
   restoreToolState(draft) {
-    // SIMPLIFIED VERSION - just restore form fields
+    // FIXED: Handle the actual data structure from saveDraft
     let dataToRestore = {};
     
-    // Try to find the actual form data in various locations
-    if (draft.data) {
-      if (typeof draft.data === 'object') {
-        // Could be draft.data directly contains fields
-        dataToRestore = draft.data.data || draft.data;
-      }
-    } else if (draft) {
-      // Maybe draft itself contains the fields
+    // The draft structure from saveDraft is: { toolId, pattern, data, progress, timestamp }
+    // where data is the flat object from collectToolData()
+    if (draft && draft.data && typeof draft.data === 'object') {
+      dataToRestore = draft.data;
+    } else if (draft && !draft.data) {
+      // If draft IS the data itself (shouldn't happen but safety check)
       dataToRestore = draft;
     }
     
-    // Simply restore all form fields we can find
+    console.log('Restoring draft data:', dataToRestore);
+    
+    // Restore all form fields
     const allInputs = document.querySelectorAll('input, select, textarea');
+    let restoredCount = 0;
+    
     allInputs.forEach(field => {
       const fieldName = field.name;
       if (fieldName && dataToRestore[fieldName] !== undefined) {
-        if (field.type === 'checkbox' || field.type === 'radio') {
-          field.checked = dataToRestore[fieldName] === true || dataToRestore[fieldName] === field.value;
+        if (field.type === 'checkbox') {
+          field.checked = dataToRestore[fieldName] === 'on' || dataToRestore[fieldName] === true || dataToRestore[fieldName] === field.value;
+          restoredCount++;
+        } else if (field.type === 'radio') {
+          field.checked = dataToRestore[fieldName] === field.value;
+          if (field.checked) restoredCount++;
         } else {
           field.value = dataToRestore[fieldName];
+          restoredCount++;
         }
       }
     });
     
-    this.showNotification('Draft loaded', 'success');
+    // Update progress if it exists
+    if (draft.progress) {
+      this.updateProgressDisplay(draft.progress);
+    }
+    
+    this.showNotification(`Draft loaded (${restoredCount} fields restored)`, 'success');
   },
   
   /**
@@ -441,12 +453,22 @@ const ToolWrapper = {
       const draftAge = new Date() - new Date(draft.timestamp);
       const hoursOld = Math.floor(draftAge / (1000 * 60 * 60));
       
+      // FIXED: Use the actual progress from the saved draft
+      let progressValue = 0;
+      if (draft.progress) {
+        progressValue = typeof draft.progress === 'object' ? draft.progress.percentage : draft.progress;
+      }
+      
       // Show continue button if draft exists
       const continueBtn = document.getElementById('continue-draft-btn');
       if (continueBtn) {
         continueBtn.style.display = 'block';
-        const progressValue = typeof draft.progress === 'object' ? draft.progress.percentage : draft.progress || 0;
         continueBtn.innerHTML = `📂 Continue Previous (${progressValue}% complete, ${hoursOld}h ago)`;
+        
+        // Store draft for loading when clicked
+        continueBtn.onclick = () => {
+          this.restoreToolState(draft);
+        };
       }
     }
     
@@ -461,8 +483,16 @@ const ToolWrapper = {
               const continueBtn = document.getElementById('continue-draft-btn');
               if (continueBtn) {
                 continueBtn.style.display = 'block';
-                const serverProgress = typeof serverDraft.progress === 'object' ? serverDraft.progress.percentage : serverDraft.progress || 0;
-                continueBtn.innerHTML = `📂 Continue Previous (${serverProgress}% complete)`;
+                let serverProgress = 0;
+                if (serverDraft.progress) {
+                  serverProgress = typeof serverDraft.progress === 'object' ? serverDraft.progress.percentage : serverDraft.progress;
+                }
+                continueBtn.innerHTML = `📂 Continue Previous (${serverProgress}% complete - from cloud)`;
+                
+                // Store server draft for loading when clicked
+                continueBtn.onclick = () => {
+                  this.restoreToolState(serverDraft);
+                };
               }
             }
           }
@@ -551,14 +581,14 @@ const ToolWrapper = {
     
     // Get current URL parameters
     const urlParams = new URLSearchParams(window.location.search);
-    const sessionId = urlParams.get('session') || (typeof sessionId !== 'undefined' ? sessionId : '');
-    const clientId = urlParams.get('client') || (typeof userId !== 'undefined' ? userId : '');
+    const sessionParam = urlParams.get('session') || '';
+    const clientParam = urlParams.get('client') || (typeof userId !== 'undefined' ? userId : '');
     
     // Build dashboard URL with necessary parameters
     const baseUrl = window.location.href.split('?')[0];
     let dashboardUrl = baseUrl + '?route=dashboard';
-    if (sessionId) dashboardUrl += '&session=' + sessionId;
-    if (clientId) dashboardUrl += '&client=' + clientId;
+    if (sessionParam) dashboardUrl += '&session=' + sessionParam;
+    if (clientParam) dashboardUrl += '&client=' + clientParam;
     
     if (hasUnsavedChanges) {
       if (confirm('You have unsaved changes. Do you want to save before leaving?')) {
