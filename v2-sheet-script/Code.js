@@ -4,6 +4,19 @@
  */
 
 /**
+ * Include function for HTML templates
+ * Allows including other JS files in templates
+ */
+function include(filename) {
+  try {
+    return HtmlService.createHtmlOutputFromFile(filename).getContent();
+  } catch(e) {
+    console.error('Include error for file:', filename, e);
+    return '';
+  }
+}
+
+/**
  * Main entry point for web application
  * @param {Object} e - Event object with parameters
  * @returns {HtmlOutput} The appropriate HTML page
@@ -41,91 +54,33 @@ function doGet(e) {
       return createLoginPage();
       
     } else if (route === 'tool' || route === 'orientation' || route === 'Tool1' || route === 'tool1') {
-      // TEMPORARY: Simple HTML test to diagnose blank page issue
-      const clientId = e.parameter.client || 'TEST001';
-      const sessionId = e.parameter.session || 'test-session';
-      const toolId = e.parameter.tool || 'none';
-      
-      // Option 2: Simple HTML that definitely works
-      const simpleHtml = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <base target="_top">
-          <title>Tool1 Test</title>
-        </head>
-        <body>
-          <h1>Tool1 Simple Test</h1>
-          <p>If you see this, routing works!</p>
-          <hr>
-          <p>Client ID: ${clientId}</p>
-          <p>Session: ${sessionId}</p>
-          <p>Route: ${route}</p>
-          <p>Tool: ${toolId}</p>
-          <hr>
-          <h2>Quick Test Form</h2>
-          <form onsubmit="testSave(event)">
-            <input type="text" id="testName" placeholder="Enter name" required>
-            <button type="submit">Test Save</button>
-          </form>
-          <div id="result"></div>
-          
-          <script>
-            console.log('Simple HTML loaded successfully');
-            console.log('Client:', '${clientId}');
-            console.log('Session:', '${sessionId}');
-            
-            function testSave(e) {
-              e.preventDefault();
-              const name = document.getElementById('testName').value;
-              document.getElementById('result').innerHTML = 'Saving...';
-              
-              google.script.run
-                .withSuccessHandler(function(result) {
-                  console.log('Save result:', result);
-                  document.getElementById('result').innerHTML = 
-                    '<p style="color:green">Success: ' + JSON.stringify(result) + '</p>';
-                })
-                .withFailureHandler(function(error) {
-                  console.error('Save error:', error);
-                  document.getElementById('result').innerHTML = 
-                    '<p style="color:red">Error: ' + error + '</p>';
-                })
-                .saveUserData('${clientId}', 'tool1', {name: name, test: true});
-            }
-          </script>
-        </body>
-        </html>
-      `;
-      
-      return HtmlService.createHtmlOutput(simpleHtml)
-        .setTitle('Tool1 Simple Test')
-        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-        
-      /* COMMENTED OUT - Complex template causing issues
-      // Validate session for tool access
+      // ACTIVATING: Sophisticated Tool 1 from index.html
       const sessionId = e.parameter.session || '';
-      const clientId = e.parameter.client || '';
+      const clientId = e.parameter.client || 'TEST001';
       
+      // Skip session validation for testing - comment this section to re-enable
+      /*
       if (sessionId) {
         const validation = validateSession(sessionId);
         if (!validation.valid) {
           return createLoginPage('Your session has expired. Please log in again.');
         }
       }
+      */
       
-      // Show Tool 1 (existing index.html)
+      // Show Tool 1 (existing index.html with sophisticated form)
       const template = HtmlService.createTemplateFromFile('index');
       template.userId = clientId || 'USER_' + Utilities.getUuid();
       template.sessionId = sessionId || Utilities.getUuid();
       template.currentWeek = getCurrentWeek();
       template.config = CONFIG;
       
+      console.log('Loading Tool 1 for client:', clientId, 'session:', sessionId);
+      
       return template.evaluate()
         .setTitle('Financial TruPath V2.0 - Orientation Assessment')
         .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
         .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
-      */
     }
     
     // Default: Show login page (inline HTML)
@@ -1084,6 +1039,105 @@ function saveUserData(userId, toolId, data) {
       message: 'Failed to save data',
       error: error.toString()
     };
+  }
+}
+
+/**
+ * Save tool draft (for auto-save and manual save)
+ * @param {string} userId - User ID
+ * @param {string} toolId - Tool identifier
+ * @param {Object} draftData - Draft data to save
+ * @param {number} progress - Progress percentage
+ * @param {string} status - Status (DRAFT, etc.)
+ */
+function saveToolDraft(userId, toolId, draftData, progress, status) {
+  try {
+    console.log(`saveToolDraft called - userId: ${userId}, toolId: ${toolId}, progress: ${progress}, status: ${status}`);
+    // Include progress and status in the draft data
+    const enrichedData = {
+      ...draftData,
+      progress: progress || 0,
+      status: status || 'DRAFT'
+    };
+    return DataService.saveToolDraft(userId, toolId, enrichedData);
+  } catch (error) {
+    console.error('Error saving draft:', error);
+    return {
+      success: false,
+      error: error.toString()
+    };
+  }
+}
+
+/**
+ * Get tool draft
+ * @param {string} userId - User ID
+ * @param {string} toolId - Tool identifier
+ * @param {boolean} getAllVersions - If true, returns all versions
+ */
+function getToolDraft(userId, toolId, getAllVersions = false) {
+  try {
+    console.log(`getToolDraft called - userId: ${userId}, toolId: ${toolId}, getAllVersions: ${getAllVersions}`);
+    return DataService.getToolDraft(userId, toolId, getAllVersions);
+  } catch (error) {
+    console.error('Error getting draft:', error);
+    return null;
+  }
+}
+
+/**
+ * Get all draft versions for a tool
+ * @param {string} userId - User ID
+ * @param {string} toolId - Tool identifier
+ */
+function getAllDraftVersions(userId, toolId) {
+  try {
+    console.log(`getAllDraftVersions called - userId: ${userId}, toolId: ${toolId}`);
+    return DataService.getToolDraft(userId, toolId, true);
+  } catch (error) {
+    console.error('Error getting draft versions:', error);
+    return { versions: [], count: 0, latest: null };
+  }
+}
+
+/**
+ * Get relevant insights for a specific tool
+ * @param {string} userId - User ID
+ * @param {string} toolId - Tool identifier
+ */
+function getRelevantInsights(userId, toolId) {
+  try {
+    console.log(`getRelevantInsights called - userId: ${userId}, toolId: ${toolId}`);
+    // For now, return empty insights. This will be enhanced later
+    return [];
+  } catch (error) {
+    console.error('Error getting insights:', error);
+    return [];
+  }
+}
+
+/**
+ * Get a specific draft by ID
+ * @param {string} draftId - Draft ID
+ * @param {string} userId - User ID (optional, for better lookup)
+ * @param {string} toolId - Tool ID (optional, for better lookup)
+ */
+function getSpecificDraft(draftId, userId, toolId) {
+  try {
+    console.log(`getSpecificDraft called - draftId: ${draftId}, userId: ${userId}, toolId: ${toolId}`);
+    
+    // If we have userId and toolId, use the more efficient lookup
+    if (userId && toolId) {
+      return DataService.getSpecificDraftVersion(userId, toolId, draftId);
+    }
+    
+    // Otherwise, we'd need to search through all user properties
+    // For now, require userId and toolId
+    console.warn('getSpecificDraft requires userId and toolId for lookup');
+    return null;
+  } catch (error) {
+    console.error('Error getting specific draft:', error);
+    return null;
   }
 }
 

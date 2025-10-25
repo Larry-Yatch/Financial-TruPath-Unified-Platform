@@ -1,1 +1,7 @@
 archive/**
+agents/**
+*.md
+.git/**
+node_modules/**
+safe-deploy.js
+*.sh

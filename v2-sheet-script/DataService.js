@@ -28,6 +28,164 @@ const DataService = {
   },
   
   /**
+   * Save a tool draft (incomplete submission)
+   * @param {string} clientId - Client/User ID
+   * @param {string} toolId - Tool identifier
+   * @param {Object} data - Form data
+   * @param {Object} progress - Progress information
+   * @param {string} status - 'DRAFT' or 'COMPLETED'
+   * @returns {Object} Result with success status
+   */
+  saveToolDraft(clientId, toolId, data, progress, status = 'DRAFT') {
+    try {
+      if (!clientId || !toolId) {
+        throw new Error(`Invalid parameters: clientId=${clientId}, toolId=${toolId}`);
+      }
+      
+      console.log(`Saving Tool Draft - Client: ${clientId}, Tool: ${toolId}, Status: ${status}`);
+      
+      const ss = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
+      const responseSheet = ss.getSheetByName(CONFIG.SHEETS.RESPONSES);
+      
+      if (!responseSheet) {
+        throw new Error('RESPONSES sheet not found');
+      }
+      
+      const timestamp = new Date();
+      const sessionId = this.getCurrentSessionId();
+      
+      // Prepare draft record with status
+      const draftRecord = {
+        timestamp: timestamp.toISOString(),
+        clientId: clientId,
+        toolId: toolId,
+        data: JSON.stringify(data),
+        version: CONFIG.VERSION,
+        sessionId: sessionId || 'draft-' + Utilities.getUuid(),
+        status: status,
+        progress: JSON.stringify(progress || {})
+      };
+      
+      // Append to sheet
+      responseSheet.appendRow([
+        draftRecord.timestamp,
+        draftRecord.sessionId, 
+        draftRecord.clientId,
+        draftRecord.toolId,
+        draftRecord.data,
+        draftRecord.version,
+        draftRecord.status,
+        draftRecord.progress
+      ]);
+      
+      console.log('Draft saved successfully');
+      
+      return {
+        success: true,
+        message: 'Draft saved',
+        draftId: draftRecord.sessionId
+      };
+      
+    } catch (error) {
+      console.error('Error saving draft:', error);
+      return {
+        success: false,
+        error: error.toString()
+      };
+    }
+  },
+  
+  /**
+   * Get the most recent draft for a tool
+   * @param {string} clientId - Client/User ID
+   * @param {string} toolId - Tool identifier
+   * @returns {Object|null} Draft data or null
+   */
+  getToolDraft(clientId, toolId) {
+    try {
+      const ss = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
+      const responseSheet = ss.getSheetByName(CONFIG.SHEETS.RESPONSES);
+      
+      if (!responseSheet) {
+        return null;
+      }
+      
+      const data = responseSheet.getDataRange().getValues();
+      
+      // Find most recent draft
+      let latestDraft = null;
+      let latestTimestamp = null;
+      
+      for (let i = data.length - 1; i > 0; i--) {
+        const row = data[i];
+        // Check if this is a draft for the right client/tool
+        if (row[2] === clientId && 
+            row[3] === toolId && 
+            row[6] === 'DRAFT') {
+          const timestamp = new Date(row[0]);
+          if (!latestTimestamp || timestamp > latestTimestamp) {
+            latestTimestamp = timestamp;
+            latestDraft = {
+              timestamp: row[0],
+              sessionId: row[1],
+              clientId: row[2],
+              toolId: row[3],
+              data: JSON.parse(row[4] || '{}'),
+              status: row[6] || 'DRAFT',
+              progress: JSON.parse(row[7] || '{}')
+            };
+          }
+        }
+      }
+      
+      return latestDraft;
+      
+    } catch (error) {
+      console.error('Error getting draft:', error);
+      return null;
+    }
+  },
+  
+  /**
+   * Get specific draft by ID
+   * @param {string} draftId - Draft session ID
+   * @returns {Object|null} Draft data or null
+   */
+  getSpecificDraft(draftId) {
+    try {
+      const ss = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
+      const responseSheet = ss.getSheetByName(CONFIG.SHEETS.RESPONSES);
+      
+      if (!responseSheet) {
+        return null;
+      }
+      
+      const data = responseSheet.getDataRange().getValues();
+      
+      for (let i = 1; i < data.length; i++) {
+        const row = data[i];
+        if (row[1] === draftId) {
+          return {
+            timestamp: row[0],
+            sessionId: row[1],
+            clientId: row[2],
+            toolId: row[3],
+            data: JSON.parse(row[4] || '{}'),
+            status: row[6] || 'COMPLETED',
+            progress: JSON.parse(row[7] || '{}')
+          };
+        }
+      }
+      
+      return null;
+      
+    } catch (error) {
+      console.error('Error getting specific draft:', error);
+      return null;
+    }
+  },
+  
+  /**
    * Save tool response data to Google Sheets
    * @param {string} clientId - Student's unique ID
    * @param {string} toolId - Tool identifier (tool1, tool2, etc.)
@@ -111,6 +269,153 @@ const DataService = {
         error: error.toString(),
         message: `Failed to save ${toolId} response`
       };
+    }
+  },
+  
+  /**
+   * Save tool draft (for auto-save and manual save)
+   * Maintains up to 3 versions per tool per student
+   * @param {string} clientId - Student's unique ID
+   * @param {string} toolId - Tool identifier
+   * @param {Object} draftData - Draft data to save
+   * @returns {Object} Result with success status
+   */
+  saveToolDraft(clientId, toolId, draftData) {
+    try {
+      const userProperties = PropertiesService.getUserProperties();
+      const versionsKey = `drafts_${clientId}_${toolId}_versions`;
+      
+      // Get existing versions or initialize empty array
+      let versions = [];
+      const existingVersions = userProperties.getProperty(versionsKey);
+      if (existingVersions) {
+        try {
+          versions = JSON.parse(existingVersions);
+        } catch (e) {
+          console.warn('Error parsing existing versions, starting fresh');
+          versions = [];
+        }
+      }
+      
+      // Create new draft with unique ID
+      const draft = {
+        id: Utilities.getUuid(),
+        data: draftData,
+        timestamp: new Date().toISOString(),
+        clientId: clientId,
+        toolId: toolId,
+        version: versions.length + 1
+      };
+      
+      // Add new draft to beginning of array
+      versions.unshift(draft);
+      
+      // Keep only the 3 most recent versions
+      if (versions.length > 3) {
+        versions = versions.slice(0, 3);
+      }
+      
+      // Save the versions array
+      userProperties.setProperty(versionsKey, JSON.stringify(versions));
+      
+      // Also save the latest as the "current" draft for quick access
+      const currentKey = `draft_${clientId}_${toolId}_current`;
+      userProperties.setProperty(currentKey, JSON.stringify(draft));
+      
+      return {
+        success: true,
+        message: 'Draft saved successfully',
+        timestamp: draft.timestamp,
+        versionCount: versions.length,
+        version: draft.version
+      };
+    } catch (error) {
+      console.error('Error saving draft:', error);
+      return {
+        success: false,
+        error: error.toString()
+      };
+    }
+  },
+  
+  /**
+   * Get tool draft(s)
+   * @param {string} clientId - Student's unique ID
+   * @param {string} toolId - Tool identifier
+   * @param {boolean} getAllVersions - If true, returns all versions (up to 3)
+   * @returns {Object} Draft data or array of drafts or null
+   */
+  getToolDraft(clientId, toolId, getAllVersions = false) {
+    try {
+      const userProperties = PropertiesService.getUserProperties();
+      
+      if (getAllVersions) {
+        // Return all versions (up to 3)
+        const versionsKey = `drafts_${clientId}_${toolId}_versions`;
+        const versionsJson = userProperties.getProperty(versionsKey);
+        
+        if (versionsJson) {
+          const versions = JSON.parse(versionsJson);
+          return {
+            versions: versions,
+            count: versions.length,
+            latest: versions[0] || null
+          };
+        }
+        return {
+          versions: [],
+          count: 0,
+          latest: null
+        };
+      } else {
+        // Return just the current/latest draft
+        const currentKey = `draft_${clientId}_${toolId}_current`;
+        const currentJson = userProperties.getProperty(currentKey);
+        
+        if (currentJson) {
+          return JSON.parse(currentJson);
+        }
+        
+        // Fallback to checking versions array
+        const versionsKey = `drafts_${clientId}_${toolId}_versions`;
+        const versionsJson = userProperties.getProperty(versionsKey);
+        
+        if (versionsJson) {
+          const versions = JSON.parse(versionsJson);
+          return versions[0] || null;
+        }
+        
+        return null;
+      }
+    } catch (error) {
+      console.error('Error getting draft:', error);
+      return null;
+    }
+  },
+  
+  /**
+   * Get a specific draft version by ID
+   * @param {string} clientId - Student's unique ID
+   * @param {string} toolId - Tool identifier  
+   * @param {string} draftId - Draft ID
+   * @returns {Object} Specific draft or null
+   */
+  getSpecificDraftVersion(clientId, toolId, draftId) {
+    try {
+      const userProperties = PropertiesService.getUserProperties();
+      const versionsKey = `drafts_${clientId}_${toolId}_versions`;
+      const versionsJson = userProperties.getProperty(versionsKey);
+      
+      if (versionsJson) {
+        const versions = JSON.parse(versionsJson);
+        const draft = versions.find(v => v.id === draftId);
+        return draft || null;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error getting specific draft:', error);
+      return null;
     }
   },
   

@@ -1,0 +1,961 @@
+<script>
+/**
+ * Universal Tool Wrapper for Financial TruPath Platform
+ * Supports 4 tool patterns across 8 tools
+ * Pattern 1: Insights Assessment (Tool 1)
+ * Pattern 2: Comprehensive Assessment (Tool 2)
+ * Pattern 3: Grounding Templates (Tools 3, 5, 7)
+ * Pattern 4: Interactive Calculators (Tools 4, 6, 8)
+ */
+
+const ToolWrapper = {
+  // Current tool state
+  currentTool: null,
+  currentPattern: null,
+  autoSaveTimer: null,
+  lastSaveTime: null,
+  savingInProgress: false,
+  
+  // Tool configurations by pattern
+  patterns: {
+    'pattern1': { // Tool 1: Orientation
+      hasForm: true,
+      hasSections: true,
+      sectionCount: 5,
+      canSaveDraft: true,
+      hasReport: true,
+      navigation: ['save', 'load', 'dashboard', 'help'], // Removed 'print' - only show on report
+      autoSaveInterval: 120000 // 2 minutes
+    },
+    'pattern2': { // Tool 2: Financial Clarity
+      hasForm: true,
+      hasSections: true,
+      sectionCount: 7,
+      canSaveDraft: true,
+      hasReport: true,
+      isAdaptive: true,
+      navigation: ['save', 'load', 'dashboard', 'help', 'insights'], // Removed 'print'
+      autoSaveInterval: 120000
+    },
+    'pattern3': { // Tools 3, 5, 7: Grounding
+      hasForm: true,
+      hasSections: false,
+      canSaveDraft: true,
+      hasReport: true,
+      navigation: ['save', 'load', 'dashboard', 'help'], // Removed 'print'
+      autoSaveInterval: 180000 // 3 minutes
+    },
+    'pattern4': { // Tools 4, 6, 8: Calculators
+      hasForm: false,
+      hasSections: false,
+      canSaveDraft: true,
+      hasReport: false,
+      hasExport: true,
+      navigation: ['save', 'load', 'dashboard', 'export', 'help'],
+      autoSaveInterval: 60000 // 1 minute for live calculators
+    }
+  },
+  
+  // Tool metadata
+  tools: {
+    'tool1': {
+      pattern: 'pattern1',
+      title: 'Orientation Assessment',
+      icon: '💡',
+      description: 'Discover your Financial GPS',
+      estimatedTime: '20 minutes'
+    },
+    'tool2': {
+      pattern: 'pattern2',
+      title: 'Financial Clarity',
+      icon: '💰',
+      description: 'Deep dive into your financial situation',
+      estimatedTime: '30 minutes'
+    },
+    'tool3': {
+      pattern: 'pattern3',
+      title: 'Control Fear Grounding',
+      icon: '🧘',
+      description: 'Understand your emotional money patterns',
+      estimatedTime: '15 minutes'
+    },
+    'tool4': {
+      pattern: 'pattern4',
+      title: 'Goal Setting Framework',
+      icon: '🎯',
+      description: 'Build SMART financial goals',
+      estimatedTime: '25 minutes'
+    },
+    'tool5': {
+      pattern: 'pattern3',
+      title: 'Investment Strategy',
+      icon: '📈',
+      description: 'Discover your investment personality',
+      estimatedTime: '20 minutes'
+    },
+    'tool6': {
+      pattern: 'pattern4',
+      title: 'Debt Management',
+      icon: '💳',
+      description: 'Optimize your debt reduction strategy',
+      estimatedTime: '15 minutes'
+    },
+    'tool7': {
+      pattern: 'pattern3',
+      title: 'Retirement Blueprint',
+      icon: '🏖️',
+      description: 'Plan your retirement journey',
+      estimatedTime: '25 minutes'
+    },
+    'tool8': {
+      pattern: 'pattern4',
+      title: 'Financial Dashboard',
+      icon: '📊',
+      description: 'Track your complete financial picture',
+      estimatedTime: '10 minutes'
+    }
+  },
+  
+  /**
+   * Initialize wrapper for any tool
+   * @param {string} toolId - Tool identifier (tool1-tool8)
+   * @returns {string} HTML for wrapper
+   */
+  init(toolId) {
+    const tool = this.tools[toolId];
+    if (!tool) {
+      console.error(`Unknown tool: ${toolId}`);
+      return '';
+    }
+    
+    const pattern = tool.pattern;
+    const config = this.patterns[pattern];
+    
+    this.currentTool = toolId;
+    this.currentPattern = pattern;
+    
+    // Build wrapper HTML
+    const wrapperHtml = `
+      <div id="tool-wrapper" data-tool="${toolId}" data-pattern="${pattern}" class="tool-wrapper">
+        ${this.renderNavigation(config.navigation, toolId)}
+        ${this.renderHeader(tool)}
+        ${config.hasSections ? this.renderProgress(toolId, config.sectionCount) : ''}
+        <div id="tool-content" class="tool-content-area">
+          <!-- Tool-specific content loads here -->
+        </div>
+      </div>
+    `;
+    
+    // Set up auto-save after rendering
+    setTimeout(() => {
+      this.initAutoSave(config.autoSaveInterval);
+      this.checkForExistingDraft(toolId);
+    }, 100);
+    
+    return wrapperHtml;
+  },
+  
+  /**
+   * Render navigation bar based on tool needs
+   */
+  renderNavigation(navItems, toolId) {
+    const buttons = {
+      save: `<button onclick="ToolWrapper.saveDraft()" class="btn-nav" title="Save your progress">
+               <span class="nav-icon">💾</span>
+               <span class="nav-text">Save</span>
+             </button>`,
+      load: `<button onclick="ToolWrapper.showLoadOptions()" class="btn-nav" title="Load previous work">
+               <span class="nav-icon">📂</span>
+               <span class="nav-text">Load</span>
+             </button>`,
+      dashboard: `<button onclick="ToolWrapper.backToDashboard()" class="btn-nav" title="Return to dashboard">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-text">Dashboard</span>
+                  </button>`,
+      print: `<button onclick="ToolWrapper.printTool()" class="btn-nav" title="Print this page">
+                <span class="nav-icon">🖨️</span>
+                <span class="nav-text">Print</span>
+              </button>`,
+      export: `<button onclick="ToolWrapper.exportData()" class="btn-nav" title="Export your data">
+                 <span class="nav-icon">📊</span>
+                 <span class="nav-text">Export</span>
+               </button>`,
+      help: `<button onclick="ToolWrapper.showHelp()" class="btn-nav" title="Get help">
+               <span class="nav-icon">❓</span>
+               <span class="nav-text">Help</span>
+             </button>`,
+      insights: `<button onclick="ToolWrapper.showInsights()" class="btn-nav" title="View insights from other tools">
+                   <span class="nav-icon">💡</span>
+                   <span class="nav-text">Insights</span>
+                 </button>`
+    };
+    
+    return `
+      <nav class="tool-navigation">
+        <div class="nav-left">
+          ${navItems.slice(0, 3).map(item => buttons[item] || '').join('')}
+        </div>
+        <div class="nav-center">
+          <div class="auto-save-indicator" id="auto-save-status">
+            <span class="save-dot" id="save-dot"></span>
+            <span class="save-text" id="save-text">Auto-save: On</span>
+          </div>
+        </div>
+        <div class="nav-right">
+          ${navItems.slice(3).map(item => buttons[item] || '').join('')}
+        </div>
+      </nav>
+    `;
+  },
+  
+  /**
+   * Render tool header with metadata
+   */
+  renderHeader(tool) {
+    return `
+      <div class="tool-header">
+        <div class="tool-title">
+          <span class="tool-icon">${tool.icon}</span>
+          <h1>${tool.title}</h1>
+        </div>
+        <div class="tool-meta">
+          <span class="tool-description">${tool.description}</span>
+          <span class="tool-time">⏱️ ${tool.estimatedTime}</span>
+        </div>
+      </div>
+    `;
+  },
+  
+  /**
+   * Render progress bar for multi-section tools
+   */
+  renderProgress(toolId, sectionCount) {
+    return `
+      <div class="progress-container" id="progress-${toolId}">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+        <div class="progress-text">
+          <span id="progress-section">Getting Started</span>
+          <span class="progress-separator">•</span>
+          <span id="progress-percent">0% Complete</span>
+          <span class="progress-separator">•</span>
+          <span id="progress-steps">Section 1 of ${sectionCount}</span>
+        </div>
+      </div>
+    `;
+  },
+  
+  /**
+   * Save current tool state as draft
+   */
+  saveDraft(isAutoSave = false) {
+    if (!this.currentTool) return;
+    
+    // Prevent concurrent saves
+    if (this.savingInProgress) {
+      console.log('Save already in progress, skipping...');
+      return;
+    }
+    
+    this.savingInProgress = true;
+    
+    const toolId = this.currentTool;
+    const pattern = this.currentPattern;
+    const data = this.collectToolData(pattern);
+    const progress = this.calculateProgress(pattern);
+    
+    // Create draft object
+    const draft = {
+      toolId,
+      pattern,
+      data,
+      progress,
+      timestamp: new Date().toISOString(),
+      isAutoSave
+    };
+    
+    // Save to localStorage immediately (with safety check)
+    const currentUserId = typeof userId !== 'undefined' ? userId : 'default';
+    const localKey = `draft_${toolId}_${currentUserId}`;
+    
+    try {
+      if (typeof Storage !== 'undefined') {
+        localStorage.setItem(localKey, JSON.stringify(draft));
+      }
+    } catch (e) {
+      console.warn('localStorage not available:', e);
+    }
+    
+    // Update UI
+    this.updateSaveIndicator('saving');
+    
+    // Save to Google Sheets if online
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      google.script.run
+        .withSuccessHandler(() => {
+          this.updateSaveIndicator('saved');
+          this.lastSaveTime = new Date();
+          this.savingInProgress = false;  // Reset flag
+          if (!isAutoSave) {
+            this.showNotification('Progress saved successfully!', 'success');
+          }
+        })
+        .withFailureHandler((error) => {
+          console.error('Save to server failed:', error);
+          this.updateSaveIndicator('local');
+          this.savingInProgress = false;  // Reset flag
+          if (!isAutoSave) {
+            this.showNotification('Saved locally (offline mode)', 'warning');
+          }
+        })
+        .saveToolDraft(userId, toolId, data, progress, 'DRAFT');
+    } else {
+      // Offline mode
+      this.updateSaveIndicator('local');
+      this.savingInProgress = false;  // Reset flag
+      if (!isAutoSave) {
+        this.showNotification('Progress saved locally', 'info');
+      }
+    }
+  },
+  
+  /**
+   * Collect data based on pattern type
+   */
+  collectToolData(pattern) {
+    const config = this.patterns[pattern];
+    
+    if (config.hasForm) {
+      // Form-based tools (Patterns 1, 2, 3)
+      const form = document.querySelector('#tool-content form');
+      if (form) {
+        const formData = new FormData(form);
+        return Object.fromEntries(formData);
+      }
+    } else {
+      // Calculator tools (Pattern 4) - collect state
+      return this.getCalculatorState();
+    }
+    
+    return {};
+  },
+  
+  /**
+   * Calculate progress for current tool
+   */
+  calculateProgress(pattern) {
+    // SIMPLIFIED - just count filled fields
+    const inputs = document.querySelectorAll('input:not([type="button"]):not([type="submit"]):not([type="hidden"]), select, textarea');
+    let totalFields = 0;
+    let filledFields = 0;
+    
+    inputs.forEach(field => {
+      if (field.name) {  // Only count named fields
+        totalFields++;
+        if (field.type === 'checkbox' || field.type === 'radio') {
+          if (field.checked) filledFields++;
+        } else if (field.value && field.value.trim() !== '') {
+          filledFields++;
+        }
+      }
+    });
+    
+    const percentage = totalFields > 0 ? Math.round((filledFields / totalFields) * 100) : 0;
+    
+    return {
+      percentage: percentage,
+      completed: filledFields,
+      total: totalFields
+    };
+  },
+  
+  /**
+   * Load draft data
+   */
+  loadDraft(draftData = null) {
+    if (!this.currentTool) return;
+    
+    const toolId = this.currentTool;
+    const localKey = `draft_${toolId}_${typeof userId !== 'undefined' ? userId : 'default'}`;
+    
+    // Use provided draft or load from localStorage
+    if (!draftData) {
+      const localDraft = (typeof localStorage !== 'undefined' && localStorage) ? localStorage.getItem(localKey) : null;
+      if (localDraft) {
+        draftData = JSON.parse(localDraft);
+      }
+    }
+    
+    if (draftData && draftData.data) {
+      this.restoreToolState(draftData);
+      this.showNotification('Previous progress loaded', 'success');
+    } else {
+      this.showNotification('No saved progress found', 'info');
+    }
+  },
+  
+  /**
+   * Restore tool state from draft
+   */
+  restoreToolState(draft) {
+    // SIMPLIFIED VERSION - just restore form fields
+    let dataToRestore = {};
+    
+    // Try to find the actual form data in various locations
+    if (draft.data) {
+      if (typeof draft.data === 'object') {
+        // Could be draft.data directly contains fields
+        dataToRestore = draft.data.data || draft.data;
+      }
+    } else if (draft) {
+      // Maybe draft itself contains the fields
+      dataToRestore = draft;
+    }
+    
+    // Simply restore all form fields we can find
+    const allInputs = document.querySelectorAll('input, select, textarea');
+    allInputs.forEach(field => {
+      const fieldName = field.name;
+      if (fieldName && dataToRestore[fieldName] !== undefined) {
+        if (field.type === 'checkbox' || field.type === 'radio') {
+          field.checked = dataToRestore[fieldName] === true || dataToRestore[fieldName] === field.value;
+        } else {
+          field.value = dataToRestore[fieldName];
+        }
+      }
+    });
+    
+    this.showNotification('Draft loaded', 'success');
+  },
+  
+  /**
+   * Check for existing drafts on tool load
+   */
+  checkForExistingDraft(toolId) {
+    const localKey = `draft_${toolId}_${typeof userId !== 'undefined' ? userId : 'default'}`;
+    const localDraft = (typeof localStorage !== 'undefined' && localStorage) ? localStorage.getItem(localKey) : null;
+    
+    if (localDraft) {
+      const draft = JSON.parse(localDraft);
+      const draftAge = new Date() - new Date(draft.timestamp);
+      const hoursOld = Math.floor(draftAge / (1000 * 60 * 60));
+      
+      // Show continue button if draft exists
+      const continueBtn = document.getElementById('continue-draft-btn');
+      if (continueBtn) {
+        continueBtn.style.display = 'block';
+        const progressValue = typeof draft.progress === 'object' ? draft.progress.percentage : draft.progress || 0;
+        continueBtn.innerHTML = `📂 Continue Previous (${progressValue}% complete, ${hoursOld}h ago)`;
+      }
+    }
+    
+    // Also check server for drafts
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      google.script.run
+        .withSuccessHandler((serverDraft) => {
+          if (serverDraft && serverDraft.data) {
+            // Server draft exists - compare with local
+            if (!localDraft || new Date(serverDraft.timestamp) > new Date(JSON.parse(localDraft).timestamp)) {
+              // Server draft is newer
+              const continueBtn = document.getElementById('continue-draft-btn');
+              if (continueBtn) {
+                continueBtn.style.display = 'block';
+                const serverProgress = typeof serverDraft.progress === 'object' ? serverDraft.progress.percentage : serverDraft.progress || 0;
+                continueBtn.innerHTML = `📂 Continue Previous (${serverProgress}% complete)`;
+              }
+            }
+          }
+        })
+        .getToolDraft(userId, toolId);
+    }
+  },
+  
+  /**
+   * Initialize auto-save functionality
+   */
+  initAutoSave(interval = 120000) {
+    // Clear any existing timer
+    if (this.autoSaveTimer) {
+      clearInterval(this.autoSaveTimer);
+    }
+    
+    // Clean up on page unload
+    window.addEventListener('beforeunload', () => {
+      if (this.autoSaveTimer) {
+        clearInterval(this.autoSaveTimer);
+      }
+      // Try to save one last time
+      this.saveDraft(true);
+    });
+    
+    // Debounced save on input changes
+    let saveTimeout;
+    document.addEventListener('input', (e) => {
+      if (e.target.closest('#tool-content')) {
+        clearTimeout(saveTimeout);
+        this.updateSaveIndicator('pending');
+        saveTimeout = setTimeout(() => {
+          this.saveDraft(true);
+        }, 5000); // 5 second debounce
+      }
+    });
+    
+    // Regular interval save
+    this.autoSaveTimer = setInterval(() => {
+      this.saveDraft(true);
+    }, interval);
+  },
+  
+  /**
+   * Update save indicator UI
+   */
+  updateSaveIndicator(status) {
+    const dot = document.getElementById('save-dot');
+    const text = document.getElementById('save-text');
+    
+    if (!dot || !text) return;
+    
+    switch(status) {
+      case 'saving':
+        dot.className = 'save-dot saving';
+        text.textContent = 'Saving...';
+        break;
+      case 'saved':
+        dot.className = 'save-dot saved';
+        text.textContent = 'Saved';
+        setTimeout(() => {
+          text.textContent = 'Auto-save: On';
+        }, 2000);
+        break;
+      case 'local':
+        dot.className = 'save-dot local';
+        text.textContent = 'Saved locally';
+        break;
+      case 'pending':
+        dot.className = 'save-dot pending';
+        text.textContent = 'Changes pending...';
+        break;
+      default:
+        dot.className = 'save-dot';
+        text.textContent = 'Auto-save: On';
+    }
+  },
+  
+  /**
+   * Navigate back to dashboard with confirmation
+   */
+  backToDashboard() {
+    // Check for unsaved changes
+    const hasUnsavedChanges = this.checkUnsavedChanges();
+    
+    // Get current URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session') || (typeof sessionId !== 'undefined' ? sessionId : '');
+    const clientId = urlParams.get('client') || (typeof userId !== 'undefined' ? userId : '');
+    
+    // Build dashboard URL with necessary parameters
+    const baseUrl = window.location.href.split('?')[0];
+    let dashboardUrl = baseUrl + '?route=dashboard';
+    if (sessionId) dashboardUrl += '&session=' + sessionId;
+    if (clientId) dashboardUrl += '&client=' + clientId;
+    
+    if (hasUnsavedChanges) {
+      if (confirm('You have unsaved changes. Do you want to save before leaving?')) {
+        this.saveDraft(false);
+        setTimeout(() => {
+          window.location.href = dashboardUrl;
+        }, 1000);
+      } else if (confirm('Leave without saving? Your progress will be lost.')) {
+        window.location.href = dashboardUrl;
+      }
+    } else {
+      window.location.href = dashboardUrl;
+    }
+  },
+  
+  /**
+   * Print current tool
+   */
+  printTool() {
+    window.print();
+  },
+  
+  /**
+   * Export tool data
+   */
+  exportData() {
+    const data = this.collectToolData(this.currentPattern);
+    const exportData = {
+      tool: this.currentTool,
+      timestamp: new Date().toISOString(),
+      data: data,
+      progress: this.calculateProgress(this.currentPattern)
+    };
+    
+    // Create download link
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    const exportName = `${this.currentTool}_${new Date().toISOString().split('T')[0]}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportName);
+    linkElement.click();
+    
+    this.showNotification('Data exported successfully', 'success');
+  },
+  
+  /**
+   * Show help for current tool
+   */
+  showHelp() {
+    const helpContent = this.getToolHelp(this.currentTool);
+    this.showModal('Help', helpContent);
+  },
+  
+  /**
+   * Show insights from other tools
+   */
+  showInsights() {
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      google.script.run
+        .withSuccessHandler((insights) => {
+          const insightHtml = this.formatInsights(insights);
+          this.showModal('Insights from Previous Tools', insightHtml);
+        })
+        .withFailureHandler(() => {
+          this.showNotification('Unable to load insights', 'error');
+        })
+        .getRelevantInsights(userId, this.currentTool);
+    }
+  },
+  
+  /**
+   * Show notification to user
+   */
+  showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+      <div class="notification-content">
+        ${this.getNotificationIcon(type)}
+        <span>${message}</span>
+      </div>
+    `;
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+      notification.classList.add('show');
+    }, 10);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => {
+        notification.remove();
+      }, 300);
+    }, 3000);
+  },
+  
+  /**
+   * Get notification icon by type
+   */
+  getNotificationIcon(type) {
+    const icons = {
+      'success': '✅',
+      'error': '❌',
+      'warning': '⚠️',
+      'info': 'ℹ️'
+    };
+    return icons[type] || icons.info;
+  },
+  
+  /**
+   * Show modal dialog
+   */
+  showModal(title, content) {
+    const modal = document.createElement('div');
+    modal.className = 'tool-modal';
+    modal.innerHTML = `
+      <div class="modal-backdrop" onclick="ToolWrapper.closeModal()"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>${title}</h2>
+          <button onclick="ToolWrapper.closeModal()" class="modal-close">✕</button>
+        </div>
+        <div class="modal-body">
+          ${content}
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    setTimeout(() => {
+      modal.classList.add('show');
+    }, 10);
+  },
+  
+  /**
+   * Close modal
+   */
+  closeModal() {
+    const modal = document.querySelector('.tool-modal');
+    if (modal) {
+      modal.classList.remove('show');
+      setTimeout(() => {
+        modal.remove();
+      }, 300);
+    }
+  },
+  
+  /**
+   * Check for unsaved changes
+   */
+  checkUnsavedChanges() {
+    // Compare current state with last saved state
+    const currentData = JSON.stringify(this.collectToolData(this.currentPattern));
+    const localKey = `draft_${this.currentTool}_${typeof userId !== 'undefined' ? userId : 'default'}`;
+    const savedDraft = (typeof localStorage !== 'undefined' && localStorage) ? localStorage.getItem(localKey) : null;
+    
+    if (savedDraft) {
+      const savedData = JSON.parse(savedDraft).data;
+      return currentData !== JSON.stringify(savedData);
+    }
+    
+    // Check if any fields have been filled
+    const filledFields = document.querySelectorAll('#tool-content input:valid, #tool-content select:valid, #tool-content textarea:valid');
+    return filledFields.length > 0;
+  },
+  
+  /**
+   * Update progress display with DOM safety checks
+   */
+  updateProgressDisplay(progress) {
+    if (progress === null || progress === undefined) return;
+    
+    // Handle both number and object formats
+    const progressValue = typeof progress === 'number' ? progress : 
+                         (progress.percentage !== undefined ? progress.percentage : 0);
+    
+    const fillElement = document.getElementById('progress-fill');
+    const percentElement = document.getElementById('progress-percent');
+    const sectionElement = document.getElementById('progress-section');
+    const stepsElement = document.getElementById('progress-steps');
+    
+    if (fillElement) {
+      fillElement.style.width = `${Math.max(0, Math.min(100, progressValue))}%`;
+    }
+    if (percentElement) {
+      percentElement.textContent = `${progressValue}% Complete`;
+    }
+    if (sectionElement && typeof progress === 'object' && progress.section) {
+      sectionElement.textContent = progress.section;
+    }
+    if (stepsElement && typeof progress === 'object' && progress.currentStep && progress.totalSteps) {
+      stepsElement.textContent = `Section ${progress.currentStep} of ${progress.totalSteps}`;
+    }
+  },
+  
+  /**
+   * Show load options dialog
+   */
+  showLoadOptions() {
+    const localKey = `draft_${this.currentTool}_${typeof userId !== 'undefined' ? userId : 'default'}`;
+    const localDraft = (typeof localStorage !== 'undefined' && localStorage) ? localStorage.getItem(localKey) : null;
+    
+    let options = '<div class="load-options">';
+    
+    if (localDraft) {
+      const draft = JSON.parse(localDraft);
+      const date = new Date(draft.timestamp);
+      options += `
+        <div class="load-option">
+          <h3>📱 Local Draft</h3>
+          <p>Saved: ${date.toLocaleString()}</p>
+          <p>Progress: ${typeof draft.progress === 'object' ? draft.progress.percentage : draft.progress || 0}%</p>
+          <button onclick="ToolWrapper.loadDraft(); ToolWrapper.closeModal();" class="btn-primary">
+            Load Local Draft
+          </button>
+        </div>
+      `;
+    }
+    
+    // Check for all server draft versions (up to 3)
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      google.script.run
+        .withSuccessHandler((draftsData) => {
+          if (draftsData && draftsData.versions && draftsData.versions.length > 0) {
+            let serverOptions = '<h3>☁️ Cloud Drafts (Saved to Server)</h3>';
+            
+            draftsData.versions.forEach((draft, index) => {
+              // Extract progress from the draft data
+              const progressVal = draft.data && draft.data.progress ? 
+                (typeof draft.data.progress === 'object' ? draft.data.progress.percentage : draft.data.progress) : 0;
+              const versionLabel = index === 0 ? 'Latest' : `Version ${draftsData.versions.length - index}`;
+              const timeDiff = Date.now() - new Date(draft.timestamp);
+              const hoursAgo = Math.round(timeDiff / 3600000);
+              
+              serverOptions += `
+                <div class="load-option" style="margin-top: 15px; padding: 15px; border: 1px solid var(--border); border-radius: 8px;">
+                  <h4 style="color: var(--gold);">📄 ${versionLabel}</h4>
+                  <p>Saved: ${new Date(draft.timestamp).toLocaleString()}</p>
+                  <p>Progress: ${progressVal}% complete</p>
+                  <p style="color: var(--muted); font-size: 12px;">${hoursAgo}h ago</p>
+                  <button onclick="ToolWrapper.loadServerDraft('${draft.id}', '${userId}', '${this.currentTool}'); ToolWrapper.closeModal();" class="btn-primary">
+                    Load ${versionLabel}
+                  </button>
+                </div>
+              `;
+            });
+            
+            const container = document.querySelector('.load-options');
+            if (container) {
+              container.innerHTML += serverOptions;
+            }
+          }
+        })
+        .withFailureHandler((error) => {
+          console.error('Failed to get draft versions:', error);
+        })
+        .getAllDraftVersions(userId, this.currentTool);
+    }
+    
+    options += '</div>';
+    this.showModal('Load Previous Work', options);
+  },
+  
+  /**
+   * Load draft from server
+   */
+  loadServerDraft(draftId, userId, toolId) {
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      google.script.run
+        .withSuccessHandler((draft) => {
+          if (draft && draft.data) {
+            this.restoreToolState(draft);
+            this.showNotification('Cloud draft loaded successfully', 'success');
+            // Update progress display
+            if (draft.data.progress) {
+              this.updateProgressDisplay(draft.data.progress);
+            }
+          } else {
+            this.showNotification('Draft not found or invalid', 'error');
+          }
+        })
+        .withFailureHandler((error) => {
+          console.error('Failed to load draft:', error);
+          this.showNotification('Failed to load cloud draft', 'error');
+        })
+        .getSpecificDraft(draftId, userId, toolId);
+    }
+  },
+  
+  /**
+   * Get help content for tool
+   */
+  getToolHelp(toolId) {
+    const helps = {
+      'tool1': `
+        <h3>How to Complete the Orientation Assessment</h3>
+        <ul>
+          <li>Answer all questions honestly - there are no wrong answers</li>
+          <li>Your progress is saved automatically every 2 minutes</li>
+          <li>You can leave and come back anytime using the Load button</li>
+          <li>The assessment takes about 20 minutes to complete</li>
+          <li>Your Financial Health Score will be calculated at the end</li>
+        </ul>
+      `,
+      'tool2': `
+        <h3>Financial Clarity Assessment Help</h3>
+        <p>This tool builds on your Orientation Assessment results...</p>
+      `
+      // Add more tool helps as needed
+    };
+    
+    return helps[toolId] || '<p>Help content for this tool is being developed.</p>';
+  },
+  
+  /**
+   * Format insights for display
+   */
+  formatInsights(insights) {
+    if (!insights || insights.length === 0) {
+      return '<p>No insights available yet. Complete more tools to see cross-tool insights.</p>';
+    }
+    
+    let html = '<div class="insights-list">';
+    insights.forEach(insight => {
+      html += `
+        <div class="insight-item">
+          <div class="insight-icon">${insight.icon || '💡'}</div>
+          <div class="insight-content">
+            <h4>${insight.title}</h4>
+            <p>${insight.description}</p>
+            <small>From: ${insight.source}</small>
+          </div>
+        </div>
+      `;
+    });
+    html += '</div>';
+    
+    return html;
+  },
+  
+  /**
+   * Get calculator state for Pattern 4 tools
+   */
+  getCalculatorState() {
+    // Tool-specific calculator state collection
+    // Override this for each calculator tool
+    return {};
+  },
+  
+  /**
+   * Restore calculator state for Pattern 4 tools
+   */
+  restoreCalculatorState(state) {
+    // Tool-specific calculator state restoration
+    // Override this for each calculator tool
+  },
+  
+  /**
+   * Get section-based progress
+   */
+  getSectionProgress() {
+    // Calculate based on current section visibility
+    // This would be customized per tool
+    const sections = document.querySelectorAll('.form-section');
+    const currentSection = document.querySelector('.form-section.active');
+    
+    if (sections.length > 0 && currentSection) {
+      const currentIndex = Array.from(sections).indexOf(currentSection) + 1;
+      const percentage = Math.round((currentIndex / sections.length) * 100);
+      
+      return {
+        percentage,
+        currentStep: currentIndex,
+        totalSteps: sections.length,
+        section: currentSection.dataset.sectionName || `Section ${currentIndex}`
+      };
+    }
+    
+    return {
+      percentage: 0,
+      currentStep: 1,
+      totalSteps: 1,
+      section: 'Getting Started'
+    };
+  }
+};
+
+// Make ToolWrapper globally available for Google Apps Script
+if (typeof window !== 'undefined') {
+  window.ToolWrapper = ToolWrapper;
+}
+</script>
