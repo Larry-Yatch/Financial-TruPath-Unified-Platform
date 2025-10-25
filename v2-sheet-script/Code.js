@@ -11,7 +11,7 @@ function include(filename) {
   try {
     return HtmlService.createHtmlOutputFromFile(filename).getContent();
   } catch(e) {
-    console.error('Include error for file:', filename, e);
+    // console.error('Include error for file:', filename, e);
     return '';
   }
 }
@@ -27,8 +27,8 @@ function doGet(e) {
     const route = e.parameter.route || 'login';
     
     // Log ALL parameters for debugging
-    console.log('Route requested:', route);
-    console.log('All parameters:', JSON.stringify(e.parameter));
+    // console.log('Route requested:', route);
+    // console.log('All parameters:', JSON.stringify(e.parameter));
     
     // Handle different routes
     if (route === 'dashboard') {
@@ -75,7 +75,7 @@ function doGet(e) {
       template.currentWeek = getCurrentWeek();
       template.config = CONFIG;
       
-      console.log('Loading Tool 1 for client:', clientId, 'session:', sessionId);
+      // console.log('Loading Tool 1 for client:', clientId, 'session:', sessionId);
       
       return template.evaluate()
         .setTitle('Financial TruPath V2.0 - Orientation Assessment')
@@ -87,7 +87,7 @@ function doGet(e) {
     return createLoginPage();
     
   } catch (error) {
-    console.error('Router error:', error);
+    // console.error('Router error:', error);
     // Return a simple error page since createErrorPage might not exist
     const errorHtml = `
       <!DOCTYPE html>
@@ -399,7 +399,7 @@ function createLoginPage(message) {
             
             // Navigate to dashboard after a brief delay
             setTimeout(function() {
-              window.location.href = dashboardUrl;
+              window.top.location.href = dashboardUrl;
             }, 500);
           } else {
             document.getElementById('loginForm').style.display = 'block';
@@ -411,7 +411,7 @@ function createLoginPage(message) {
           document.getElementById('loginForm').style.display = 'block';
           document.getElementById('loadingSpinner').style.display = 'none';
           showAlert('System error. Please try again.', 'error');
-          console.error(error);
+          // console.error(error);
         })
         .authenticateAndCreateSession(clientId);
     }
@@ -471,7 +471,7 @@ function createLoginPage(message) {
                     '&session=' + encodeURIComponent(sessionResult.sessionId);
                   
                   setTimeout(function() {
-                    window.location.href = dashboardUrl;
+                    window.top.location.href = dashboardUrl;
                   }, 500);
                 } else {
                   document.getElementById('loadingSpinner').style.display = 'none';
@@ -483,7 +483,7 @@ function createLoginPage(message) {
                 document.getElementById('loadingSpinner').style.display = 'none';
                 showBackupLogin();
                 showAlert('System error. Please try again.', 'error');
-                console.error(error);
+                // console.error(error);
               })
               .authenticateAndCreateSession(result.clientId);
               
@@ -497,7 +497,7 @@ function createLoginPage(message) {
           document.getElementById('loadingSpinner').style.display = 'none';
           showBackupLogin();
           showAlert('System error. Please try again.', 'error');
-          console.error(error);
+          // console.error(error);
         })
         .lookupClientByDetails({
           firstName: firstName,
@@ -780,7 +780,7 @@ function createSimpleDashboard(clientId, sessionId) {
         '&tool=' + toolId + 
         '&client=${clientId || ''}' +
         '&session=${sessionId || ''}';
-      window.location.href = toolUrl;
+      window.top.location.href = toolUrl;
     }
   </script>
 </body>
@@ -997,12 +997,12 @@ function getCurrentWeek() {
  */
 function saveUserData(userId, toolId, data) {
   try {
-    console.log(`saveUserData called - userId: ${userId}, toolId: ${toolId}, data fields: ${Object.keys(data).length}`);
+    // console.log(`saveUserData called - userId: ${userId}, toolId: ${toolId}, data fields: ${Object.keys(data).length}`);
     
     // Use DataService for saving tool data
     const result = DataService.saveToolResponse(userId, toolId, data);
     
-    console.log(`DataService.saveToolResponse result:`, result);
+    // console.log(`DataService.saveToolResponse result:`, result);
     
     // Log the save event
     logEvent('DATA_SAVED', {
@@ -1027,7 +1027,7 @@ function saveUserData(userId, toolId, data) {
       };
     }
   } catch (error) {
-    console.error('Error saving data:', error);
+    // console.error('Error saving data:', error);
     logEvent('SAVE_ERROR', {
       userId: userId,
       tool: toolId,
@@ -1052,7 +1052,7 @@ function saveUserData(userId, toolId, data) {
  */
 function saveToolDraft(userId, toolId, draftData, progress, status) {
   try {
-    console.log(`saveToolDraft called - userId: ${userId}, toolId: ${toolId}, progress: ${progress}, status: ${status}`);
+    // console.log(`saveToolDraft called - userId: ${userId}, toolId: ${toolId}, progress: ${progress}, status: ${status}`);
     // Include progress and status in the draft data
     const enrichedData = {
       ...draftData,
@@ -1061,7 +1061,7 @@ function saveToolDraft(userId, toolId, draftData, progress, status) {
     };
     return DataService.saveToolDraft(userId, toolId, enrichedData);
   } catch (error) {
-    console.error('Error saving draft:', error);
+    // console.error('Error saving draft:', error);
     return {
       success: false,
       error: error.toString()
@@ -1077,10 +1077,10 @@ function saveToolDraft(userId, toolId, draftData, progress, status) {
  */
 function getToolDraft(userId, toolId, getAllVersions = false) {
   try {
-    console.log(`getToolDraft called - userId: ${userId}, toolId: ${toolId}, getAllVersions: ${getAllVersions}`);
+    // console.log(`getToolDraft called - userId: ${userId}, toolId: ${toolId}, getAllVersions: ${getAllVersions}`);
     return DataService.getToolDraft(userId, toolId, getAllVersions);
   } catch (error) {
-    console.error('Error getting draft:', error);
+    // console.error('Error getting draft:', error);
     return null;
   }
 }
@@ -1092,10 +1092,10 @@ function getToolDraft(userId, toolId, getAllVersions = false) {
  */
 function getAllDraftVersions(userId, toolId) {
   try {
-    console.log(`getAllDraftVersions called - userId: ${userId}, toolId: ${toolId}`);
+    // console.log(`getAllDraftVersions called - userId: ${userId}, toolId: ${toolId}`);
     return DataService.getToolDraft(userId, toolId, true);
   } catch (error) {
-    console.error('Error getting draft versions:', error);
+    // console.error('Error getting draft versions:', error);
     return { versions: [], count: 0, latest: null };
   }
 }
@@ -1107,11 +1107,11 @@ function getAllDraftVersions(userId, toolId) {
  */
 function getRelevantInsights(userId, toolId) {
   try {
-    console.log(`getRelevantInsights called - userId: ${userId}, toolId: ${toolId}`);
+    // console.log(`getRelevantInsights called - userId: ${userId}, toolId: ${toolId}`);
     // For now, return empty insights. This will be enhanced later
     return [];
   } catch (error) {
-    console.error('Error getting insights:', error);
+    // console.error('Error getting insights:', error);
     return [];
   }
 }
@@ -1124,7 +1124,7 @@ function getRelevantInsights(userId, toolId) {
  */
 function getSpecificDraft(draftId, userId, toolId) {
   try {
-    console.log(`getSpecificDraft called - draftId: ${draftId}, userId: ${userId}, toolId: ${toolId}`);
+    // console.log(`getSpecificDraft called - draftId: ${draftId}, userId: ${userId}, toolId: ${toolId}`);
     
     // If we have userId and toolId, use the more efficient lookup
     if (userId && toolId) {
@@ -1133,10 +1133,10 @@ function getSpecificDraft(draftId, userId, toolId) {
     
     // Otherwise, we'd need to search through all user properties
     // For now, require userId and toolId
-    console.warn('getSpecificDraft requires userId and toolId for lookup');
+    // console.warn('getSpecificDraft requires userId and toolId for lookup');
     return null;
   } catch (error) {
-    console.error('Error getting specific draft:', error);
+    // console.error('Error getting specific draft:', error);
     return null;
   }
 }
@@ -1150,7 +1150,7 @@ function getUserProfile(userId) {
   try {
     return DataHub.getUnifiedProfile(userId);
   } catch (error) {
-    console.error('Error getting profile:', error);
+    // console.error('Error getting profile:', error);
     return null;
   }
 }
@@ -1197,7 +1197,7 @@ function authenticateAndCreateSession(clientId) {
     };
     
   } catch (error) {
-    console.error('Error in authenticateAndCreateSession:', error);
+    // console.error('Error in authenticateAndCreateSession:', error);
     return {
       success: false,
       error: 'System error during login. Please try again.'
@@ -1231,7 +1231,7 @@ function logEvent(eventType, details) {
       JSON.stringify(details)
     ]);
   } catch (error) {
-    console.error('Error logging event:', error);
+    // console.error('Error logging event:', error);
   }
 }
 
@@ -1820,7 +1820,7 @@ function generatePDFReport(reportData) {
     };
     
   } catch (error) {
-    console.error('Error generating PDF:', error);
+    // console.error('Error generating PDF:', error);
     return {
       success: false,
       error: error.toString()

@@ -1,0 +1,41 @@
+{
+  "name": "financial-trupath-v2-sheet-script",
+  "version": "1.0.0",
+  "description": "Google Apps Script for Financial TruPath V2",
+  "scripts": {
+    "check": "node agents/gas-doctor.js && node agents/callback-surgeon.js analyze",
+    "pre-deploy": "npm run check && node agents/deploy-guardian.js check",
+    "safe-deploy": "node safe-deploy.js deploy",
+    "deploy": "npm run safe-deploy",
+    "fix": "./start-agents.sh fix",
+    "doctor": "node agents/gas-doctor.js",
+    "doctor:fix": "node agents/gas-doctor.js Code.js --fix",
+    "surgeon": "node agents/callback-surgeon.js analyze",
+    "surgeon:fix": "node agents/callback-surgeon.js analyze --fix",
+    "guardian": "node agents/deploy-guardian.js check",
+    "quota": "node agents/quota-keeper.js analyze",
+    "sheets": "node agents/sheets-monitor.js start",
+    "master": "./start-agents.sh master",
+    "quick": "./start-agents.sh quick",
+    "test": "echo \"No tests configured\"",
+    "push": "clasp push",
+    "pull": "clasp pull",
+    "open": "clasp open",
+    "logs": "clasp logs"
+  },
+  "keywords": [
+    "google-apps-script",
+    "financial",
+    "assessment",
+    "clasp"
+  ],
+  "author": "Larry",
+  "license": "ISC",
+  "dependencies": {
+    "googleapis": "^118.0.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
