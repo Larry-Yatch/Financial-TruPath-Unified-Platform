@@ -261,7 +261,7 @@ const ToolWrapper = {
     this.savingInProgress = true;
     
     const toolId = this.currentTool;
-    const pattern = this.currentPattern;
+    const pattern = this.currentPattern || 'pattern1'; // Default to pattern1 if not set
     const data = this.collectToolData(pattern);
     const progress = this.calculateProgress(pattern);
     
@@ -326,14 +326,35 @@ const ToolWrapper = {
   collectToolData(pattern) {
     const config = this.patterns[pattern];
     
-    if (config.hasForm) {
+    if (config && config.hasForm) {
       // Form-based tools (Patterns 1, 2, 3)
-      const form = document.querySelector('#tool-content form');
-      if (form) {
-        const formData = new FormData(form);
-        return Object.fromEntries(formData);
-      }
-    } else {
+      // Manually collect to ensure all field types work correctly
+      const data = {};
+      const inputs = document.querySelectorAll('#tool-content input, #tool-content select, #tool-content textarea');
+      
+      inputs.forEach(field => {
+        if (field.name) {
+          if (field.type === 'checkbox') {
+            // For checkboxes, store true/false or the value if checked
+            if (field.checked) {
+              data[field.name] = field.value || 'on';
+            }
+          } else if (field.type === 'radio') {
+            // For radio buttons, only store if checked
+            if (field.checked) {
+              data[field.name] = field.value;
+            }
+          } else {
+            // For all other input types
+            if (field.value) {
+              data[field.name] = field.value;
+            }
+          }
+        }
+      });
+      
+      return data;
+    } else if (config) {
       // Calculator tools (Pattern 4) - collect state
       return this.getCalculatorState();
     }
@@ -748,8 +769,12 @@ const ToolWrapper = {
    * Check for unsaved changes
    */
   checkUnsavedChanges() {
+    // Ensure we have necessary data
+    if (!this.currentTool) return false;
+    
     // Compare current state with last saved state
-    const currentData = JSON.stringify(this.collectToolData(this.currentPattern));
+    const pattern = this.currentPattern || 'pattern1';
+    const currentData = JSON.stringify(this.collectToolData(pattern));
     const localKey = `draft_${this.currentTool}_${typeof userId !== 'undefined' ? userId : 'default'}`;
     const savedDraft = (typeof localStorage !== 'undefined' && localStorage) ? localStorage.getItem(localKey) : null;
     
