@@ -246,14 +246,27 @@ const DataService = {
       
       responseSheet.appendRow(newRow);
       
-      // Update tool status
-      this.updateToolStatus(clientId, toolId, 'completed');
+      // Update tool status (with error handling)
+      try {
+        this.updateToolStatus(clientId, toolId, 'completed');
+      } catch (statusError) {
+        console.warn('Could not update tool status:', statusError);
+      }
       
-      // Trigger insight generation (will connect to InsightEngine later)
-      const insights = this.triggerInsightGeneration(clientId, toolId, data);
+      // Trigger insight generation (with error handling)
+      let insights = [];
+      try {
+        insights = this.triggerInsightGeneration(clientId, toolId, data);
+      } catch (insightError) {
+        console.warn('Could not generate insights:', insightError);
+      }
       
-      // Log the activity
-      this.logActivity(clientId, `Saved ${toolId} response`);
+      // Log the activity (with error handling)
+      try {
+        this.logActivity(clientId, `Saved ${toolId} response`);
+      } catch (logError) {
+        console.warn('Could not log activity:', logError);
+      }
       
       return {
         success: true,
