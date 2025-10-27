@@ -401,13 +401,19 @@
         versionDiv.onmouseover = function() { this.style.backgroundColor = '#f0f0f0'; };
         versionDiv.onmouseout = function() { this.style.backgroundColor = 'white'; };
         
-        const savedDate = new Date(version.savedAt);
+        // Use timestamp field and handle different possible field names
+        const timestamp = version.savedAt || version.timestamp || version.data?.savedAt;
+        const savedDate = timestamp ? new Date(timestamp) : new Date();
         const formattedDate = savedDate.toLocaleString();
+        
+        // Extract progress from data if needed
+        const progressData = version.progress || version.data?.progress || {};
+        const progressPercent = progressData.percentage || progressData || 0;
         
         versionDiv.innerHTML = `
           <div style="font-weight:bold;">Version ${index + 1} ${index === 0 ? '(Latest)' : ''}</div>
           <div style="font-size:12px; color:#666;">Saved: ${formattedDate}</div>
-          <div style="font-size:12px; color:#666;">Progress: ${version.progress?.percentage || 0}%</div>
+          <div style="font-size:12px; color:#666;">Progress: ${Math.round(progressPercent)}%</div>
         `;
         
         versionDiv.onclick = function() {
