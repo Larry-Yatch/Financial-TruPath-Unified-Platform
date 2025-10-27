@@ -1,0 +1,84 @@
+{
+  "timestamp": "2025-10-27T03:19:35.618Z",
+  "changes": {
+    ".daddy/daddy-validation.db": {
+      "status": "modified",
+      "staged": false
+    },
+    "package-lock.json": {
+      "status": "modified",
+      "staged": false
+    },
+    "package.json": {
+      "status": "modified",
+      "staged": false
+    },
+    "v2-sheet-script/agent-logs/issues-2025-10-27.json": {
+      "status": "modified",
+      "staged": false
+    },
+    "test-validation.js": {
+      "status": "new",
+      "staged": false
+    }
+  },
+  "issues": [
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "security",
+      "message": "Potential security issue: api-key",
+      "severity": "critical",
+      "occurrences": 1
+    }
+  ],
+  "warnings": [
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete",
+      "message": "Found 8 TODO/FIXME markers",
+      "line": 12
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete",
+      "message": "Found 1 TODO/FIXME markers",
+      "line": 4
+    },
+    {
+      "file": "test-validation.js",
+      "type": "debug-code",
+      "message": "Found 2 console statements",
+      "line": 3
+    }
+  ],
+  "suggestions": [
+    {
+      "file": "test-validation.js",
+      "type": "naming",
+      "message": "Consider using more descriptive variable names",
+      "examples": [
+        "var x"
+      ]
+    }
+  ],
+  "summary": {
+    "filesChanged": 5,
+    "criticalIssues": 1,
+    "totalIssues": 3,
+    "totalWarnings": 3,
+    "totalSuggestions": 1,
+    "passed": false
+  }
+}

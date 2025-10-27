@@ -1,0 +1,692 @@
+{
+  "timestamp": "2025-10-27T03:19:44.345Z",
+  "changes": {
+    ".daddy/daddy-validation.db": {
+      "status": "modified",
+      "staged": false
+    },
+    "package-lock.json": {
+      "status": "modified",
+      "staged": false
+    },
+    "package.json": {
+      "status": "modified",
+      "staged": false
+    },
+    "v2-sheet-script/agent-logs/issues-2025-10-27.json": {
+      "status": "modified",
+      "staged": false
+    },
+    "test-validation.js": {
+      "status": "new",
+      "staged": false
+    },
+    "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-35-618Z.json": {
+      "status": "new",
+      "staged": false
+    },
+    "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-36-698Z.json": {
+      "status": "new",
+      "staged": false
+    },
+    "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-37-765Z.json": {
+      "status": "new",
+      "staged": false
+    },
+    "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-38-828Z.json": {
+      "status": "new",
+      "staged": false
+    },
+    "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-40-011Z.json": {
+      "status": "new",
+      "staged": false
+    },
+    "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-41-121Z.json": {
+      "status": "new",
+      "staged": false
+    },
+    "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-42-188Z.json": {
+      "status": "new",
+      "staged": false
+    },
+    "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-43-267Z.json": {
+      "status": "new",
+      "staged": false
+    }
+  },
+  "issues": [
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "security",
+      "message": "Potential security issue: api-key",
+      "severity": "critical",
+      "occurrences": 1
+    },
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "security",
+      "message": "Potential security issue: api-key",
+      "severity": "critical",
+      "occurrences": 1
+    },
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "security",
+      "message": "Potential security issue: api-key",
+      "severity": "critical",
+      "occurrences": 1
+    },
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "security",
+      "message": "Potential security issue: api-key",
+      "severity": "critical",
+      "occurrences": 1
+    },
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "security",
+      "message": "Potential security issue: api-key",
+      "severity": "critical",
+      "occurrences": 1
+    },
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "security",
+      "message": "Potential security issue: api-key",
+      "severity": "critical",
+      "occurrences": 1
+    },
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "security",
+      "message": "Potential security issue: api-key",
+      "severity": "critical",
+      "occurrences": 1
+    },
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "security",
+      "message": "Potential security issue: api-key",
+      "severity": "critical",
+      "occurrences": 1
+    },
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "test-validation.js",
+      "type": "security",
+      "message": "Potential security issue: api-key",
+      "severity": "critical",
+      "occurrences": 1
+    }
+  ],
+  "warnings": [
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete",
+      "message": "Found 8 TODO/FIXME markers",
+      "line": 12
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete",
+      "message": "Found 1 TODO/FIXME markers",
+      "line": 4
+    },
+    {
+      "file": "test-validation.js",
+      "type": "debug-code",
+      "message": "Found 2 console statements",
+      "line": 3
+    },
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete",
+      "message": "Found 8 TODO/FIXME markers",
+      "line": 12
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete",
+      "message": "Found 1 TODO/FIXME markers",
+      "line": 4
+    },
+    {
+      "file": "test-validation.js",
+      "type": "debug-code",
+      "message": "Found 2 console statements",
+      "line": 3
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-35-618Z.json",
+      "type": "incomplete",
+      "message": "Found 4 TODO/FIXME markers",
+      "line": 50
+    },
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete",
+      "message": "Found 8 TODO/FIXME markers",
+      "line": 12
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete",
+      "message": "Found 1 TODO/FIXME markers",
+      "line": 4
+    },
+    {
+      "file": "test-validation.js",
+      "type": "debug-code",
+      "message": "Found 2 console statements",
+      "line": 3
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-35-618Z.json",
+      "type": "incomplete",
+      "message": "Found 4 TODO/FIXME markers",
+      "line": 50
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-36-698Z.json",
+      "type": "incomplete",
+      "message": "Found 10 TODO/FIXME markers",
+      "line": 73
+    },
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete",
+      "message": "Found 8 TODO/FIXME markers",
+      "line": 12
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete",
+      "message": "Found 1 TODO/FIXME markers",
+      "line": 4
+    },
+    {
+      "file": "test-validation.js",
+      "type": "debug-code",
+      "message": "Found 2 console statements",
+      "line": 3
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-35-618Z.json",
+      "type": "incomplete",
+      "message": "Found 4 TODO/FIXME markers",
+      "line": 50
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-36-698Z.json",
+      "type": "incomplete",
+      "message": "Found 10 TODO/FIXME markers",
+      "line": 73
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-37-765Z.json",
+      "type": "incomplete",
+      "message": "Found 18 TODO/FIXME markers",
+      "line": 96
+    },
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete",
+      "message": "Found 8 TODO/FIXME markers",
+      "line": 12
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete",
+      "message": "Found 1 TODO/FIXME markers",
+      "line": 4
+    },
+    {
+      "file": "test-validation.js",
+      "type": "debug-code",
+      "message": "Found 2 console statements",
+      "line": 3
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-35-618Z.json",
+      "type": "incomplete",
+      "message": "Found 4 TODO/FIXME markers",
+      "line": 50
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-36-698Z.json",
+      "type": "incomplete",
+      "message": "Found 10 TODO/FIXME markers",
+      "line": 73
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-37-765Z.json",
+      "type": "incomplete",
+      "message": "Found 18 TODO/FIXME markers",
+      "line": 96
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-38-828Z.json",
+      "type": "incomplete",
+      "message": "Found 28 TODO/FIXME markers",
+      "line": 119
+    },
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete",
+      "message": "Found 8 TODO/FIXME markers",
+      "line": 12
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete",
+      "message": "Found 1 TODO/FIXME markers",
+      "line": 4
+    },
+    {
+      "file": "test-validation.js",
+      "type": "debug-code",
+      "message": "Found 2 console statements",
+      "line": 3
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-35-618Z.json",
+      "type": "incomplete",
+      "message": "Found 4 TODO/FIXME markers",
+      "line": 50
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-36-698Z.json",
+      "type": "incomplete",
+      "message": "Found 10 TODO/FIXME markers",
+      "line": 73
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-37-765Z.json",
+      "type": "incomplete",
+      "message": "Found 18 TODO/FIXME markers",
+      "line": 96
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-38-828Z.json",
+      "type": "incomplete",
+      "message": "Found 28 TODO/FIXME markers",
+      "line": 119
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-40-011Z.json",
+      "type": "incomplete",
+      "message": "Found 40 TODO/FIXME markers",
+      "line": 142
+    },
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete",
+      "message": "Found 8 TODO/FIXME markers",
+      "line": 12
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete",
+      "message": "Found 1 TODO/FIXME markers",
+      "line": 4
+    },
+    {
+      "file": "test-validation.js",
+      "type": "debug-code",
+      "message": "Found 2 console statements",
+      "line": 3
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-35-618Z.json",
+      "type": "incomplete",
+      "message": "Found 4 TODO/FIXME markers",
+      "line": 50
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-36-698Z.json",
+      "type": "incomplete",
+      "message": "Found 10 TODO/FIXME markers",
+      "line": 73
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-37-765Z.json",
+      "type": "incomplete",
+      "message": "Found 18 TODO/FIXME markers",
+      "line": 96
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-38-828Z.json",
+      "type": "incomplete",
+      "message": "Found 28 TODO/FIXME markers",
+      "line": 119
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-40-011Z.json",
+      "type": "incomplete",
+      "message": "Found 40 TODO/FIXME markers",
+      "line": 142
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-41-121Z.json",
+      "type": "incomplete",
+      "message": "Found 54 TODO/FIXME markers",
+      "line": 165
+    },
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete",
+      "message": "Found 8 TODO/FIXME markers",
+      "line": 12
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete",
+      "message": "Found 1 TODO/FIXME markers",
+      "line": 4
+    },
+    {
+      "file": "test-validation.js",
+      "type": "debug-code",
+      "message": "Found 2 console statements",
+      "line": 3
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-35-618Z.json",
+      "type": "incomplete",
+      "message": "Found 4 TODO/FIXME markers",
+      "line": 50
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-36-698Z.json",
+      "type": "incomplete",
+      "message": "Found 10 TODO/FIXME markers",
+      "line": 73
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-37-765Z.json",
+      "type": "incomplete",
+      "message": "Found 18 TODO/FIXME markers",
+      "line": 96
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-38-828Z.json",
+      "type": "incomplete",
+      "message": "Found 28 TODO/FIXME markers",
+      "line": 119
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-40-011Z.json",
+      "type": "incomplete",
+      "message": "Found 40 TODO/FIXME markers",
+      "line": 142
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-41-121Z.json",
+      "type": "incomplete",
+      "message": "Found 54 TODO/FIXME markers",
+      "line": 165
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-42-188Z.json",
+      "type": "incomplete",
+      "message": "Found 70 TODO/FIXME markers",
+      "line": 188
+    },
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete",
+      "message": "Found 8 TODO/FIXME markers",
+      "line": 12
+    },
+    {
+      "file": "test-validation.js",
+      "type": "incomplete",
+      "message": "Found 1 TODO/FIXME markers",
+      "line": 4
+    },
+    {
+      "file": "test-validation.js",
+      "type": "debug-code",
+      "message": "Found 2 console statements",
+      "line": 3
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-35-618Z.json",
+      "type": "incomplete",
+      "message": "Found 4 TODO/FIXME markers",
+      "line": 50
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-36-698Z.json",
+      "type": "incomplete",
+      "message": "Found 10 TODO/FIXME markers",
+      "line": 73
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-37-765Z.json",
+      "type": "incomplete",
+      "message": "Found 18 TODO/FIXME markers",
+      "line": 96
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-38-828Z.json",
+      "type": "incomplete",
+      "message": "Found 28 TODO/FIXME markers",
+      "line": 119
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-40-011Z.json",
+      "type": "incomplete",
+      "message": "Found 40 TODO/FIXME markers",
+      "line": 142
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-41-121Z.json",
+      "type": "incomplete",
+      "message": "Found 54 TODO/FIXME markers",
+      "line": 165
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-42-188Z.json",
+      "type": "incomplete",
+      "message": "Found 70 TODO/FIXME markers",
+      "line": 188
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T03-19-43-267Z.json",
+      "type": "incomplete",
+      "message": "Found 88 TODO/FIXME markers",
+      "line": 211
+    }
+  ],
+  "suggestions": [
+    {
+      "file": "test-validation.js",
+      "type": "naming",
+      "message": "Consider using more descriptive variable names",
+      "examples": [
+        "var x"
+      ]
+    },
+    {
+      "file": "test-validation.js",
+      "type": "naming",
+      "message": "Consider using more descriptive variable names",
+      "examples": [
+        "var x"
+      ]
+    },
+    {
+      "file": "test-validation.js",
+      "type": "naming",
+      "message": "Consider using more descriptive variable names",
+      "examples": [
+        "var x"
+      ]
+    },
+    {
+      "file": "test-validation.js",
+      "type": "naming",
+      "message": "Consider using more descriptive variable names",
+      "examples": [
+        "var x"
+      ]
+    },
+    {
+      "file": "test-validation.js",
+      "type": "naming",
+      "message": "Consider using more descriptive variable names",
+      "examples": [
+        "var x"
+      ]
+    },
+    {
+      "file": "test-validation.js",
+      "type": "naming",
+      "message": "Consider using more descriptive variable names",
+      "examples": [
+        "var x"
+      ]
+    },
+    {
+      "file": "test-validation.js",
+      "type": "naming",
+      "message": "Consider using more descriptive variable names",
+      "examples": [
+        "var x"
+      ]
+    },
+    {
+      "file": "test-validation.js",
+      "type": "naming",
+      "message": "Consider using more descriptive variable names",
+      "examples": [
+        "var x"
+      ]
+    },
+    {
+      "file": "test-validation.js",
+      "type": "naming",
+      "message": "Consider using more descriptive variable names",
+      "examples": [
+        "var x"
+      ]
+    }
+  ],
+  "summary": {
+    "filesChanged": 13,
+    "criticalIssues": 9,
+    "totalIssues": 27,
+    "totalWarnings": 63,
+    "totalSuggestions": 9,
+    "passed": false
+  }
+}

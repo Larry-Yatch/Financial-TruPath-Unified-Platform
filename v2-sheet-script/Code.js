@@ -53,6 +53,17 @@ function doGet(e) {
       // Explicitly handle login route
       return createLoginPage();
       
+    } else if (route === 'test') {
+      // Simple TestTool without ToolWrapper
+      const template = HtmlService.createTemplateFromFile('TestTool');
+      template.userId = e.parameter.client || 'TEST001';
+      template.sessionId = e.parameter.session || '';
+      
+      return template.evaluate()
+        .setTitle('Financial TruPath - Test Tool')
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+        .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
+        
     } else if (route === 'tool' || route === 'orientation' || route === 'Tool1' || route === 'tool1') {
       // ACTIVATING: Sophisticated Tool 1 from index.html
       const sessionId = e.parameter.session || '';
@@ -399,7 +410,7 @@ function createLoginPage(message) {
             
             // Navigate to dashboard after a brief delay
             setTimeout(function() {
-              window.location.href = dashboardUrl;
+              window.top.location.href = dashboardUrl;
             }, 500);
           } else {
             document.getElementById('loginForm').style.display = 'block';

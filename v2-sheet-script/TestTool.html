@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Tool - Foundation Test</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    
+    #tool-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      padding: 2rem;
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 2rem;
+      text-align: center;
+      font-size: 2rem;
+    }
+    
+    .form-section {
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+    }
+    
+    .form-section h2 {
+      color: #495057;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #495057;
+      font-weight: 500;
+    }
+    
+    input[type="text"],
+    input[type="email"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    
+    .btn {
+      padding: 0.75rem 2rem;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #5a67d8;
+    }
+    
+    .info-message {
+      background: #e7f3ff;
+      border: 1px solid #b3d9ff;
+      border-radius: 4px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      color: #0066cc;
+    }
+  </style>
+</head>
+<body>
+  <!-- Step 1: Add ToolWrapper include but don't use it yet -->
+  <?!= include('ToolWrapper'); ?>
+  
+  <!-- Step 2: Initialize variables that ToolWrapper expects -->
+  <script>
+    // Initialize userId and sessionId from template
+    const userId = '<?= userId ?>';
+    const sessionId = '<?= sessionId ?>';
+    console.log('Variables initialized - userId:', userId, 'sessionId:', sessionId);
+  </script>
+  
+  <div id="tool-container">
+    <h1>Foundation Test Tool - Simple Version</h1>
+    
+    <div class="info-message">
+      This is a simplified test form without ToolWrapper integration to isolate any issues.
+    </div>
+    
+    <div id="tool-content">
+      <form id="tool-form" data-tool-id="test">
+        
+        <!-- Section 1: Basic Information -->
+        <div class="form-section" data-section="1">
+          <h2>Section 1: Basic Information</h2>
+          
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" name="firstName">
+          </div>
+          
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" name="lastName">
+          </div>
+          
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email">
+          </div>
+        </div>
+        
+        <!-- Section 2: Preferences -->
+        <div class="form-section" data-section="2">
+          <h2>Section 2: Preferences</h2>
+          
+          <div class="form-group">
+            <label for="preference">Select Your Preference</label>
+            <select id="preference" name="preference">
+              <option value="">-- Please Select --</option>
+              <option value="option1">Option 1: Basic</option>
+              <option value="option2">Option 2: Standard</option>
+              <option value="option3">Option 3: Premium</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="comments">Comments</label>
+            <textarea id="comments" name="comments" rows="3"></textarea>
+          </div>
+        </div>
+        
+        <!-- Simple button group -->
+        <div class="button-group">
+          <button type="button" class="btn btn-primary" onclick="testSave()">Test Save</button>
+        </div>
+        
+      </form>
+    </div>
+  </div>
+  
+  <script>
+    // Step 3: Use ToolWrapper save function
+    function testSave() {
+      // First check if ToolWrapper is available
+      if (typeof ToolWrapper !== 'undefined') {
+        console.log('ToolWrapper found, attempting to save...');
+        
+        // Set the current tool so ToolWrapper knows what it's saving
+        ToolWrapper.currentTool = 'test';
+        ToolWrapper.currentPattern = 'pattern1';
+        
+        // Call ToolWrapper's save function
+        ToolWrapper.saveDraft();
+        
+        alert('Attempted to save using ToolWrapper. Check console for results.');
+      } else {
+        console.error('ToolWrapper not found!');
+        alert('ToolWrapper not loaded properly.');
+      }
+    }
+  </script>
+</body>
+</html>
