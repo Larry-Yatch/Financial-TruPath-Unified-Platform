@@ -230,6 +230,16 @@ const ToolWrapper = {
    * Render progress bar for multi-section tools
    */
   renderProgress(toolId, sectionCount) {
+    // Check if this tool provides its own progress bar
+    // Tool 1 (index.html) has its own progress implementation
+    const toolsWithOwnProgress = ['tool1', 'index'];
+    
+    if (toolsWithOwnProgress.includes(toolId)) {
+      // Tool has its own progress bar, don't render ToolWrapper's
+      console.log(`Tool ${toolId} has its own progress bar, skipping ToolWrapper progress`);
+      return '';
+    }
+    
     return `
       <div class="progress-container" id="progress-${toolId}">
         <div class="progress-bar">
@@ -265,7 +275,7 @@ const ToolWrapper = {
     const data = this.collectToolData(pattern);
     const progress = this.calculateProgress(pattern);
     
-    // Create draft object
+    // Create draft object with all the data
     const draft = {
       toolId,
       pattern,
@@ -292,6 +302,14 @@ const ToolWrapper = {
     
     // Save to Google Sheets if online
     if (typeof google !== 'undefined' && google.script && google.script.run) {
+      // Log what we're saving for debugging
+      console.log('Saving draft to cloud:', {
+        userId: currentUserId,
+        toolId,
+        draftSize: JSON.stringify(draft).length,
+        hasData: Object.keys(data).length > 0
+      });
+      
       google.script.run
         .withSuccessHandler(() => {
           this.updateSaveIndicator('saved');
@@ -309,7 +327,7 @@ const ToolWrapper = {
             this.showNotification('Saved locally (offline mode)', 'warning');
           }
         })
-        .saveToolDraft(userId, toolId, draft);
+        .saveToolDraft(currentUserId, toolId, draft);
     } else {
       // Offline mode
       this.updateSaveIndicator('local');
@@ -328,31 +346,65 @@ const ToolWrapper = {
     
     if (config && config.hasForm) {
       // Form-based tools (Patterns 1, 2, 3)
-      // Manually collect to ensure all field types work correctly
+      // First try to find form with standardized ID
+      const form = document.getElementById('tool-form');
+      if (form) {
+        // Use FormData for proper form serialization
+        const formData = new FormData(form);
+        const data = {};
+        
+        // Convert FormData to plain object
+        for (let [key, value] of formData.entries()) {
+          // Handle multiple values for same name (like checkboxes)
+          if (data[key]) {
+            if (Array.isArray(data[key])) {
+              data[key].push(value);
+            } else {
+              data[key] = [data[key], value];
+            }
+          } else {
+            data[key] = value;
+          }
+        }
+        
+        // Also collect unchecked checkboxes and radios for completeness
+        const inputs = form.querySelectorAll('input[type="checkbox"], input[type="radio"]');
+        inputs.forEach(input => {
+          if (!input.checked && input.name && !data[input.name]) {
+            // Store false for unchecked checkboxes
+            if (input.type === 'checkbox') {
+              data[input.name] = false;
+            }
+            // Radio buttons: if none selected, the key won't exist (which is correct)
+          }
+        });
+        
+        console.log('Collected form data:', data);
+        return data;
+      }
+      
+      // Fallback to manual collection if no standard form found
       const data = {};
       const inputs = document.querySelectorAll('#tool-content input, #tool-content select, #tool-content textarea');
       
       inputs.forEach(field => {
         if (field.name) {
           if (field.type === 'checkbox') {
-            // For checkboxes, store true/false or the value if checked
-            if (field.checked) {
-              data[field.name] = field.value || 'on';
-            }
+            // Store boolean for checkboxes
+            data[field.name] = field.checked;
           } else if (field.type === 'radio') {
             // For radio buttons, only store if checked
             if (field.checked) {
               data[field.name] = field.value;
             }
           } else {
-            // For all other input types
-            if (field.value) {
-              data[field.name] = field.value;
-            }
+            // For all other input types, always store (even if empty)
+            data[field.name] = field.value || '';
           }
         }
       });
       
+      console.log('Collected fallback data:', data);
       return data;
     } else if (config) {
       // Calculator tools (Pattern 4) - collect state
@@ -611,17 +663,34 @@ const ToolWrapper = {
     if (sessionParam) dashboardUrl += '&session=' + sessionParam;
     if (clientParam) dashboardUrl += '&client=' + clientParam;
     
+    // Helper function to navigate safely
+    const navigateToDashboard = () => {
+      try {
+        // Try to navigate in parent frame first (if in iframe)
+        if (window.parent && window.parent !== window) {
+          window.parent.location.href = dashboardUrl;
+        } else {
+          // Otherwise use regular navigation
+          window.location.href = dashboardUrl;
+        }
+      } catch (e) {
+        // If cross-origin issue, use regular navigation
+        console.log('Navigation fallback:', e);
+        window.location.href = dashboardUrl;
+      }
+    };
+    
     if (hasUnsavedChanges) {
       if (confirm('You have unsaved changes. Do you want to save before leaving?')) {
         this.saveDraft(false);
         setTimeout(() => {
-          window.location.href = dashboardUrl;
+          navigateToDashboard();
         }, 1000);
       } else if (confirm('Leave without saving? Your progress will be lost.')) {
-        window.location.href = dashboardUrl;
+        navigateToDashboard();
       }
     } else {
-      window.location.href = dashboardUrl;
+      navigateToDashboard();
     }
   },
   

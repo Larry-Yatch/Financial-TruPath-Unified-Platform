@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Tool - Foundation Test</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    
+    #tool-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      padding: 2rem;
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 2rem;
+      text-align: center;
+      font-size: 2rem;
+    }
+    
+    .form-section {
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+    }
+    
+    .form-section h2 {
+      color: #495057;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #495057;
+      font-weight: 500;
+    }
+    
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="tel"]:focus,
+    input[type="number"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .checkbox-group,
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .checkbox-item,
+    .radio-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    input[type="checkbox"],
+    input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    
+    .required {
+      color: #dc3545;
+    }
+    
+    .info-message {
+      background: #e7f3ff;
+      border: 1px solid #b3d9ff;
+      border-radius: 4px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      color: #0066cc;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    
+    .btn {
+      padding: 0.75rem 2rem;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #5a67d8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+  </style>
+</head>
+<body>
+  <div id="tool-container">
+    <h1>Foundation Test Form</h1>
+    
+    <div class="info-message">
+      This is a test form to validate the ToolWrapper foundation. It includes various input types across multiple sections to ensure proper data collection, saving, and restoration.
+    </div>
+    
+    <!-- Standardized structure that ToolWrapper expects -->
+    <div id="tool-content">
+      <form id="tool-form" data-tool-id="test">
+        
+        <!-- Section 1: Basic Information -->
+        <div class="form-section" data-section="1">
+          <h2>Section 1: Basic Information</h2>
+          
+          <div class="form-group">
+            <label for="firstName">First Name <span class="required">*</span></label>
+            <input type="text" id="firstName" name="firstName" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="lastName">Last Name <span class="required">*</span></label>
+            <input type="text" id="lastName" name="lastName" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="email">Email Address <span class="required">*</span></label>
+            <input type="email" id="email" name="email" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone">
+          </div>
+          
+          <div class="form-group">
+            <label for="age">Age</label>
+            <input type="number" id="age" name="age" min="18" max="120">
+          </div>
+        </div>
+        
+        <!-- Section 2: Preferences -->
+        <div class="form-section" data-section="2">
+          <h2>Section 2: Preferences & Options</h2>
+          
+          <div class="form-group">
+            <label for="preference">Select Your Preference <span class="required">*</span></label>
+            <select id="preference" name="preference" required>
+              <option value="">-- Please Select --</option>
+              <option value="option1">Option 1: Basic</option>
+              <option value="option2">Option 2: Standard</option>
+              <option value="option3">Option 3: Premium</option>
+              <option value="option4">Option 4: Enterprise</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Communication Preferences</label>
+            <div class="checkbox-group">
+              <div class="checkbox-item">
+                <input type="checkbox" id="comm_email" name="comm_email" value="yes">
+                <label for="comm_email">Email Updates</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="comm_sms" name="comm_sms" value="yes">
+                <label for="comm_sms">SMS Notifications</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="comm_phone" name="comm_phone" value="yes">
+                <label for="comm_phone">Phone Calls</label>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Experience Level</label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" id="exp_beginner" name="experience" value="beginner">
+                <label for="exp_beginner">Beginner</label>
+              </div>
+              <div class="radio-item">
+                <input type="radio" id="exp_intermediate" name="experience" value="intermediate">
+                <label for="exp_intermediate">Intermediate</label>
+              </div>
+              <div class="radio-item">
+                <input type="radio" id="exp_advanced" name="experience" value="advanced">
+                <label for="exp_advanced">Advanced</label>
+              </div>
+              <div class="radio-item">
+                <input type="radio" id="exp_expert" name="experience" value="expert">
+                <label for="exp_expert">Expert</label>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="comments">Additional Comments</label>
+            <textarea id="comments" name="comments" placeholder="Please share any additional information or questions..."></textarea>
+          </div>
+        </div>
+        
+        <!-- Section 3: Financial Information (Testing numerical inputs) -->
+        <div class="form-section" data-section="3">
+          <h2>Section 3: Financial Information</h2>
+          
+          <div class="form-group">
+            <label for="income">Annual Income</label>
+            <input type="number" id="income" name="income" min="0" step="1000" placeholder="50000">
+          </div>
+          
+          <div class="form-group">
+            <label for="savings">Current Savings</label>
+            <input type="number" id="savings" name="savings" min="0" step="100" placeholder="10000">
+          </div>
+          
+          <div class="form-group">
+            <label for="investment_goal">Investment Goal</label>
+            <select id="investment_goal" name="investment_goal">
+              <option value="">-- Please Select --</option>
+              <option value="retirement">Retirement Planning</option>
+              <option value="education">Education Fund</option>
+              <option value="house">House Purchase</option>
+              <option value="emergency">Emergency Fund</option>
+              <option value="wealth">Wealth Building</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="risk_tolerance">Risk Tolerance (1-10)</label>
+            <input type="number" id="risk_tolerance" name="risk_tolerance" min="1" max="10" placeholder="5">
+          </div>
+        </div>
+        
+        <!-- Hidden fields for testing -->
+        <input type="hidden" name="tool_version" value="test_v1">
+        <input type="hidden" name="timestamp" value="">
+        
+        <!-- Button group for testing save/load functionality -->
+        <div class="button-group">
+          <button type="button" class="btn btn-secondary" onclick="if(window.toolWrapper) toolWrapper.loadDraft()">Load Draft</button>
+          <button type="button" class="btn btn-primary" onclick="if(window.toolWrapper) toolWrapper.saveDraft()">Save Progress</button>
+        </div>
+        
+      </form>
+    </div>
+  </div>
+  
+  <script>
+    // Initialize timestamp
+    document.querySelector('input[name="timestamp"]').value = new Date().toISOString();
+    
+    // Simple validation feedback
+    document.getElementById('tool-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Form submitted! (Test mode - no actual submission)');
+    });
+    
+    // Log form changes for debugging
+    document.getElementById('tool-form').addEventListener('change', function(e) {
+      console.log('Field changed:', e.target.name, '=', e.target.value);
+    });
+  </script>
+</body>
+</html>
