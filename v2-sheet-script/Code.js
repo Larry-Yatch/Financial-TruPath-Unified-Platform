@@ -1022,12 +1022,12 @@ function getCurrentWeek() {
  */
 function saveUserData(userId, toolId, data) {
   try {
-    // console.log(`saveUserData called - userId: ${userId}, toolId: ${toolId}, data fields: ${Object.keys(data).length}`);
+    console.log(`saveUserData called - userId: ${userId}, toolId: ${toolId}, data fields: ${Object.keys(data).length}`);
     
     // Use DataService for saving tool data
     const result = DataService.saveToolResponse(userId, toolId, data);
     
-    // console.log(`DataService.saveToolResponse result:`, result);
+    console.log('DataService.saveToolResponse result:', JSON.stringify(result));
     
     // Log the save event
     logEvent('DATA_SAVED', {
@@ -1038,18 +1038,22 @@ function saveUserData(userId, toolId, data) {
     });
     
     if (result.success) {
-      return {
+      const returnValue = {
         success: true,
         message: result.message || 'Data saved successfully',
         insights: result.insights || [],
         timestamp: result.timestamp
       };
+      console.log('Returning success:', JSON.stringify(returnValue));
+      return returnValue;
     } else {
-      return {
+      const returnValue = {
         success: false,
         message: result.error || 'Failed to save data',
         error: result.error
       };
+      console.log('Returning failure:', JSON.stringify(returnValue));
+      return returnValue;
     }
   } catch (error) {
     // console.error('Error saving data:', error);
