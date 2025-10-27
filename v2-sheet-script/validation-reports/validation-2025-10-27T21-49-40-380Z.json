@@ -1,0 +1,305 @@
+{
+  "timestamp": "2025-10-27T21:49:40.383Z",
+  "changes": {
+    "v2-sheet-script/Code.js": {
+      "status": "modified",
+      "staged": true
+    },
+    "v2-sheet-script/ToolWrapper.html": {
+      "status": "modified",
+      "staged": true
+    },
+    "v2-sheet-script/index.html": {
+      "status": "modified",
+      "staged": true
+    }
+  },
+  "issues": [
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "v2-sheet-script/ToolWrapper.html",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "v2-sheet-script/index.html",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "unreachable-code",
+      "message": "Possible unreachable code detected",
+      "severity": "medium"
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "unreachable-code",
+      "message": "Possible unreachable code detected",
+      "severity": "medium"
+    },
+    {
+      "file": "v2-sheet-script/ToolWrapper.html",
+      "type": "security",
+      "message": "Potential security issue: innerHTML",
+      "severity": "critical",
+      "occurrences": 5
+    },
+    {
+      "file": "v2-sheet-script/index.html",
+      "type": "security",
+      "message": "Potential security issue: innerHTML",
+      "severity": "critical",
+      "occurrences": 13
+    }
+  ],
+  "warnings": [
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "debug-code",
+      "message": "Found 30 console statements",
+      "line": 14
+    }
+  ],
+  "suggestions": [
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "naming",
+      "message": "Consider using more descriptive variable names",
+      "examples": [
+        "const data",
+        "const data"
+      ]
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function include might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function doGet might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function createLoginPage might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function showAlert might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function showPrimaryLogin might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function showBackupLogin might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function handleLogin might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function handleBackupLogin might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function createSimpleDashboard might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function navigateToTool might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function createDashboardPage might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function createErrorPage might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function handleAdminRoute might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function showResult might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function testAuth might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function include might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function generateSessionId might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getCurrentWeek might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getLastToolResponse might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function saveUserData might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function saveToolDraft might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getToolDraft might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getAllDraftVersions might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getRelevantInsights might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getSpecificDraft might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getUserProfile might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function authenticateAndCreateSession might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function logEvent might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getAvailableTools might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function runAllAuthTests might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function testAuthenticationSystem might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function testRosterConnection might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getSampleClientIds might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function testSessionCreation might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function openAdminPanel might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function initializePlatform might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function createDataSheets might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function viewTool1Data might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function viewLogs might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function generatePDFReport might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function testWebApp might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function testDataSaving might be too long (1995 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "duplication",
+      "message": "Found potential duplicate code blocks. Consider refactoring."
+    }
+  ],
+  "summary": {
+    "filesChanged": 3,
+    "criticalIssues": 2,
+    "totalIssues": 7,
+    "totalWarnings": 1,
+    "totalSuggestions": 44,
+    "passed": false
+  }
+}

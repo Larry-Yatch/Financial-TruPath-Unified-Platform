@@ -746,7 +746,7 @@
         console.log('Navigating back to dashboard using form submission...');
         
         // Use server-provided baseUrl instead of trying to extract from iframe
-        const baseUrl = '<?!= baseUrl ?>' || 'https://script.google.com/macros/s/AKfycbw-xZaXS8yLYZk2rf-hGsgQvCAMP3ACjmxBeDWyl6WyIrVeBUTEWLmfau4RRLfuETp7/exec';
+        const baseUrl = '<?= baseUrl ?>' || 'https://script.google.com/macros/s/AKfycbw-xZaXS8yLYZk2rf-hGsgQvCAMP3ACjmxBeDWyl6WyIrVeBUTEWLmfau4RRLfuETp7/exec';
         
         const currentUserId = typeof userId !== 'undefined' ? userId : 'TEST001';
         const currentSessionId = typeof sessionId !== 'undefined' ? sessionId : '';
