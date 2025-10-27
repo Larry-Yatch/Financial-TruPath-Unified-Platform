@@ -5,3 +5,4 @@ agents/**
 node_modules/**
 safe-deploy.js
 *.sh
+sheets.js

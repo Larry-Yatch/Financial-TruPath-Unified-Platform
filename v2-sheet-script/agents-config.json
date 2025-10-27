@@ -1,0 +1,42 @@
+{
+  "codeFile": "Code.js",
+  "monitoring": {
+    "enabled": true,
+    "interval": 30000,
+    "autoFix": false
+  },
+  "agents": {
+    "gasDoctor": {
+      "enabled": true,
+      "autoFix": false
+    },
+    "deployGuardian": {
+      "enabled": true
+    },
+    "sheetsMonitor": {
+      "enabled": true
+    },
+    "callbackSurgeon": {
+      "enabled": true,
+      "autoFix": false
+    },
+    "quotaKeeper": {
+      "enabled": true
+    },
+    "validator": {
+      "enabled": true,
+      "autoRun": true,
+      "blockOnCritical": true,
+      "reportFormat": "detailed"
+    }
+  },
+  "alerts": {
+    "console": true,
+    "file": true,
+    "sound": false
+  },
+  "watchFiles": [
+    "Code.js",
+    "appsscript.json"
+  ]
+}

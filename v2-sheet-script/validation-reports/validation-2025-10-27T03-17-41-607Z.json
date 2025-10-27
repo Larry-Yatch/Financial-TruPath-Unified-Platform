@@ -1,0 +1,230 @@
+{
+  "timestamp": "2025-10-27T03:17:41.607Z",
+  "changes": {
+    ".daddy/daddy-validation.db": {
+      "status": "modified",
+      "staged": false
+    },
+    "DOCUMENTATION-MAP.md": {
+      "status": "deleted",
+      "staged": false
+    },
+    "HANDOFF.md": {
+      "status": "deleted",
+      "staged": false
+    },
+    "README.md": {
+      "status": "modified",
+      "staged": false
+    },
+    "v2-sheet-script/CROSS-TOOL-STRATEGY.md": {
+      "status": "deleted",
+      "staged": false
+    },
+    "v2-sheet-script/DEBUGGING-GUIDE.md": {
+      "status": "deleted",
+      "staged": false
+    },
+    "v2-sheet-script/NEXT-SESSION-PROMPT.md": {
+      "status": "deleted",
+      "staged": false
+    },
+    "v2-sheet-script/PROJECT-README.md": {
+      "status": "deleted",
+      "staged": false
+    },
+    "v2-sheet-script/SCALABLE-ARCHITECTURE-PLAN.md": {
+      "status": "deleted",
+      "staged": false
+    },
+    "v2-sheet-script/SESSION-3-HANDOFF.md": {
+      "status": "deleted",
+      "staged": false
+    },
+    "v2-sheet-script/TOOL1-STATUS-CHECKPOINT.md": {
+      "status": "deleted",
+      "staged": false
+    },
+    "v2-sheet-script/V7.1-TESTING-GUIDE.md": {
+      "status": "deleted",
+      "staged": false
+    },
+    "v2-sheet-script/code-review-checklist.md": {
+      "status": "deleted",
+      "staged": false
+    },
+    "v2-sheet-script/deployment-pipeline.md": {
+      "status": "deleted",
+      "staged": false
+    },
+    "v2-sheet-script/proposed-agents.md": {
+      "status": "deleted",
+      "staged": false
+    },
+    "v2-sheet-script/sheets.js": {
+      "status": "deleted",
+      "staged": false
+    },
+    "v2-sheet-script/agent-logs/issues-2025-10-27.json": {
+      "status": "new",
+      "staged": false
+    },
+    "v2-sheet-script/agents-config.json": {
+      "status": "new",
+      "staged": false
+    },
+    "v2-sheet-script/agents/sheets.js": {
+      "status": "new",
+      "staged": false
+    },
+    "v2-sheet-script/agents/validator.js": {
+      "status": "new",
+      "staged": false
+    },
+    "v2-sheet-script/archive/V7.1-TESTING-GUIDE.md": {
+      "status": "new",
+      "staged": false
+    },
+    "v2-sheet-script/archive/old-docs/PROJECT-README-V7.md": {
+      "status": "new",
+      "staged": false
+    },
+    "v2-sheet-script/archive/old-docs/TOOL1-STATUS-CHECKPOINT-V7.5.md": {
+      "status": "new",
+      "staged": false
+    },
+    "v2-sheet-script/archive/session-docs/NEXT-SESSION-PROMPT-OLD.md": {
+      "status": "new",
+      "staged": false
+    },
+    "v2-sheet-script/quota-usage.json": {
+      "status": "new",
+      "staged": false
+    },
+    "validate.js": {
+      "status": "new",
+      "staged": false
+    }
+  },
+  "issues": [
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "v2-sheet-script/agents/sheets.js",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "v2-sheet-script/agents/validator.js",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "v2-sheet-script/agents/sheets.js",
+      "type": "unreachable-code",
+      "message": "Possible unreachable code detected",
+      "severity": "medium"
+    },
+    {
+      "file": "v2-sheet-script/agents/sheets.js",
+      "type": "unreachable-code",
+      "message": "Possible unreachable code detected",
+      "severity": "medium"
+    },
+    {
+      "file": "v2-sheet-script/agents/validator.js",
+      "type": "unreachable-code",
+      "message": "Possible unreachable code detected",
+      "severity": "medium"
+    },
+    {
+      "file": "v2-sheet-script/agents/validator.js",
+      "type": "unreachable-code",
+      "message": "Possible unreachable code detected",
+      "severity": "medium"
+    }
+  ],
+  "warnings": [
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete",
+      "message": "Found 8 TODO/FIXME markers",
+      "line": 12
+    },
+    {
+      "file": "v2-sheet-script/agents/sheets.js",
+      "type": "debug-code",
+      "message": "Found 10 console statements",
+      "line": 55
+    },
+    {
+      "file": "v2-sheet-script/agents/validator.js",
+      "type": "incomplete",
+      "message": "Found 13 TODO/FIXME markers",
+      "line": 112
+    },
+    {
+      "file": "v2-sheet-script/agents/validator.js",
+      "type": "debug-code",
+      "message": "Found 42 console statements",
+      "line": 24
+    },
+    {
+      "file": "validate.js",
+      "type": "debug-code",
+      "message": "Found 1 console statements",
+      "line": 23
+    }
+  ],
+  "suggestions": [
+    {
+      "file": "v2-sheet-script/agents/sheets.js",
+      "type": "naming",
+      "message": "Consider using more descriptive variable names",
+      "examples": [
+        "const data",
+        "const data",
+        "const data"
+      ]
+    },
+    {
+      "file": "v2-sheet-script/agents/sheets.js",
+      "type": "complexity",
+      "message": "Function getAuth might be too long (164 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/agents/sheets.js",
+      "type": "complexity",
+      "message": "Function fetch might be too long (164 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/agents/sheets.js",
+      "type": "complexity",
+      "message": "Function fetchAsObjects might be too long (164 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/agents/sheets.js",
+      "type": "complexity",
+      "message": "Function test might be too long (164 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/agents/sheets.js",
+      "type": "complexity",
+      "message": "Function saveLocal might be too long (164 lines). Consider breaking it down."
+    }
+  ],
+  "summary": {
+    "filesChanged": 26,
+    "criticalIssues": 0,
+    "totalIssues": 7,
+    "totalWarnings": 5,
+    "totalSuggestions": 6,
+    "passed": false
+  }
+}

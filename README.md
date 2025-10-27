@@ -1,93 +1,151 @@
 # Financial TruPath Unified Platform V2.0
 
-## 🎯 Current Status (October 23, 2024)
-**Phase:** Week 1 Implementation - Debug Sophisticated Tool 1  
-**Architecture:** Hybrid 4-Pattern approach for 8 tools  
-**Discovery:** Tool 1 is already built - 1,321 lines with Financial Health Score + insights
+## 🚨 Current Status (October 25, 2025)
+**Version:** V9.7 Deployed  
+**Phase:** Foundation Rebuild Decision  
+**Issue:** 8 critical bugs found - architectural conflict between ToolWrapper and Tool 1  
+**Decision:** Stop patching, rebuild clean foundation first
+
+## 📍 Quick Links
+- **Live Deployment:** [V9.7 Test URL](https://script.google.com/macros/s/AKfycbyqrSzYPra9tqpbEMi27p-bmhEFhSdi5leEOpYq1UdtFVl5dgcB7b6AS4V9nXO14Y2P/exec)
+- **Current Issues:** See `Documentation/SESSION-HANDOFF.md`
+- **Rebuild Plan:** See `Documentation/FOUNDATION-ROADMAP.md`
+- **Deployment History:** See `Documentation/V9-DEPLOYMENT-STATUS.md`
 
 ## 📁 Project Structure
 
 ```
 Financial-TruPath-Unified-Platform/
 ├── v2-sheet-script/        # ✅ MAIN: Active development
-│   ├── index.html         # Sophisticated Tool 1 (1,321 lines ready to debug)
-│   ├── ToolFramework.js   # Cross-tool intelligence (726 lines ready)
-│   ├── Tool2_FinancialClarity.js # Adaptive logic (525 lines ready)
-│   ├── DataService.js     # Google Sheets integration (working)
-│   ├── Code.js            # Router with commented Tool 1
-│   └── SCALABLE-ARCHITECTURE-PLAN.md # 8-week roadmap
+│   ├── Documentation/      # 📚 All current documentation
+│   │   ├── SESSION-HANDOFF.md    # START HERE - Current state
+│   │   ├── FOUNDATION-ROADMAP.md # Rebuild plan
+│   │   └── V9-DEPLOYMENT-STATUS.md # Deploy history
+│   ├── index.html         # Tool 1 (25 questions, competing with ToolWrapper)
+│   ├── ToolWrapper.html   # Framework (conflicts with index.html)
+│   ├── ToolFramework.js   # Cross-tool intelligence (726 lines)
+│   ├── DataService.js     # Google Sheets integration
+│   ├── Code.js            # Router & authentication
+│   └── archive/           # Old versions & docs
 │
-├── apps/                  # Legacy tools (numbered Tool-1 through Tool-8)
-├── old-docs/             # Reference: TOOLS_INVENTORY.md
-├── .claude/              # Claude AI configuration
-└── NEXT-SESSION-PROMPT.md # Week 1 Day 1 implementation plan
+├── apps/                  # Legacy tools (Tool-1 through Tool-8.5)
+├── .claude/              # AI configuration
+└── node_modules/         # Dependencies
 ```
+
+## 🔴 Critical Issues (V9.7)
+
+1. **Cloud draft saving broken** - Saves empty versions with 0% progress
+2. **Duplicate progress systems** - ToolWrapper vs native Tool 1
+3. **Dashboard navigation** - White screen on return
+4. **Form data collection** - collectToolData() not finding fields
+
+See full list of 8 issues in `Documentation/SESSION-HANDOFF.md`
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-1. Google Apps Script project connected
-2. Google Sheets with student roster
-3. Node.js and clasp installed
-
-### Deployment
 ```bash
-# Push code to Google Apps Script
-cd v2-sheet-script
-clasp push
+# 1. Install dependencies
+npm install googleapis
 
-# Open in browser
-# Go to script.google.com and find your project
-# Deploy → Test deployments → Copy URL
+# 2. Setup clasp for deployment
+npm install -g @google/clasp
+clasp login
 ```
 
-## 📊 Google Sheets Structure
+### Development Workflow
+```bash
+# 1. Navigate to project
+cd v2-sheet-script
 
-The system uses these sheets:
-- **Student Roster** - Authentication (Column G: Student IDs)
-- **Tool1_Orientation** - Assessment data storage
-- **Students** - Master tracking
+# 2. Start monitoring (REQUIRED - runs in background)
+cd .. && node debug-sheets.js watch
 
-## 🔧 Current Features
+# 3. Make changes and deploy
+clasp push
+clasp deploy --description "Your change description"
+```
 
-✅ **Working:**
-- Student authentication via roster
-- Tool 1: Orientation Assessment (25 fields)
-- Data persistence to Google Sheets
-- PDF report generation
-- Financial health scoring
+### Testing
+- **Test Users:** TEST001, TEST002
+- **Monitor:** Check `debug-sheets.js watch` output for real-time activity
+- **Database:** Google Sheets ID: `18qpjnCvFVYDXOAN14CKb3ceoiG6G_nIFc9n3ZO5St24`
 
-🚧 **Next Steps:**
-1. Fix login page branding
-2. Add simple dashboard
-3. Implement return student detection
-4. Add remaining 7 tools
+## 📊 System Architecture
 
-## 📝 Development Notes
+### Current Problem
+Two competing systems trying to manage the same functionality:
+- **ToolWrapper** - New framework for all 8 tools
+- **index.html** - Original Tool 1 with 25 questions
 
-### Adding New Features
-1. Always test in small increments
-2. Use the Test Deployment URL
-3. Check browser console for errors
-4. Commit working versions frequently
+These conflict at every level causing the 8 critical issues.
 
-### Common Issues
-- **Blank pages:** Usually deployment URL mismatch
-- **404 errors:** Wrong deployment ID in URLs
-- **Authentication fails:** Check roster sheet structure
+### Solution: Foundation Rebuild
+1. Build clean foundation with standardized form structure
+2. Test with simple form first
+3. Rebuild Tool 1 using foundation
+4. Scale to all 8 tools
 
-## 🔗 Important URLs
+## 🎯 8-Tool System Overview
 
-- Script ID: `1TIkkayrocz3TA2kuYJSsegU94xzrd2fJuY9Wf9eI_K83B0IKyPlpzeY9`
-- Test deployment: Get from script.google.com → Deploy → Test deployments
+| Tool | Name | Pattern | Status |
+|------|------|---------|--------|
+| 1 | Orientation/Demographics | Insights Assessment | ⚠️ Broken |
+| 2 | Financial Clarity | Comprehensive Assessment | 📝 Logic ready |
+| 3 | False Self/External Validation | Grounding Template | 📝 Planned |
+| 4 | Financial Freedom Framework | Interactive Calculator | 📝 Planned |
+| 5 | Issues Showing Love | Grounding Template | 📝 Planned |
+| 6 | Retirement Blueprint | Interactive Calculator | 📝 Planned |
+| 7 | Control Fear | Grounding Template | 📝 Planned |
+| 8 | Investment Tool | Interactive Calculator | 📝 Planned |
+
+## 📈 Monitoring
+
+```bash
+# Real-time Google Sheets monitoring
+node debug-sheets.js watch
+
+# Check current state
+node debug-sheets.js summary
+
+# View sessions
+node debug-sheets.js sessions
+
+# View responses
+node debug-sheets.js responses
+```
+
+## 📚 Documentation
+
+**Start Here:**
+1. `Documentation/SESSION-HANDOFF.md` - Current V9.7 status & issues
+2. `Documentation/FOUNDATION-ROADMAP.md` - Complete rebuild plan
+3. `Documentation/DOCUMENTATION-MAP.md` - All docs overview
+
+**Reference:**
+- `Documentation/DEBUGGING-GUIDE.md` - Troubleshooting
+- `Documentation/CROSS-TOOL-STRATEGY.md` - Tool integration
+- `Documentation/SCALABLE-ARCHITECTURE-PLAN.md` - 4-pattern approach
+
+## 🔄 Next Steps
+
+1. **Immediate:** Build test form with standardized structure
+2. **Fix:** Core ToolWrapper functions (collectToolData, saveDraft, etc.)
+3. **Test:** Verify all persistence works
+4. **Rebuild:** Tool 1 using clean foundation
+5. **Scale:** Implement remaining 7 tools
+
+## 🤝 Contributing
+
+See `CLAUDE.md` for AI development guidelines and behavioral rules.
 
 ## 📞 Support
 
-For issues or questions about this codebase, check:
-1. Browser console for JavaScript errors
-2. Google Apps Script logs
-3. Roster data structure
+- **Issues:** Check `Documentation/DEBUGGING-GUIDE.md` first
+- **Monitor:** Always run `debug-sheets.js watch` during development
+- **Test Users:** Use TEST001 or TEST002 for testing
 
 ---
-*Last Updated: October 2024*
-*Status: Working baseline - Tool 1 complete*
+
+*Last Updated: October 25, 2025 - V9.7 with foundation rebuild decision*
