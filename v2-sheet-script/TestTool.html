@@ -357,7 +357,8 @@
     // Draft version selection functions
     window.loadDraftWithVersions = function() {
       console.log('Loading draft versions...');
-      const userId = document.getElementById('userId')?.value || 'TEST_USER';
+      // Use the global userId set from the template
+      const currentUserId = typeof userId !== 'undefined' ? userId : 'TEST_USER';
       
       // Get all draft versions
       google.script.run
@@ -382,7 +383,7 @@
           console.error('Error loading draft versions:', error);
           alert('Error loading drafts: ' + error.toString());
         })
-        .getToolDraft(userId, 'test', true); // true = getAllVersions
+        .getToolDraft(currentUserId, 'test', true); // true = getAllVersions
     };
     
     window.showVersionModal = function(versions) {
@@ -474,7 +475,8 @@
       }
       
       // Get user info
-      const userId = document.getElementById('userId')?.value || 'TEST_USER';
+      // Use the global userId set from the template
+      const currentUserId = typeof userId !== 'undefined' ? userId : 'TEST_USER';
       
       // Save as completed response (not draft)
       google.script.run
@@ -494,7 +496,7 @@
           alert('Error submitting form: ' + error.toString());
           console.error('Submission error:', error);
         })
-        .saveUserData(userId, 'test', formData);
+        .saveUserData(currentUserId, 'test', formData);
       
       return false;
     };
