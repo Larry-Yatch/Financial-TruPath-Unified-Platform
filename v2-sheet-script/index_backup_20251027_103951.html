@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TruPath Financial - Platform V2.0</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Radley:wght@400&family=Rubik:wght@300;400;500;600;700&display=swap');
+      :root {
+        --bg: #1e192b;
+        --bg-gradient: linear-gradient(135deg, #4b4166, #1e192b);
+        --card: rgba(20, 15, 35, 0.9);
+        --muted: #94a3b8;
+        --text: #ffffff;
+        --accent: #ad9168;
+        --accent-blue: #188bf6;
+        --ok: #9ae6b4;
+        --warn: #f59e0b;
+        --bad: #ef4444;
+        --border: rgba(173, 145, 104, 0.2);
+        --gold: #ad9168;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 24px;
+        background: var(--bg-gradient);
+        background-attachment: fixed;
+        min-height: 100vh;
+        color: var(--text);
+        font-family: 'Rubik', Arial, sans-serif;
+        font-size: 15px;
+        position: relative;
+      }
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('https://lh3.googleusercontent.com/d/1FWWkcJ77rtbkLGstB1LHHGHEENaM5JZj');
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: 90%;
+        opacity: 0.05;
+        z-index: -1;
+        pointer-events: none;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        font-family: 'Radley', serif;
+        font-weight: 400;
+        color: var(--text);
+      }
+      h1 { margin: 0 0 16px 0; font-size: 35px; letter-spacing: 0.5px; }
+      h2 { font-size: 26px; margin-bottom: 20px; color: var(--gold); }
+      .card {
+        background: var(--card);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        margin-bottom: 20px;
+      }
+      .btn {
+        appearance: none;
+        border: 2px solid var(--gold);
+        background: transparent;
+        color: var(--gold);
+        padding: 12px 24px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 14px;
+        font-family: 'Rubik', sans-serif;
+        font-weight: 500;
+        text-transform: uppercase;
+        transition: all 0.3s;
+        letter-spacing: 0.5px;
+      }
+      .btn:hover {
+        background: var(--gold);
+        color: #140f23;
+        box-shadow: 0 4px 15px rgba(173, 145, 104, 0.3);
+        transform: translateY(-2px);
+      }
+      .btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        transform: none;
+      }
+      .tool-card {
+        background: linear-gradient(315deg, rgba(173, 145, 104, 0.2) 0%, rgba(30, 25, 43, 0.4) 100%);
+        border: 1px solid var(--border);
+        border-radius: 15px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: block;
+        font-family: inherit;
+        color: inherit;
+      }
+      button.tool-card {
+        appearance: none;
+        -webkit-appearance: none;
+        font-size: inherit;
+      }
+      .tool-card:hover:not(.locked):not(:disabled) {
+        background: linear-gradient(315deg, rgba(173, 145, 104, 0.3) 0%, rgba(30, 25, 43, 0.5) 100%);
+        border-color: var(--gold);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(173, 145, 104, 0.2);
+      }
+      .tool-card.locked, .tool-card:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .form-label {
+        display: block;
+        font-size: 14px;
+        color: var(--text);
+        font-weight: 500;
+        margin-bottom: 8px;
+      }
+      .form-input {
+        width: 100%;
+        padding: 10px 15px;
+        border-radius: 50px;
+        border: 1px solid var(--border);
+        background: rgba(20, 15, 35, 0.6);
+        color: var(--text);
+        font-size: 14px;
+        font-family: 'Rubik', sans-serif;
+        transition: all 0.3s;
+      }
+      .form-input:focus {
+        outline: none;
+        border-color: var(--gold);
+        background: rgba(20, 15, 35, 0.8);
+      }
+      .form-select {
+        width: 100%;
+        padding: 10px 15px;
+        border-radius: 50px;
+        border: 1px solid var(--border);
+        background: rgba(20, 15, 35, 0.6);
+        color: var(--text);
+        font-size: 14px;
+        font-family: 'Rubik', sans-serif;
+        cursor: pointer;
+      }
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+      @media (max-width: 768px) {
+        .form-grid { grid-template-columns: 1fr; }
+      }
+      .insight-box {
+        padding: 15px;
+        background: linear-gradient(135deg, rgba(24, 139, 246, 0.1) 0%, rgba(173, 145, 104, 0.1) 100%);
+        border: 1px solid var(--accent-blue);
+        border-radius: 12px;
+        margin-top: 20px;
+      }
+      .muted {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .hr {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--border), transparent);
+        margin: 20px 0;
+      }
+      .badge {
+        display: inline-block;
+        padding: 6px 12px;
+        background: rgba(173, 145, 104, 0.2);
+        border: 1px solid var(--gold);
+        border-radius: 20px;
+        font-size: 12px;
+        color: var(--gold);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .success-icon {
+        font-size: 60px;
+        color: var(--ok);
+        margin-bottom: 20px;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        background: rgba(173, 145, 104, 0.2);
+        border-radius: 5px;
+        outline: none;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: var(--gold);
+        border-radius: 50%;
+        cursor: pointer;
+      }
+      
+      /* Tool Wrapper Styles */
+      .tool-wrapper {
+        animation: fadeIn 0.3s ease-in;
+      }
+      
+      .tool-navigation {
+        background: rgba(20, 15, 35, 0.95);
+        border: 1px solid var(--border);
+        border-radius: 15px;
+        padding: 12px 20px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        backdrop-filter: blur(10px);
+      }
+      
+      .nav-left, .nav-right {
+        display: flex;
+        gap: 10px;
+      }
+      
+      .btn-nav {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 8px 16px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 13px;
+        font-family: 'Rubik', sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.3s;
+      }
+      
+      .btn-nav:hover {
+        background: rgba(173, 145, 104, 0.2);
+        border-color: var(--gold);
+        transform: translateY(-1px);
+      }
+      
+      .nav-icon {
+        font-size: 16px;
+      }
+      
+      .nav-text {
+        display: inline-block;
+      }
+      
+      @media (max-width: 768px) {
+        .nav-text { display: none; }
+      }
+      
+      .auto-save-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      
+      .save-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--ok);
+        transition: all 0.3s;
+      }
+      
+      .save-dot.saving {
+        background: var(--warn);
+        animation: pulse 1s infinite;
+      }
+      
+      .save-dot.saved {
+        background: var(--ok);
+      }
+      
+      .save-dot.local {
+        background: var(--accent-blue);
+      }
+      
+      .save-dot.pending {
+        background: var(--muted);
+      }
+      
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+      
+      .tool-header {
+        text-align: center;
+        margin-bottom: 25px;
+      }
+      
+      .tool-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 10px;
+      }
+      
+      .tool-icon {
+        font-size: 40px;
+      }
+      
+      .tool-title h1 {
+        margin: 0;
+        font-size: 32px;
+      }
+      
+      .tool-meta {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      
+      .progress-container {
+        background: rgba(20, 15, 35, 0.6);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 25px;
+      }
+      
+      .progress-bar {
+        height: 8px;
+        background: rgba(173, 145, 104, 0.2);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 12px;
+      }
+      
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--gold), var(--accent-blue));
+        border-radius: 4px;
+        transition: width 0.5s ease;
+      }
+      
+      .progress-text {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      
+      .progress-separator {
+        color: var(--border);
+      }
+      
+      /* Notification Styles */
+      .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        z-index: 10000;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s;
+      }
+      
+      .notification.show {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      
+      .notification-content {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      
+      .notification-success { border-color: var(--ok); }
+      .notification-error { border-color: var(--bad); }
+      .notification-warning { border-color: var(--warn); }
+      .notification-info { border-color: var(--accent-blue); }
+      
+      /* Modal Styles */
+      .tool-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+      }
+      
+      .tool-modal.show {
+        opacity: 1;
+        pointer-events: all;
+      }
+      
+      .modal-backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.7);
+      }
+      
+      .modal-content {
+        position: relative;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 80vh;
+        overflow: auto;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      }
+      
+      .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .modal-header h2 {
+        margin: 0;
+        font-size: 24px;
+        color: var(--gold);
+      }
+      
+      .modal-close {
+        background: transparent;
+        border: none;
+        color: var(--muted);
+        font-size: 24px;
+        cursor: pointer;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+      }
+      
+      .modal-close:hover {
+        color: var(--text);
+      }
+      
+      .modal-body {
+        padding: 20px;
+      }
+      
+      .load-options {
+        display: grid;
+        gap: 20px;
+      }
+      
+      .load-option {
+        padding: 15px;
+        background: rgba(173, 145, 104, 0.1);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+      }
+      
+      .load-option h3 {
+        margin: 0 0 10px 0;
+        font-size: 18px;
+      }
+      
+      .load-option p {
+        margin: 5px 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      
+      .btn-primary {
+        background: var(--gold);
+        color: #140f23;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 500;
+        margin-top: 10px;
+        transition: all 0.3s;
+      }
+      
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(173, 145, 104, 0.3);
+      }
+      
+      .tool-landing {
+        text-align: center;
+        padding: 40px 20px;
+      }
+      
+      .tool-landing h2 {
+        margin-bottom: 15px;
+      }
+      
+      .tool-actions {
+        margin: 30px 0;
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      
+      .btn-secondary {
+        background: transparent;
+        color: var(--gold);
+        border: 2px solid var(--gold);
+        padding: 10px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s;
+      }
+      
+      .btn-secondary:hover {
+        background: rgba(173, 145, 104, 0.2);
+      }
+    </style>
+    <script>
+      // Platform configuration (must be defined before ToolWrapper)
+      const userId = '<?!= userId || "" ?>' || 'user-' + Date.now();
+      const currentWeek = <?!= currentWeek || 1 ?>;
+      const sessionId = '<?!= sessionId || "" ?>' || '';
+    </script>
+    
+    <!-- Include ToolWrapper as separate HTML file with script tags -->
+    <?!= include('ToolWrapper'); ?>
+    
+    <script>
+      
+      // Verify ToolWrapper loaded and define fallback if needed
+      if (typeof ToolWrapper === 'undefined') {
+        console.error('ToolWrapper not loaded, using fallback');
+        window.ToolWrapper = {
+          init: function(toolId) { 
+            return '<div class="card"><p>Tool wrapper not available - using basic mode</p></div>'; 
+          },
+          saveDraft: function() { 
+            console.warn('Save not available in basic mode'); 
+          },
+          loadDraft: function() { 
+            console.warn('Load not available in basic mode'); 
+          },
+          checkForExistingDraft: function() { 
+            console.log('Draft checking not available in basic mode');
+          },
+          updateProgressDisplay: function(progress) { 
+            console.log('Progress update:', progress);
+          },
+          backToDashboard: function() {
+            window.location.href = '?route=dashboard';
+          },
+          showNotification: function(msg, type) {
+            alert(msg);
+          },
+          initAutoSave: function() {
+            console.log('Auto-save not available in basic mode');
+          }
+        };
+      }
+    </script>
+  </head>
+  <body>
+    <!-- TruPath Financial Brand Header with Logo -->
+    <div style="text-align: center; margin-bottom: 30px; padding-top: 20px;">
+      <div class="logo-container" style="display: inline-block; position: relative;">
+        <div style="text-align: center;">
+          <img src="https://lh3.googleusercontent.com/d/1fXEp_y6Wj8nlMUbEERCNIbW9si_3v0Uw" alt="TruPath Financial Logo" style="height: 180px; width: auto;">
+        </div>
+        <div style="margin-top: 5px;">
+          <p style="font-family: 'Rubik', sans-serif; font-size: 35px; color: #94a3b8; letter-spacing: 3px; text-transform: uppercase; font-weight: 500; margin: 0;">
+            Platform V2.0
+          </p>
+          <p class="muted" style="margin-top: 10px;">Week <span id="current-week">1</span> of Course</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="app" style="max-width: 1200px; margin: 0 auto;">
+
+      <!-- Main Content -->
+      <main>
+        <!-- Tool Container - This will be filled with Tool 1 content -->
+        <div id="tool-container">
+          <!-- Tool 1 content will be loaded here automatically -->
+        </div>
+
+        <!-- Insights Panel -->
+        <div id="insights-panel" class="insight-box" style="display: none;">
+          <h3 style="font-size: 18px; margin-bottom: 12px; color: var(--accent-blue);">💡 Insights</h3>
+          <div id="insights-content"></div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Debug info
+      console.log('Tool1 Page Loaded - userId:', userId, 'sessionId:', sessionId, 'currentWeek:', currentWeek);
+      
+      // Update week display and check for auto-load
+      document.addEventListener('DOMContentLoaded', function() {
+        const weekSpan = document.getElementById('current-week');
+        if (weekSpan) {
+          weekSpan.textContent = currentWeek;
+        }
+        
+        // Check URL parameters for tool auto-load
+        const urlParams = new URLSearchParams(window.location.search);
+        const route = urlParams.get('route');
+        const toolParam = urlParams.get('tool');
+        
+        console.log('DOMContentLoaded - route:', route, 'tool:', toolParam);
+        
+        // Auto-load Tool 1 immediately when this page loads
+        // (index.html is ONLY for Tool 1, not a menu page)
+        console.log('Loading Tool 1 Orientation Assessment...');
+        setTimeout(() => {
+          if (typeof loadOrientationTool === 'function') {
+            loadOrientationTool();
+          } else {
+            console.error('loadOrientationTool function not found');
+          }
+        }, 100);
+      });
+      
+      // Make loadTool globally accessible for onclick handlers
+      window.loadTool = function(toolId) {
+        console.log('Loading tool:', toolId);
+        
+        try {
+          // Check if tool is available
+          if (toolId === 'financial-clarity' && currentWeek < 2) {
+            alert('This tool will be available in Week 2');
+            return;
+          }
+          
+          // Show loading state
+          const container = document.getElementById('tool-container');
+          if (!container) {
+            console.error('Tool container not found!');
+            alert('Error: Tool container not found. Please refresh the page.');
+            return;
+          }
+          
+          container.innerHTML = '<div style="text-align: center; padding: 40px;"><p class="muted">Loading...</p></div>';
+          
+          // Load tool content immediately (remove setTimeout for better reliability)
+          if (toolId === 'orientation') {
+            console.log('Loading orientation tool...');
+            loadOrientationTool();
+          } else if (toolId === 'financial-clarity') {
+            console.log('Loading financial clarity tool...');
+            loadFinancialClarityTool();
+          } else {
+            container.innerHTML = '<div style="text-align: center; padding: 40px;"><p class="muted">Tool not yet implemented</p></div>';
+          }
+        } catch (error) {
+          console.error('Error loading tool:', error);
+          const container = document.getElementById('tool-container');
+          if (container) {
+            container.innerHTML = '<div style="text-align: center; padding: 40px;"><p class="error">Error loading tool. Please refresh and try again.</p></div>';
+          }
+        }
+      }
+      
+      // Function to start the actual Tool 1 form after landing page
+      window.startTool1Form = function() {
+        const landingDiv = document.getElementById('tool1-landing');
+        const formDiv = document.getElementById('tool1-form');
+        
+        if (landingDiv) landingDiv.style.display = 'none';
+        if (formDiv) formDiv.style.display = 'block';
+        
+        // Update progress tracking with safety check
+        if (typeof ToolWrapper !== 'undefined' && ToolWrapper.updateProgressDisplay) {
+          ToolWrapper.updateProgressDisplay({
+            percentage: 0,
+            currentStep: 1,
+            totalSteps: 5,
+            section: 'Basic Information'
+          });
+        }
+      }
+      
+      // Load Comprehensive Orientation Tool (25 Questions)
+      window.loadOrientationTool = function() {
+        // Check if ToolWrapper is available
+        if (typeof ToolWrapper !== 'undefined') {
+          // Use the new wrapper system
+          const wrapperHtml = ToolWrapper.init('tool1');
+          document.getElementById('tool-container').innerHTML = wrapperHtml;
+          
+          // Create the tool content (landing + form)
+          const toolContent = `
+            <div class="tool-landing" id="tool1-landing">
+              <p style="color: var(--muted); font-size: 16px; margin: 20px 0;">
+                Complete this comprehensive assessment to receive your personalized Financial Health Score, 
+                profile type, and customized recommendations.
+              </p>
+              
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 30px 0;">
+                <div class="card" style="text-align: left;">
+                  <h4 style="color: var(--gold);">📊 What You'll Discover</h4>
+                  <ul style="color: var(--muted); font-size: 14px;">
+                    <li>Financial Health Score (0-100)</li>
+                    <li>Money Mindset Analysis</li>
+                    <li>Personalized Profile Type</li>
+                    <li>Custom Recommendations</li>
+                  </ul>
+                </div>
+                <div class="card" style="text-align: left;">
+                  <h4 style="color: var(--gold);">⏱️ Assessment Overview</h4>
+                  <ul style="color: var(--muted); font-size: 14px;">
+                    <li>25+ comprehensive questions</li>
+                    <li>5 sections to complete</li>
+                    <li>Auto-saves every 2 minutes</li>
+                    <li>About 20 minutes total</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div class="tool-actions">
+                <button onclick="startTool1Form()" class="btn-primary" style="font-size: 16px; padding: 12px 30px;">
+                  🚀 Start Assessment
+                </button>
+                <button onclick="ToolWrapper.loadDraft()" class="btn-secondary" id="continue-draft-btn" style="display:none;">
+                  📂 Continue Previous
+                </button>
+              </div>
+            </div>
+            
+            <div id="tool1-form" style="display:none;">
+              ${getOrientationFormHTML()}
+            </div>
+          `;
+          
+          document.getElementById('tool-content').innerHTML = toolContent;
+          
+          // Check for existing drafts
+          ToolWrapper.checkForExistingDraft('tool1');
+          
+        } else {
+          // Fallback to legacy version without wrapper
+          loadOrientationToolLegacy();
+        }
+      }
+      
+      // Get the orientation form HTML (extracted for clarity)
+      window.getOrientationFormHTML = function() {
+        return `
+          <h2>📋 Comprehensive Financial Profile Assessment</h2>
+          <div class="hr"></div>
+          <p class="muted" style="margin-bottom: 20px;">
+            All 25 questions help us understand your complete situation.
+          
+          <!-- Progress Bar -->
+          <div style="margin-bottom: 25px;">
+            <div style="background: rgba(173, 145, 104, 0.2); border-radius: 20px; height: 8px; overflow: hidden;">
+              <div id="progress-bar" style="background: var(--gold); height: 100%; width: 20%; transition: width 0.3s;"></div>
+            </div>
+            <p class="muted" style="text-align: center; margin-top: 8px;">Section 1 of 5</p>
+          </div>
+          
+          <form id="orientation-form" onsubmit="saveOrientationData(event)">
+            <!-- Section 1: Basic Information -->
+            <div style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+              <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--gold);">👤 Basic Information</h3>
+              <div class="form-grid">
+                <div>
+                  <label class="form-label">First Name *</label>
+                  <input type="text" name="firstName" required class="form-input" placeholder="John">
+                </div>
+                
+                <div>
+                  <label class="form-label">Last Name *</label>
+                  <input type="text" name="lastName" required class="form-input" placeholder="Doe">
+                </div>
+                
+                <div>
+                  <label class="form-label">Email Address *</label>
+                  <input type="email" name="email" required class="form-input" placeholder="john@example.com">
+                </div>
+                
+                <div>
+                  <label class="form-label">Age *</label>
+                  <input type="number" name="age" min="18" max="100" required class="form-input" placeholder="35">
+                </div>
+                
+                <div>
+                  <label class="form-label">Marital Status *</label>
+                  <select name="maritalStatus" required class="form-select">
+                    <option value="">Select...</option>
+                    <option value="single">Single</option>
+                    <option value="married">Married</option>
+                    <option value="divorced">Divorced</option>
+                    <option value="widowed">Widowed</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label class="form-label">Employment Status *</label>
+                  <select name="employmentStatus" required class="form-select">
+                    <option value="">Select...</option>
+                    <option value="employed-ft">Employed Full-Time</option>
+                    <option value="employed-pt">Employed Part-Time</option>
+                    <option value="self-employed">Self-Employed</option>
+                    <option value="unemployed">Unemployed</option>
+                    <option value="retired">Retired</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label class="form-label">Number of Dependents *</label>
+                  <input type="number" name="dependents" min="0" max="10" required class="form-input" placeholder="0">
+                </div>
+              </div>
+            </div>
+            
+            <!-- Section 2: Employment & Income -->
+            <div style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+              <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--gold);">💼 Employment & Income</h3>
+              <div class="form-grid">
+                <div>
+                  <label class="form-label">Industry/Profession</label>
+                  <input type="text" name="profession" class="form-input" placeholder="e.g., Teacher">
+                </div>
+                
+                <div>
+                  <label class="form-label">Years at Current Job</label>
+                  <input type="number" name="yearsEmployed" min="0" max="50" class="form-input" placeholder="5">
+                </div>
+                
+                <div>
+                  <label class="form-label">Other Income Sources</label>
+                  <input type="number" name="otherIncome" min="0" class="form-input" placeholder="0">
+                </div>
+                
+                <div>
+                  <label class="form-label">401k/Retirement Access *</label>
+                  <select name="retirementAccess" required class="form-select">
+                    <option value="">Select...</option>
+                    <option value="401k-match">401k with Match</option>
+                    <option value="401k-no-match">401k No Match</option>
+                    <option value="none">No Workplace Retirement</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Section 3: Financial Snapshot -->
+            <div style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+              <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--gold);">💰 Financial Snapshot</h3>
+              <div class="form-grid">
+                <div>
+                  <label class="form-label">Annual Household Income *</label>
+                  <select name="annualIncome" required class="form-select">
+                    <option value="">Select...</option>
+                    <option value="< $30,000">Under $30,000</option>
+                    <option value="$30,000-$50,000">$30,000 - $50,000</option>
+                    <option value="$50,000-$75,000">$50,000 - $75,000</option>
+                    <option value="$75,000-$100,000">$75,000 - $100,000</option>
+                    <option value="$100,000-$150,000">$100,000 - $150,000</option>
+                    <option value="> $150,000">Over $150,000</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label class="form-label">Monthly Housing Cost *</label>
+                  <input type="number" name="housingCost" min="0" required class="form-input" placeholder="1500">
+                </div>
+                
+                <div>
+                  <label class="form-label">Total Monthly Expenses *</label>
+                  <input type="number" name="monthlyExpenses" min="0" required class="form-input" placeholder="3500">
+                </div>
+                
+                <div>
+                  <label class="form-label">Monthly Savings *</label>
+                  <input type="number" name="monthlySavings" min="0" required class="form-input" placeholder="500">
+                </div>
+                
+                <div>
+                  <label class="form-label">Total Debt (excluding mortgage) *</label>
+                  <select name="totalDebt" required class="form-select">
+                    <option value="">Select...</option>
+                    <option value="None">$0 (Debt Free)</option>
+                    <option value="< $10,000">Under $10,000</option>
+                    <option value="$10,000-$25,000">$10,000 - $25,000</option>
+                    <option value="$25,000-$50,000">$25,000 - $50,000</option>
+                    <option value="$50,000-$100,000">$50,000 - $100,000</option>
+                    <option value="> $100,000">Over $100,000</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label class="form-label">Emergency Fund Status *</label>
+                  <select name="emergencyFund" required class="form-select">
+                    <option value="">Select...</option>
+                    <option value="None">No Emergency Fund</option>
+                    <option value="< 1 month">Less than 1 Month</option>
+                    <option value="1-3 months">1-3 Months</option>
+                    <option value="3-6 months">3-6 Months</option>
+                    <option value="> 6 months">More than 6 Months</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label class="form-label">Current Total Savings</label>
+                  <input type="number" name="currentSavings" min="0" class="form-input" placeholder="5000">
+                </div>
+                
+                <div>
+                  <label class="form-label">Investment Experience *</label>
+                  <select name="investmentExperience" required class="form-select">
+                    <option value="">Select...</option>
+                    <option value="none">No Experience</option>
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="experienced">Experienced</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label class="form-label">Primary Financial Goal *</label>
+                  <select name="primaryGoal" required class="form-select">
+                    <option value="">Select...</option>
+                    <option value="Eliminate Debt">Eliminate Debt</option>
+                    <option value="Build Emergency Fund">Build Emergency Fund</option>
+                    <option value="Save for Retirement">Save for Retirement</option>
+                    <option value="Buy a Home">Buy a Home</option>
+                    <option value="Start a Business">Start a Business</option>
+                    <option value="Save for Education">Save for Education</option>
+                    <option value="Build Wealth">Build Wealth</option>
+                    <option value="Financial Independence">Financial Independence</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label class="form-label">Target Retirement Age</label>
+                  <input type="number" name="retirementTarget" min="50" max="80" class="form-input" placeholder="65">
+                </div>
+                
+                <div>
+                  <label class="form-label">Biggest Financial Obstacle *</label>
+                  <select name="biggestObstacle" required class="form-select">
+                    <option value="">Select...</option>
+                    <option value="Lack of Income">Lack of Income</option>
+                    <option value="Too Much Debt">Too Much Debt</option>
+                    <option value="No Clear Plan">No Clear Plan</option>
+                    <option value="Lack of Knowledge">Lack of Knowledge</option>
+                    <option value="Fear/Anxiety">Fear/Anxiety</option>
+                    <option value="Lack of Discipline">Lack of Discipline</option>
+                    <option value="Market Volatility">Market Volatility</option>
+                    <option value="Family Obligations">Family Obligations</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Section 4: Mindset Assessment (Scored -3 to +3) -->
+            <div style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+              <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--gold);">🧠 Mindset Assessment</h3>
+              <p class="muted" style="margin-bottom: 20px; font-size: 13px;">Move the sliders to indicate where you fall on each scale</p>
+              
+              <div style="margin-bottom: 25px;">
+                <label class="form-label">How would you describe your current Financial Situation? *</label>
+                <input type="range" name="financialSituation" min="-3" max="3" value="0" required 
+                       oninput="updateScaleLabel(this, 'financial-situation')" style="width: 100%;">
+                <div id="financial-situation-label" style="text-align: center; margin-top: 10px; color: var(--gold);">
+                  Okay (0)
+                </div>
+                <div class="muted" style="font-size: 11px; display: flex; justify-content: space-between; margin-top: 5px;">
+                  <span>-3: Horrible</span>
+                  <span>0: Okay</span>
+                  <span>+3: Great</span>
+                </div>
+              </div>
+              
+              <div style="margin-bottom: 25px;">
+                <label class="form-label">Your relationship with Money? *</label>
+                <input type="range" name="moneyRelationship" min="-3" max="3" value="0" required 
+                       oninput="updateScaleLabel(this, 'money-relationship')" style="width: 100%;">
+                <div id="money-relationship-label" style="text-align: center; margin-top: 10px; color: var(--gold);">
+                  Okay (0)
+                </div>
+                <div class="muted" style="font-size: 11px; display: flex; justify-content: space-between; margin-top: 5px;">
+                  <span>-3: Combat</span>
+                  <span>0: Okay</span>
+                  <span>+3: Great</span>
+                </div>
+              </div>
+              
+              <div style="margin-bottom: 25px;">
+                <label class="form-label">Financial Scarcity vs Abundance Mindset? *</label>
+                <input type="range" name="scarcityAbundance" min="-3" max="3" value="0" required 
+                       oninput="updateScaleLabel(this, 'scarcity-abundance')" style="width: 100%;">
+                <div id="scarcity-abundance-label" style="text-align: center; margin-top: 10px; color: var(--gold);">
+                  Balanced (0)
+                </div>
+                <div class="muted" style="font-size: 11px; display: flex; justify-content: space-between; margin-top: 5px;">
+                  <span>-3: Full Scarcity</span>
+                  <span>0: Balanced</span>
+                  <span>+3: Full Abundance</span>
+                </div>
+              </div>
+              
+              <div style="margin-bottom: 25px;">
+                <label class="form-label">Confidence in reaching your financial goals? *</label>
+                <input type="range" name="goalConfidence" min="-3" max="3" value="0" required 
+                       oninput="updateScaleLabel(this, 'goal-confidence')" style="width: 100%;">
+                <div id="goal-confidence-label" style="text-align: center; margin-top: 10px; color: var(--gold);">
+                  Maybe (0)
+                </div>
+                <div class="muted" style="font-size: 11px; display: flex; justify-content: space-between; margin-top: 5px;">
+                  <span>-3: No Chance</span>
+                  <span>0: Maybe</span>
+                  <span>+3: Certain</span>
+                </div>
+              </div>
+              
+              <div style="margin-bottom: 25px;">
+                <label class="form-label">What is your level of Financial Ambition? *</label>
+                <input type="range" name="financialAmbition" min="-3" max="3" value="0" required 
+                       oninput="updateScaleLabel(this, 'financial-ambition')" style="width: 100%;">
+                <div id="financial-ambition-label" style="text-align: center; margin-top: 10px; color: var(--gold);">
+                  Comfort (0)
+                </div>
+                <div class="muted" style="font-size: 11px; display: flex; justify-content: space-between; margin-top: 5px;">
+                  <span>-3: Survival Mode</span>
+                  <span>0: Comfort</span>
+                  <span>+3: Financial Freedom</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Section 5: Goals & Planning -->
+            <div style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+              <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--gold);">🎯 Goals & Planning</h3>
+              <div style="margin-bottom: 20px;">
+                <label class="form-label">Target Retirement Age</label>
+                <input type="number" name="retirementAge" min="30" max="100" class="form-input" placeholder="65">
+              </div>
+              
+              <div>
+                <label class="form-label">What is your BIGGEST financial obstacle? *</label>
+                <textarea name="biggestObstacle" required class="form-input" rows="3" 
+                          placeholder="What's the main thing holding you back financially?" 
+                          style="border-radius: 15px; resize: vertical; width: 100%;"></textarea>
+              </div>
+            </div>
+            
+            <div style="margin-top: 30px; text-align: center;">
+              <button type="submit" class="btn" style="min-width: 250px;">
+                📊 Generate My Personalized Insights Report
+              </button>
+            </div>
+          </form>
+          
+          <!-- Insights Report Display (Hidden initially) -->
+          <div id="insights-report" style="display: none;"></div>
+        `;
+      }
+      
+      // Legacy function without wrapper (fallback)
+      window.loadOrientationToolLegacy = function() {
+        const html = getOrientationFormHTML();
+        document.getElementById('tool-container').innerHTML = html;
+      }
+      
+      // Update scale label helper
+      window.updateScaleLabel = function(input, labelType) {
+        const value = parseInt(input.value);
+        const label = document.getElementById(labelType + '-label');
+        
+        const labels = {
+          'financial-situation': [
+            'Horrible and getting worse (-3)',
+            'Bad but stable (-2)',
+            'Not where I want it (-1)',
+            'Okay (0)',
+            'Bad but hopeful (+1)',
+            'Good and improving (+2)',
+            'Great and stable (+3)'
+          ],
+          'money-relationship': [
+            'Constant combat (-3)',
+            'Consistent fear (-2)',
+            'Troubled (-1)',
+            'Okay (0)',
+            'Pretty good (+1)',
+            'Good (+2)',
+            'Great (+3)'
+          ],
+          'scarcity-abundance': [
+            'Full scarcity (-3)',
+            'Mostly scarcity (-2)',
+            'Some scarcity (-1)',
+            'Balanced (0)',
+            'Some abundance (+1)',
+            'Mostly abundance (+2)',
+            'Full abundance (+3)'
+          ],
+          'goal-confidence': [
+            'Not a chance (-3)',
+            'Very unlikely (-2)',
+            'Unlikely (-1)',
+            'Maybe (0)',
+            'Likely (+1)',
+            'Very likely (+2)',
+            'Absolutely certain (+3)'
+          ],
+          'financial-ambition': [
+            'Survival mode (-3)',
+            'Getting by (-2)',
+            'Stability (-1)',
+            'Comfort (0)',
+            'Growth (+1)',
+            'Wealth building (+2)',
+            'Financial freedom (+3)'
+          ]
+        };
+        
+        if (labels[labelType]) {
+          label.textContent = labels[labelType][value + 3];
+          // Color code based on value
+          if (value < 0) {
+            label.style.color = 'var(--bad)';
+          } else if (value > 0) {
+            label.style.color = 'var(--ok)';
+          } else {
+            label.style.color = 'var(--gold)';
+          }
+        }
+      }
+      
+      // Save Orientation Data and Generate Insights Report
+      window.saveOrientationData = function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        console.log('saveOrientationData called');
+        
+        const form = event.target;
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+        
+        console.log('Form data collected:', data);
+        
+        // Show saving state
+        const button = form.querySelector('button[type="submit"]');
+        button.disabled = true;
+        button.textContent = 'Analyzing your profile...';
+        
+        // Generate the report immediately while saving in background
+        const report = generateLocalInsightsReport(data);
+        console.log('Report generated:', report);
+        
+        // Display the report immediately
+        displayInsightsReport(report);
+        
+        // Save data in background
+        google.script.run
+          .withSuccessHandler(function(result) {
+            console.log('Save result:', result);
+            // Add any server insights if available
+            if (result && result.insights && result.insights.length > 0) {
+              report.serverInsights = result.insights;
+              // Update display with server insights
+              displayInsightsReport(report);
+            }
+          })
+          .withFailureHandler(function(error) {
+            console.error('Save error:', error);
+            // Still show the report even if save fails
+            alert('Note: Data save failed but your report is displayed. Error: ' + error);
+          })
+          .saveUserData(userId, 'tool1', data);
+          
+        return false; // Prevent form submission
+      }
+      
+      // Generate Insights Report Locally
+      window.generateLocalInsightsReport = function(data) {
+        // Calculate Financial Health Score (0-100)
+        let healthScore = 50; // Base score
+        
+        // Financial situation contributes
+        healthScore += (parseInt(data.financialSituation) || 0) * 10;
+        
+        // Debt level impacts score (now handles string values)
+        const debtValue = data.totalDebt || 'None';
+        if (debtValue === 'None') healthScore += 15;
+        else if (debtValue === '< $10,000') healthScore += 5;
+        else if (debtValue === '$10,000-$25,000') healthScore -= 5;
+        else if (debtValue === '$25,000-$50,000') healthScore -= 10;
+        else if (debtValue === '$50,000-$100,000') healthScore -= 15;
+        else if (debtValue === '> $100,000') healthScore -= 20;
+        
+        // Emergency fund impacts score (now handles string values)
+        const emergencyValue = data.emergencyFund || 'None';
+        if (emergencyValue === 'None') healthScore -= 15;
+        else if (emergencyValue === '< 1 month') healthScore -= 5;
+        else if (emergencyValue === '1-3 months') healthScore += 5;
+        else if (emergencyValue === '3-6 months') healthScore += 10;
+        else if (emergencyValue === '> 6 months') healthScore += 15;
+        
+        // Annual income impacts score
+        const incomeValue = data.annualIncome || '< $30,000';
+        if (incomeValue === '< $30,000') healthScore -= 10;
+        else if (incomeValue === '$30,000-$50,000') healthScore -= 5;
+        else if (incomeValue === '$50,000-$75,000') healthScore += 0;
+        else if (incomeValue === '$75,000-$100,000') healthScore += 5;
+        else if (incomeValue === '$100,000-$150,000') healthScore += 10;
+        else if (incomeValue === '> $150,000') healthScore += 15;
+        
+        // Money relationship
+        healthScore += (parseInt(data.moneyRelationship) || 0) * 3;
+        
+        // Ensure score is 0-100
+        healthScore = Math.max(0, Math.min(100, healthScore));
+        
+        // Calculate Mindset Score (now includes financialAmbition)
+        const mindsetScore = 
+          (parseInt(data.scarcityAbundance) || 0) + 
+          (parseInt(data.goalConfidence) || 0) + 
+          (parseInt(data.moneyRelationship) || 0) + 
+          (parseInt(data.financialAmbition) || 0) / 2;  // Average the 4 mindset fields
+        
+        // Determine profile type
+        let profile = {};
+        if (healthScore >= 70 && mindsetScore >= 3) {
+          profile = {
+            type: 'Thriving Optimizer',
+            emoji: '🚀',
+            message: 'You are in a strong financial position with an abundance mindset',
+            focus: 'Focus on wealth multiplication and advanced strategies'
+          };
+        } else if (healthScore >= 70 && mindsetScore < 3) {
+          profile = {
+            type: 'Cautious Success',
+            emoji: '🛡️',
+            message: 'Financially stable but held back by limiting beliefs',
+            focus: 'Work on aligning your mindset with your financial reality'
+          };
+        } else if (healthScore >= 40 && mindsetScore >= 0) {
+          profile = {
+            type: 'Emerging Builder',
+            emoji: '🌱',
+            message: 'You are on the right path with room to grow',
+            focus: 'Focus on systematic improvement and building confidence'
+          };
+        } else if (healthScore < 40 && mindsetScore >= 0) {
+          profile = {
+            type: 'Optimistic Striver',
+            emoji: '💪',
+            message: 'Your positive mindset is your greatest asset',
+            focus: 'Channel your optimism into concrete financial actions'
+          };
+        } else {
+          profile = {
+            type: 'Foundation Builder',
+            emoji: '🏗️',
+            message: 'You are ready to build from the ground up',
+            focus: 'Start with basics and celebrate small wins to build momentum'
+          };
+        }
+        
+        return { healthScore, mindsetScore, profile, data };
+      }
+      
+      // Display the Insights Report
+      window.displayInsightsReport = function(report) {
+        // Store report data for download function
+        window.lastGeneratedReport = report;
+        
+        const reportHtml = `
+          <div style="animation: fadeIn 0.5s;">
+            <h2>📊 Your Personalized Financial Insights Report</h2>
+            <div class="hr"></div>
+            
+            <!-- Profile Type Card -->
+            <div class="card" style="text-align: center; background: linear-gradient(135deg, rgba(173, 145, 104, 0.2) 0%, rgba(30, 25, 43, 0.4) 100%);">
+              <div style="font-size: 60px; margin-bottom: 20px;">${report.profile.emoji}</div>
+              <h3 style="font-size: 28px; margin-bottom: 10px; color: var(--gold);">
+                ${report.profile.type}
+              </h3>
+              <p style="font-size: 16px; margin-bottom: 15px;">${report.profile.message}</p>
+              <p class="muted">${report.profile.focus}</p>
+            </div>
+            
+            <!-- Scores Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+              <div class="card" style="text-align: center;">
+                <h4 style="color: var(--gold); margin-bottom: 10px;">Financial Health Score</h4>
+                <div style="font-size: 48px; font-weight: bold; color: ${report.healthScore >= 70 ? 'var(--ok)' : report.healthScore >= 40 ? 'var(--gold)' : 'var(--bad)'};">
+                  ${report.healthScore}
+                </div>
+                <p class="muted">out of 100</p>
+              </div>
+              
+              <div class="card" style="text-align: center;">
+                <h4 style="color: var(--gold); margin-bottom: 10px;">Mindset Score</h4>
+                <div style="font-size: 48px; font-weight: bold; color: ${report.mindsetScore >= 3 ? 'var(--ok)' : report.mindsetScore >= 0 ? 'var(--gold)' : 'var(--bad)'};">
+                  ${report.mindsetScore > 0 ? '+' : ''}${report.mindsetScore}
+                </div>
+                <p class="muted">range: -9 to +9</p>
+              </div>
+            </div>
+            
+            <!-- Key Insights -->
+            <div class="card" style="margin-top: 20px;">
+              <h4 style="color: var(--gold); margin-bottom: 15px;">🔍 Key Insights for You</h4>
+              <ul style="list-style: none; padding: 0;">
+                ${report.healthScore < 40 ? '<li style="margin-bottom: 10px;">⚠️ <strong>Immediate attention needed:</strong> Focus on emergency savings and debt reduction</li>' : ''}
+                ${report.data.totalDebt > 50000 ? '<li style="margin-bottom: 10px;">💰 <strong>High debt burden:</strong> Prioritize debt elimination strategies</li>' : ''}
+                ${report.data.emergencyFund == 0 ? '<li style="margin-bottom: 10px;">🚨 <strong>No emergency fund:</strong> Start with $1,000 emergency fund immediately</li>' : ''}
+                ${report.mindsetScore < 0 ? '<li style="margin-bottom: 10px;">🧠 <strong>Mindset barriers detected:</strong> Your beliefs about money need attention</li>' : ''}
+                ${report.mindsetScore >= 6 ? '<li style="margin-bottom: 10px;">✨ <strong>Exceptional mindset:</strong> Your positive outlook is a major advantage</li>' : ''}
+                <li style="margin-bottom: 10px;">📈 <strong>Next focus:</strong> ${report.data.primaryGoal === 'retirement' ? 'Retirement planning tools will be crucial' : report.data.primaryGoal === 'debt' ? 'Debt elimination should be your priority' : 'Building financial foundations'}</li>
+              </ul>
+            </div>
+            
+            <!-- Action Plan -->
+            <div class="card" style="margin-top: 20px;">
+              <h4 style="color: var(--gold); margin-bottom: 15px;">📋 Your Personalized Action Plan</h4>
+              <ol style="padding-left: 20px; line-height: 1.8;">
+                <li>Complete Tool 2: Financial Clarity (Week 2) for detailed assessment</li>
+                ${report.mindsetScore < 0 ? '<li>Focus on Tool 3: Control Fear Grounding (Week 3) for mindset work</li>' : ''}
+                ${report.data.primaryGoal === 'retirement' ? '<li>Prioritize Tools 6 & 8 for retirement planning</li>' : ''}
+                ${report.data.emergencyFund == 0 ? '<li>Start building $1,000 emergency fund this month</li>' : ''}
+                <li>Review this report weekly and track progress</li>
+              </ol>
+            </div>
+            
+            <!-- Financial Clarity Prep Work -->
+            <div class="card" style="margin-top: 20px; background: linear-gradient(135deg, rgba(24, 139, 246, 0.1) 0%, rgba(173, 145, 104, 0.1) 100%);">
+              <h4 style="color: var(--gold); margin-bottom: 15px;">📝 Your Homework: Prepare for Tool 2 - Financial Clarity</h4>
+              <p class="muted" style="margin-bottom: 15px;">Tool 2 will deep-dive into your finances. Based on your profile, prioritize gathering this information:</p>
+              
+              ${report.healthScore < 40 || report.data.totalDebt > 25000 ? `
+                <div style="margin-bottom: 20px;">
+                  <h5 style="color: var(--bad); margin-bottom: 10px;">🔴 Priority 1: Debt Documentation (Critical for You)</h5>
+                  <ul style="list-style: none; padding-left: 0;">
+                    <li>☐ List ALL debts: credit cards, loans, medical, personal</li>
+                    <li>☐ For each debt, write down: Balance, Interest Rate, Minimum Payment</li>
+                    <li>☐ Calculate total minimum monthly debt payments</li>
+                    <li>☐ Identify highest interest rate debt</li>
+                  </ul>
+                </div>
+              ` : ''}
+              
+              ${report.data.emergencyFund <= 1 || report.healthScore < 50 ? `
+                <div style="margin-bottom: 20px;">
+                  <h5 style="color: var(--warn); margin-bottom: 10px;">🟡 Priority ${report.data.totalDebt > 25000 ? '2' : '1'}: Expense Tracking (Important for You)</h5>
+                  <ul style="list-style: none; padding-left: 0;">
+                    <li>☐ List all monthly fixed expenses (rent, insurance, subscriptions)</li>
+                    <li>☐ Track this week's variable spending (food, gas, entertainment)</li>
+                    <li>☐ Identify your 3 biggest expense categories</li>
+                    <li>☐ Find 3 expenses you could reduce or eliminate</li>
+                  </ul>
+                </div>
+              ` : ''}
+              
+              ${report.data.annualIncome && parseInt(report.data.annualIncome) > 0 ? `
+                <div style="margin-bottom: 20px;">
+                  <h5 style="color: var(--ok); margin-bottom: 10px;">🟢 Priority ${report.healthScore < 40 ? '3' : '2'}: Income & Assets Review</h5>
+                  <ul style="list-style: none; padding-left: 0;">
+                    <li>☐ Gather last 2 pay stubs</li>
+                    <li>☐ List all income sources and amounts</li>
+                    <li>☐ Check all account balances (checking, savings, retirement)</li>
+                    <li>☐ Note any expected income changes in next 6 months</li>
+                  </ul>
+                </div>
+              ` : ''}
+              
+              ${report.data.primaryGoal === 'retirement' || report.data.retirementAccess !== 'none' ? `
+                <div style="margin-bottom: 20px;">
+                  <h5 style="color: var(--gold); margin-bottom: 10px;">✨ Bonus: Retirement Account Review</h5>
+                  <ul style="list-style: none; padding-left: 0;">
+                    <li>☐ Find your 401k/IRA balance and contribution rate</li>
+                    <li>☐ Check if you're getting full employer match</li>
+                    <li>☐ Calculate years until retirement goal</li>
+                  </ul>
+                </div>
+              ` : ''}
+              
+              <div style="background: rgba(173, 145, 104, 0.1); border-radius: 10px; padding: 15px; margin-top: 15px;">
+                <p style="margin: 0; font-size: 14px;">
+                  <strong>💡 Pro Tip:</strong> ${
+                    report.healthScore < 40 ? 
+                    'Focus on the debt documentation first - this will be crucial for creating your debt elimination strategy.' :
+                    report.data.emergencyFund == 0 ?
+                    'Tracking expenses this week will reveal where your emergency fund money can come from.' :
+                    'Having these numbers ready will make Tool 2 much more powerful and actionable for you.'
+                  }
+                </p>
+              </div>
+            </div>
+            
+            <!-- Next Steps -->
+            <div style="text-align: center; margin-top: 30px;">
+              <button onclick="downloadReport(event)" class="btn" style="margin-right: 10px; background: linear-gradient(135deg, #AD9168 0%, #8B7355 100%); color: #1e1933 !important;">
+                📥 Download Report (PDF)
+              </button>
+              <button onclick="window.print()" class="btn" style="margin-right: 10px; background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%); color: white !important;">
+                🖨️ Print Report
+              </button>
+              ${currentWeek >= 2 ? `
+                <button onclick="loadTool('financial-clarity')" class="btn" style="margin-right: 10px;">
+                  Continue to Tool 2
+                </button>
+              ` : ''}
+              <button onclick="window.location.href = '${window.location.origin}${window.location.pathname}?route=dashboard&client=${userId}'" class="btn-secondary" style="background: var(--card-bg); color: var(--text);">
+                Return to Dashboard
+              </button>
+            </div>
+          </div>
+        `;
+        
+        document.getElementById('tool-container').innerHTML = reportHtml;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      
+      // Download report function - generates PDF server-side
+      window.downloadReport = function(event) {
+        const reportData = window.lastGeneratedReport;
+        if (!reportData) {
+          alert('No report available to download');
+          return;
+        }
+        
+        // Show loading state
+        const downloadBtn = event ? event.target : document.querySelector('button[onclick*="downloadReport"]');
+        const originalText = downloadBtn.textContent;
+        downloadBtn.textContent = '⏳ Generating PDF...';
+        downloadBtn.disabled = true;
+        
+        // Call server to generate PDF
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              // Convert base64 to blob
+              const byteCharacters = atob(result.base64);
+              const byteNumbers = new Array(byteCharacters.length);
+              for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+              }
+              const byteArray = new Uint8Array(byteNumbers);
+              const blob = new Blob([byteArray], {type: result.mimeType});
+              
+              // Create download link
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = result.fileName;
+              document.body.appendChild(a);
+              a.click();
+              
+              // Clean up
+              document.body.removeChild(a);
+              window.URL.revokeObjectURL(url);
+              
+              console.log('PDF downloaded successfully');
+            } else {
+              alert('Error generating PDF: ' + (result.error || 'Unknown error'));
+            }
+            
+            // Restore button state
+            downloadBtn.textContent = originalText;
+            downloadBtn.disabled = false;
+          })
+          .withFailureHandler(function(error) {
+            alert('Error generating report: ' + error.message);
+            downloadBtn.textContent = originalText;
+            downloadBtn.disabled = false;
+          })
+          .generatePDFReport(reportData);
+      }
+      
+      // Legacy HTML download function (kept as backup)
+      window.downloadHTMLReport = function() {
+        const reportData = window.lastGeneratedReport;
+        if (!reportData) {
+          alert('No report available to download');
+          return;
+        }
+        
+        // Create a formatted HTML document matching website theme
+        const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Financial TruPath - Assessment Report</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(180deg, #1e1933 0%, #2d2844 50%, #1e1933 100%);
+      min-height: 100vh;
+      color: #e2e8f0;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    
+    .header {
+      text-align: center;
+      padding: 40px;
+      background: rgba(30, 25, 51, 0.8);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      border: 1px solid rgba(173, 145, 104, 0.3);
+      margin-bottom: 30px;
+    }
+    
+    .logo {
+      font-family: 'Rubik', sans-serif;
+      font-size: 48px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #AD9168 0%, #8B7355 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 4px;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      font-size: 35px;
+      color: #94a3b8;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-weight: 500;
+      margin: 10px 0;
+    }
+    
+    .profile-card {
+      background: linear-gradient(135deg, rgba(173, 145, 104, 0.2) 0%, rgba(30, 25, 43, 0.4) 100%);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(173, 145, 104, 0.3);
+      padding: 40px;
+      border-radius: 15px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .profile-emoji {
+      font-size: 80px;
+      margin-bottom: 20px;
+    }
+    
+    .profile-type {
+      font-size: 32px;
+      color: #AD9168;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+    
+    .scores-container {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .score-box {
+      flex: 1;
+      background: rgba(30, 25, 51, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(173, 145, 104, 0.3);
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+    }
+    
+    .score-label {
+      color: #AD9168;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    
+    .score-value {
+      font-size: 56px;
+      font-weight: bold;
+      margin: 15px 0;
+    }
+    
+    .section {
+      background: rgba(30, 25, 51, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(173, 145, 104, 0.3);
+      padding: 30px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .section h3 {
+      color: #AD9168;
+      font-size: 24px;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(173, 145, 104, 0.3);
+    }
+    
+    .good { color: #22c55e; }
+    .warning { color: #f59e0b; }
+    .critical { color: #ef4444; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">FINANCIAL TRUPATH</div>
+      <div class="subtitle">Assessment Report</div>
+    </div>
+
+    <div class="profile-card">
+      <div class="profile-emoji">${reportData.profile.emoji || '🎯'}</div>
+      <div class="profile-type">${reportData.profile.type}</div>
+      <p>${reportData.profile.message}</p>
+      <p style="color: #94a3b8;">${reportData.profile.focus}</p>
+    </div>
+
+    <div class="scores-container">
+      <div class="score-box">
+        <div class="score-label">Financial Health</div>
+        <div class="score-value ${reportData.healthScore >= 70 ? 'good' : reportData.healthScore >= 40 ? 'warning' : 'critical'}">
+          ${reportData.healthScore}
+        </div>
+      </div>
+      
+      <div class="score-box">
+        <div class="score-label">Mindset Score</div>
+        <div class="score-value ${reportData.mindsetScore >= 3 ? 'good' : reportData.mindsetScore >= 0 ? 'warning' : 'critical'}">
+          ${reportData.mindsetScore > 0 ? '+' : ''}${reportData.mindsetScore}
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>📊 Key Insights</h3>
+      ${reportData.healthScore < 40 ? '<p style="color: #ef4444;">⚠️ <strong>Immediate attention needed:</strong> Your financial health score indicates areas requiring urgent focus.</p>' : ''}
+      ${reportData.mindsetScore < 0 ? '<p style="color: #f59e0b;">🧠 <strong>Mindset barriers detected:</strong> Your beliefs about money may be limiting your progress.</p>' : ''}
+      ${reportData.mindsetScore >= 6 ? '<p style="color: #22c55e;">✨ <strong>Exceptional mindset:</strong> Your positive outlook is a powerful asset for financial growth.</p>' : ''}
+      ${reportData.healthScore >= 70 ? '<p style="color: #22c55e;">💪 <strong>Strong foundation:</strong> You have a solid financial base to build upon.</p>' : ''}
+    </div>
+
+    <div class="section">
+      <h3>📚 Your Personalized Homework for Tool 2 Preparation</h3>
+      
+      ${reportData.healthScore < 40 || (reportData.data && reportData.data.totalDebt === 'over_100k') ? `
+      <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
+        <h4 style="color: #ef4444; margin-top: 0;">🔴 Priority 1: Debt & Cash Flow Review (Critical)</h4>
+        <ul style="color: #e2e8f0; list-style-type: none; padding-left: 0;">
+          <li style="padding: 5px 0;">☐ List all debts with balances, interest rates, and minimum payments</li>
+          <li style="padding: 5px 0;">☐ Calculate total monthly debt payments</li>
+          <li style="padding: 5px 0;">☐ Identify highest interest rate debts</li>
+          <li style="padding: 5px 0;">☐ Review last 3 months of bank statements</li>
+        </ul>
+      </div>
+      ` : ''}
+      
+      ${reportData.healthScore < 60 || (reportData.data && reportData.data.emergencyFund === 'none') ? `
+      <div style="background: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
+        <h4 style="color: #f59e0b; margin-top: 0;">🟡 Priority 2: Expense Tracking</h4>
+        <ul style="color: #e2e8f0; list-style-type: none; padding-left: 0;">
+          <li style="padding: 5px 0;">☐ Track all expenses for next 7 days</li>
+          <li style="padding: 5px 0;">☐ Identify top 3 spending categories</li>
+          <li style="padding: 5px 0;">☐ Find 3 expenses you could reduce</li>
+          <li style="padding: 5px 0;">☐ Calculate true monthly living costs</li>
+        </ul>
+      </div>
+      ` : ''}
+      
+      <div style="background: rgba(34, 197, 94, 0.1); border-left: 4px solid #22c55e; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
+        <h4 style="color: #22c55e; margin-top: 0;">🟢 Priority 3: Income & Assets Review</h4>
+        <ul style="color: #e2e8f0; list-style-type: none; padding-left: 0;">
+          <li style="padding: 5px 0;">☐ Gather last 2 pay stubs</li>
+          <li style="padding: 5px 0;">☐ List all income sources</li>
+          <li style="padding: 5px 0;">☐ Check all account balances</li>
+          <li style="padding: 5px 0;">☐ Review any investment accounts</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>🎯 Next Steps</h3>
+      <ol style="color: #e2e8f0;">
+        <li style="padding: 5px 0;">Complete your personalized homework tasks above</li>
+        <li style="padding: 5px 0;">Take Tool 2: Financial Clarity Assessment (Week 2)</li>
+        ${reportData.mindsetScore < 0 ? '<li style="padding: 5px 0;">Prepare for Tool 3: Control Fear Grounding (Week 3)</li>' : ''}
+        <li style="padding: 5px 0;">Track your progress weekly</li>
+        <li style="padding: 5px 0;">Celebrate small wins along your journey</li>
+      </ol>
+    </div>
+    
+    <div class="section" style="text-align: center; background: linear-gradient(135deg, rgba(173, 145, 104, 0.2) 0%, rgba(30, 25, 43, 0.4) 100%);">
+      <p style="font-size: 18px; color: #AD9168; margin: 0;">Remember: Every financial journey starts with a single step.</p>
+      <p style="color: #94a3b8; margin-top: 10px;">You've taken that step today. Keep moving forward!</p>
+    </div>
+  </div>
+</body>
+</html>
+        `;
+        
+        // Create a Blob and download
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `FinancialTruPath_Report_${new Date().toISOString().split('T')[0]}.html`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        console.log('Report downloaded successfully');
+      }
+      
+      // Show insights panel
+      window.showInsights = function(insights) {
+        const panel = document.getElementById('insights-panel');
+        const content = document.getElementById('insights-content');
+        
+        let html = '<ul class="space-y-2">';
+        insights.forEach(insight => {
+          const priorityColor = insight.priority === 'high' ? 'text-red-600' : 
+                               insight.priority === 'critical' ? 'text-red-800' : 
+                               'text-blue-600';
+          html += `
+            <li class="border-l-4 border-blue-400 pl-4">
+              <p class="font-medium ${priorityColor}">${insight.message}</p>
+              <p class="text-sm text-gray-600 mt-1">${insight.recommendation}</p>
+            </li>
+          `;
+        });
+        html += '</ul>';
+        
+        content.innerHTML = html;
+        panel.style.display = 'block';
+      }
+      
+      // Load Financial Clarity Tool (Tool 2)
+      window.loadFinancialClarityTool = function() {
+        const html = `
+          <h2>💰 Tool 2: Financial Clarity Assessment</h2>
+          <div class="hr"></div>
+          <p class="muted" style="margin-bottom: 20px;">
+            This tool helps you gain clarity on your complete financial picture.
+          </p>
+          
+          <div style="background: rgba(173, 145, 104, 0.2); border-radius: 15px; padding: 30px; text-align: center;">
+            <p style="color: var(--gold); font-size: 18px; margin-bottom: 15px;">
+              🚧 Coming in Week 2
+            </p>
+            <p class="muted">
+              This comprehensive financial assessment will help you understand:<br><br>
+              • Your income and expense patterns<br>
+              • Debt situation and management strategies<br>
+              • Savings and investment readiness<br>
+              • Areas needing immediate attention
+            </p>
+          </div>
+        `;
+        
+        document.getElementById('tool-container').innerHTML = html;
+      }
+      
+      // Auto-save functionality
+      let autoSaveTimer;
+      window.enableAutoSave = function() {
+        document.addEventListener('input', function() {
+          clearTimeout(autoSaveTimer);
+          autoSaveTimer = setTimeout(function() {
+            console.log('Auto-saving...');
+            // Implement auto-save logic here
+          }, 30000); // 30 seconds
+        });
+      }
+      
+      // Initialize
+      enableAutoSave();
+    </script>
+  </body>
+</html>

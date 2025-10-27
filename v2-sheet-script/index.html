@@ -796,9 +796,9 @@
             <p class="muted" style="text-align: center; margin-top: 8px;">Section 1 of 5</p>
           </div>
           
-          <form id="orientation-form" onsubmit="saveOrientationData(event)">
+          <form id="tool-form" data-tool-id="tool1" onsubmit="saveOrientationData(event)">
             <!-- Section 1: Basic Information -->
-            <div style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+            <div data-section="1" style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
               <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--gold);">👤 Basic Information</h3>
               <div class="form-grid">
                 <div>
@@ -852,7 +852,7 @@
             </div>
             
             <!-- Section 2: Employment & Income -->
-            <div style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+            <div data-section="2" style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
               <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--gold);">💼 Employment & Income</h3>
               <div class="form-grid">
                 <div>
@@ -883,7 +883,7 @@
             </div>
             
             <!-- Section 3: Financial Snapshot -->
-            <div style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+            <div data-section="3" style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
               <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--gold);">💰 Financial Snapshot</h3>
               <div class="form-grid">
                 <div>
@@ -993,7 +993,7 @@
             </div>
             
             <!-- Section 4: Mindset Assessment (Scored -3 to +3) -->
-            <div style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+            <div data-section="4" style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
               <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--gold);">🧠 Mindset Assessment</h3>
               <p class="muted" style="margin-bottom: 20px; font-size: 13px;">Move the sliders to indicate where you fall on each scale</p>
               
@@ -1069,7 +1069,7 @@
             </div>
             
             <!-- Section 5: Goals & Planning -->
-            <div style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+            <div data-section="5" style="background: linear-gradient(315deg, rgba(173, 145, 104, 0.1) 0%, rgba(30, 25, 43, 0.2) 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
               <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--gold);">🎯 Goals & Planning</h3>
               <div style="margin-bottom: 20px;">
                 <label class="form-label">Target Retirement Age</label>
@@ -1085,6 +1085,16 @@
             </div>
             
             <div style="margin-top: 30px; text-align: center;">
+              <!-- Draft management buttons -->
+              <div style="margin-bottom: 20px;">
+                <button type="button" class="btn btn-secondary" onclick="loadDraftWithVersions()" style="margin-right: 10px;">
+                  📂 Load Draft
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="ToolWrapper.saveDraft()">
+                  💾 Save Progress
+                </button>
+              </div>
+              <!-- Submit button -->
               <button type="submit" class="btn" style="min-width: 250px;">
                 📊 Generate My Personalized Insights Report
               </button>
@@ -1166,6 +1176,120 @@
             label.style.color = 'var(--gold)';
           }
         }
+      }
+      
+      // Wrapper function to bridge V10 pattern with existing logic
+      window.submitForm = function(event) {
+        // Call the existing function that has all the scoring logic
+        return saveOrientationData(event);
+      }
+      
+      // Draft version selection functions (from TestTool pattern)
+      window.loadDraftWithVersions = function() {
+        console.log('Loading draft versions...');
+        const currentUserId = typeof userId !== 'undefined' ? userId : 'TEST_USER';
+        console.log('Using userId:', currentUserId);
+        
+        google.script.run
+          .withSuccessHandler(function(drafts) {
+            console.log('Retrieved drafts:', drafts);
+            
+            if (!drafts || drafts.length === 0) {
+              alert('No saved drafts found');
+              return;
+            }
+            
+            // Create modal for version selection
+            const modal = document.createElement('div');
+            modal.id = 'draft-modal';
+            modal.className = 'tool-modal show';
+            modal.innerHTML = `
+              <div class="modal-backdrop" onclick="closeDraftModal()"></div>
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h2>Select Draft Version</h2>
+                  <button class="close-btn" onclick="closeDraftModal()">×</button>
+                </div>
+                <div class="modal-body">
+                  <div class="draft-list">
+                    ${drafts.map((draft, index) => {
+                      const timestamp = draft.timestamp ? new Date(draft.timestamp).toLocaleString() : 'Unknown time';
+                      const progress = draft.progress || 0;
+                      return `
+                        <div class="draft-item card" onclick="selectDraftVersion(${index})" style="cursor: pointer; margin-bottom: 10px; padding: 15px;">
+                          <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                              <strong>Version ${index + 1}</strong>
+                              <div style="font-size: 0.9em; color: var(--muted);">${timestamp}</div>
+                            </div>
+                            <div style="text-align: right;">
+                              <div style="font-size: 1.2em; font-weight: bold; color: var(--gold);">${progress}%</div>
+                              <div style="font-size: 0.8em; color: var(--muted);">Complete</div>
+                            </div>
+                          </div>
+                        </div>
+                      `;
+                    }).join('')}
+                  </div>
+                </div>
+              </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Store drafts globally for selection
+            window.availableDrafts = drafts;
+          })
+          .withFailureHandler(function(error) {
+            console.error('Error loading drafts:', error);
+            alert('Error loading drafts: ' + error);
+          })
+          .getToolDraftFromProperties(currentUserId, 'tool1');
+      }
+      
+      window.closeDraftModal = function() {
+        const modal = document.getElementById('draft-modal');
+        if (modal) {
+          modal.remove();
+        }
+      }
+      
+      window.selectDraftVersion = function(index) {
+        if (!window.availableDrafts || !window.availableDrafts[index]) {
+          console.error('Invalid draft selection');
+          return;
+        }
+        
+        const selectedDraft = window.availableDrafts[index];
+        console.log('Selected draft:', selectedDraft);
+        
+        // Use ToolWrapper to restore the draft
+        if (typeof ToolWrapper !== 'undefined' && ToolWrapper.restoreDraft) {
+          ToolWrapper.restoreDraft(selectedDraft);
+        } else {
+          // Fallback: manually restore form data
+          if (selectedDraft.data) {
+            Object.keys(selectedDraft.data).forEach(key => {
+              const element = document.querySelector(`[name="${key}"]`);
+              if (element) {
+                if (element.type === 'checkbox' || element.type === 'radio') {
+                  element.checked = element.value === selectedDraft.data[key];
+                } else {
+                  element.value = selectedDraft.data[key];
+                }
+              }
+            });
+          }
+        }
+        
+        closeDraftModal();
+        
+        // Show notification
+        const notification = document.createElement('div');
+        notification.className = 'notification notification-success show';
+        notification.innerHTML = '<div class="notification-content">✅ Draft loaded successfully</div>';
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
       }
       
       // Save Orientation Data and Generate Insights Report
