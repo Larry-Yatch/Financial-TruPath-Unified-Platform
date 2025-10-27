@@ -310,10 +310,20 @@
         
         <!-- Button group for testing save/load functionality -->
         <div class="button-group">
-          <button type="button" class="btn btn-secondary" onclick="ToolWrapper.loadDraft()">Load Draft</button>
+          <button type="button" class="btn btn-secondary" onclick="loadDraftWithVersions()">Load Draft</button>
           <button type="button" class="btn btn-primary" onclick="ToolWrapper.saveDraft()">Save Progress</button>
           <button type="submit" class="btn btn-success" onclick="submitForm(event)">Submit Form</button>
         </div>
+        
+        <!-- Draft version selector modal -->
+        <div id="versionModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:20px; border:2px solid #333; border-radius:8px; z-index:1000; max-width:500px;">
+          <h3>Select Draft Version</h3>
+          <div id="versionList" style="max-height:300px; overflow-y:auto; margin:15px 0;"></div>
+          <button onclick="closeVersionModal()" class="btn btn-secondary">Cancel</button>
+        </div>
+        
+        <!-- Modal backdrop -->
+        <div id="modalBackdrop" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999;" onclick="closeVersionModal()"></div>
         
       </form>
     </div>
@@ -343,6 +353,108 @@
         console.error('ToolWrapper not loaded!');
       }
     });
+    
+    // Draft version selection functions
+    window.loadDraftWithVersions = function() {
+      console.log('Loading draft versions...');
+      const userId = document.getElementById('userId')?.value || 'TEST_USER';
+      
+      // Get all draft versions
+      google.script.run
+        .withSuccessHandler(function(result) {
+          console.log('Draft versions result:', result);
+          
+          if (!result || !result.versions || result.versions.length === 0) {
+            alert('No saved drafts found.');
+            return;
+          }
+          
+          // If only one version, load it directly
+          if (result.versions.length === 1) {
+            loadSpecificDraft(result.versions[0]);
+            return;
+          }
+          
+          // Show version selector modal
+          showVersionModal(result.versions);
+        })
+        .withFailureHandler(function(error) {
+          console.error('Error loading draft versions:', error);
+          alert('Error loading drafts: ' + error.toString());
+        })
+        .getToolDraft(userId, 'test', true); // true = getAllVersions
+    };
+    
+    window.showVersionModal = function(versions) {
+      const modal = document.getElementById('versionModal');
+      const backdrop = document.getElementById('modalBackdrop');
+      const versionList = document.getElementById('versionList');
+      
+      // Clear previous list
+      versionList.innerHTML = '';
+      
+      // Create version items
+      versions.forEach(function(version, index) {
+        const versionDiv = document.createElement('div');
+        versionDiv.style.cssText = 'padding:10px; margin:5px 0; border:1px solid #ddd; border-radius:4px; cursor:pointer;';
+        versionDiv.onmouseover = function() { this.style.backgroundColor = '#f0f0f0'; };
+        versionDiv.onmouseout = function() { this.style.backgroundColor = 'white'; };
+        
+        const savedDate = new Date(version.savedAt);
+        const formattedDate = savedDate.toLocaleString();
+        
+        versionDiv.innerHTML = `
+          <div style="font-weight:bold;">Version ${index + 1} ${index === 0 ? '(Latest)' : ''}</div>
+          <div style="font-size:12px; color:#666;">Saved: ${formattedDate}</div>
+          <div style="font-size:12px; color:#666;">Progress: ${version.progress?.percentage || 0}%</div>
+        `;
+        
+        versionDiv.onclick = function() {
+          loadSpecificDraft(version);
+          closeVersionModal();
+        };
+        
+        versionList.appendChild(versionDiv);
+      });
+      
+      // Show modal
+      modal.style.display = 'block';
+      backdrop.style.display = 'block';
+    };
+    
+    window.closeVersionModal = function() {
+      document.getElementById('versionModal').style.display = 'none';
+      document.getElementById('modalBackdrop').style.display = 'none';
+    };
+    
+    window.loadSpecificDraft = function(draft) {
+      console.log('Loading specific draft:', draft);
+      
+      if (!draft || !draft.data) {
+        alert('Invalid draft data.');
+        return;
+      }
+      
+      // Parse the data if it's a string
+      const formData = typeof draft.data === 'string' ? JSON.parse(draft.data) : draft.data;
+      
+      // Fill form with draft data
+      Object.keys(formData).forEach(function(key) {
+        const field = document.querySelector(`[name="${key}"]`);
+        if (field) {
+          if (field.type === 'checkbox') {
+            field.checked = formData[key] === true || formData[key] === 'yes';
+          } else if (field.type === 'radio') {
+            const radio = document.querySelector(`[name="${key}"][value="${formData[key]}"]`);
+            if (radio) radio.checked = true;
+          } else {
+            field.value = formData[key];
+          }
+        }
+      });
+      
+      alert('Draft loaded successfully!');
+    };
     
     // Simple validation feedback
     // Handle form submission
