@@ -54,7 +54,8 @@ function doGet(e) {
       return createLoginPage();
       
     } else if (route === 'tool' || route === 'orientation' || route === 'Tool1' || route === 'tool1') {
-      // ACTIVATING: Sophisticated Tool 1 from index.html
+      // Check which tool is being requested
+      const toolId = e.parameter.tool || 'orientation';
       const sessionId = e.parameter.session || '';
       const clientId = e.parameter.client || 'TEST001';
       
@@ -68,19 +69,32 @@ function doGet(e) {
       }
       */
       
-      // Show Tool 1 (existing index.html with sophisticated form)
-      const template = HtmlService.createTemplateFromFile('index');
-      template.userId = clientId || 'USER_' + Utilities.getUuid();
-      template.sessionId = sessionId || Utilities.getUuid();
-      template.currentWeek = getCurrentWeek();
-      template.config = CONFIG;
-      
-      // console.log('Loading Tool 1 for client:', clientId, 'session:', sessionId);
-      
-      return template.evaluate()
-        .setTitle('Financial TruPath V2.0 - Orientation Assessment')
-        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-        .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
+      // Route to the appropriate tool
+      if (toolId === 'test') {
+        // Load the TestTool for V10 foundation testing
+        const template = HtmlService.createTemplateFromFile('TestTool');
+        template.userId = clientId || 'USER_' + Utilities.getUuid();
+        template.sessionId = sessionId || Utilities.getUuid();
+        
+        return template.evaluate()
+          .setTitle('Financial TruPath V2.0 - Foundation Test Tool')
+          .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+          .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
+      } else {
+        // Default to Tool 1 (existing index.html with sophisticated form)
+        const template = HtmlService.createTemplateFromFile('index');
+        template.userId = clientId || 'USER_' + Utilities.getUuid();
+        template.sessionId = sessionId || Utilities.getUuid();
+        template.currentWeek = getCurrentWeek();
+        template.config = CONFIG;
+        
+        // console.log('Loading Tool 1 for client:', clientId, 'session:', sessionId);
+        
+        return template.evaluate()
+          .setTitle('Financial TruPath V2.0 - Orientation Assessment')
+          .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+          .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
+      }
     }
     
     // Default: Show login page (inline HTML)
@@ -726,6 +740,17 @@ function createSimpleDashboard(clientId, sessionId) {
     </div>
     
     <div class="tools-grid">
+      <!-- Test Tool - V10 Foundation Testing -->
+      <div class="tool-card" onclick="navigateToTool('test')" style="border-color: #4CAF50;">
+        <div class="tool-header">
+          <span class="tool-number">🧪</span>
+          <span class="tool-status" style="background: #4CAF50;">TEST V10</span>
+        </div>
+        <h3 class="tool-title">Foundation Test Tool</h3>
+        <p class="tool-description">Test the new V10 foundation with standardized form structure.</p>
+        <span class="button">Test Now</span>
+      </div>
+      
       <!-- Tool 1 - Always Available -->
       <div class="tool-card" onclick="navigateToTool('orientation')">
         <div class="tool-header">

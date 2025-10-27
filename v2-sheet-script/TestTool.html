@@ -162,6 +162,14 @@
   </style>
 </head>
 <body>
+  <!-- Include ToolWrapper framework -->
+  <?!= include('ToolWrapper'); ?>
+  
+  <script>
+    // Initialize userId from template variable
+    const userId = '<?= userId ?>';
+    const sessionId = '<?= sessionId ?>';
+  </script>
   <div id="tool-container">
     <h1>Foundation Test Form</h1>
     
@@ -302,8 +310,8 @@
         
         <!-- Button group for testing save/load functionality -->
         <div class="button-group">
-          <button type="button" class="btn btn-secondary" onclick="if(window.toolWrapper) toolWrapper.loadDraft()">Load Draft</button>
-          <button type="button" class="btn btn-primary" onclick="if(window.toolWrapper) toolWrapper.saveDraft()">Save Progress</button>
+          <button type="button" class="btn btn-secondary" onclick="ToolWrapper.loadDraft()">Load Draft</button>
+          <button type="button" class="btn btn-primary" onclick="ToolWrapper.saveDraft()">Save Progress</button>
         </div>
         
       </form>
@@ -313,6 +321,23 @@
   <script>
     // Initialize timestamp
     document.querySelector('input[name="timestamp"]').value = new Date().toISOString();
+    
+    // Initialize ToolWrapper for test tool
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize ToolWrapper with test tool configuration
+      if (typeof ToolWrapper !== 'undefined') {
+        // Set the current tool without wrapping (since we have our own UI)
+        ToolWrapper.currentTool = 'test';
+        ToolWrapper.currentPattern = 'pattern1';
+        
+        // Start auto-save
+        ToolWrapper.startAutoSave();
+        
+        console.log('ToolWrapper configured for test tool');
+      } else {
+        console.error('ToolWrapper not loaded!');
+      }
+    });
     
     // Simple validation feedback
     document.getElementById('tool-form').addEventListener('submit', function(e) {
