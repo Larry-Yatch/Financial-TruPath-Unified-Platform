@@ -330,8 +330,12 @@
         ToolWrapper.currentTool = 'test';
         ToolWrapper.currentPattern = 'pattern1';
         
-        // Start auto-save
-        ToolWrapper.startAutoSave();
+        // Start auto-save (if available)
+        if (typeof ToolWrapper.startAutoSave === 'function') {
+          ToolWrapper.startAutoSave();
+        } else {
+          console.log('Auto-save not available - manual save only');
+        }
         
         console.log('ToolWrapper configured for test tool');
       } else {
