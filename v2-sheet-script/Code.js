@@ -87,6 +87,7 @@ function doGet(e) {
         template.sessionId = sessionId || Utilities.getUuid();
         template.currentWeek = getCurrentWeek();
         template.config = CONFIG;
+        template.baseUrl = ScriptApp.getService().getUrl();
         
         // console.log('Loading Tool 1 for client:', clientId, 'session:', sessionId);
         

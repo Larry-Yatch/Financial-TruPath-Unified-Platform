@@ -745,23 +745,8 @@
       window.navigateBackToDashboard = function() {
         console.log('Navigating back to dashboard using form submission...');
         
-        // Get the correct Apps Script URL, not the iframe URL
-        let baseUrl;
-        try {
-          // Try to get from parent frame URL
-          const scriptPattern = /\/macros\/s\/(.*?)\/exec/;
-          const parentUrl = window.parent ? window.parent.location.href : window.location.href;
-          const match = parentUrl.match(scriptPattern);
-          if (match) {
-            baseUrl = 'https://script.google.com/macros/s/' + match[1] + '/exec';
-          } else {
-            // Hardcoded fallback to current deployment
-            baseUrl = 'https://script.google.com/macros/s/AKfycbw-xZaXS8yLYZk2rf-hGsgQvCAMP3ACjmxBeDWyl6WyIrVeBUTEWLmfau4RRLfuETp7/exec';
-          }
-        } catch(e) {
-          // If we can't access parent, use hardcoded URL
-          baseUrl = 'https://script.google.com/macros/s/AKfycbw-xZaXS8yLYZk2rf-hGsgQvCAMP3ACjmxBeDWyl6WyIrVeBUTEWLmfau4RRLfuETp7/exec';
-        }
+        // Use server-provided baseUrl instead of trying to extract from iframe
+        const baseUrl = '<?!= baseUrl ?>' || 'https://script.google.com/macros/s/AKfycbw-xZaXS8yLYZk2rf-hGsgQvCAMP3ACjmxBeDWyl6WyIrVeBUTEWLmfau4RRLfuETp7/exec';
         
         const currentUserId = typeof userId !== 'undefined' ? userId : 'TEST001';
         const currentSessionId = typeof sessionId !== 'undefined' ? sessionId : '';
