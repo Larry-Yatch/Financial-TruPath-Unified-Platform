@@ -1038,11 +1038,11 @@ function saveUserData(userId, toolId, data) {
     });
     
     if (result.success) {
+      // Simplify return object to ensure it serializes properly through Google Apps Script
       const returnValue = {
         success: true,
-        message: result.message || 'Data saved successfully',
-        insights: result.insights || [],
-        timestamp: result.timestamp
+        message: result.message || 'Data saved successfully'
+        // Removed insights and timestamp as they might have serialization issues
       };
       console.log('Returning success:', JSON.stringify(returnValue));
       return returnValue;
