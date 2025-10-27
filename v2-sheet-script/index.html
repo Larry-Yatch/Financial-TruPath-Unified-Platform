@@ -718,13 +718,119 @@
         }
       }
       
+      // Navigation function for returning to dashboard after report
+      window.navigateBackToDashboard = function() {
+        console.log('Navigating back to dashboard...');
+        
+        // Try multiple approaches in order
+        const baseUrl = window.location.href.split('?')[0];
+        const currentUserId = typeof userId !== 'undefined' ? userId : 'TEST001';
+        const currentSessionId = typeof sessionId !== 'undefined' ? sessionId : '';
+        
+        // Build the dashboard URL
+        let dashboardUrl = baseUrl + '?route=dashboard&client=' + currentUserId;
+        if (currentSessionId) {
+          dashboardUrl += '&session=' + currentSessionId;
+        }
+        
+        console.log('Dashboard URL:', dashboardUrl);
+        
+        // Method 1: Try using google.script.host if available (for Apps Script iframe)
+        if (typeof google !== 'undefined' && google.script && google.script.host) {
+          try {
+            google.script.host.setHeight(1); // Collapse the iframe
+            setTimeout(() => {
+              window.location.assign(dashboardUrl);
+            }, 100);
+            return;
+          } catch (e) {
+            console.log('google.script.host method failed:', e);
+          }
+        }
+        
+        // Method 2: Try location.replace (doesn't add to history)
+        try {
+          window.location.replace(dashboardUrl);
+          return;
+        } catch (e) {
+          console.log('location.replace failed:', e);
+        }
+        
+        // Method 3: Try location.assign
+        try {
+          window.location.assign(dashboardUrl);
+          return;
+        } catch (e) {
+          console.log('location.assign failed:', e);
+        }
+        
+        // Method 4: Last resort - set href directly
+        window.location.href = dashboardUrl;
+      }
+      
       // Draft version selection functions (from TestTool pattern)
       // MOVED HERE: Must be defined BEFORE loadOrientationTool which uses it
       window.loadDraftWithVersions = function() {
-        console.log('Loading draft versions...');
+        console.log('Loading draft versions and previous submissions...');
         const currentUserId = typeof userId !== 'undefined' ? userId : 'TEST_USER';
         console.log('Using userId:', currentUserId);
         
+        // First, try to get the last submitted response
+        google.script.run
+          .withSuccessHandler(function(lastResponse) {
+            console.log('Last submitted response:', lastResponse);
+            
+            // Then get draft versions
+            google.script.run
+              .withSuccessHandler(function(drafts) {
+                console.log('Retrieved drafts:', drafts);
+                
+                // Combine last response with drafts
+                const allVersions = [];
+                
+                // Add last submitted response if it exists
+                if (lastResponse && lastResponse.data) {
+                  allVersions.push({
+                    data: lastResponse.data,
+                    timestamp: lastResponse.timestamp,
+                    progress: 100,
+                    isSubmitted: true,
+                    label: 'Last Submitted'
+                  });
+                }
+                
+                // Add drafts
+                if (drafts && drafts.length > 0) {
+                  drafts.forEach(draft => {
+                    draft.isSubmitted = false;
+                    draft.label = 'Draft';
+                    allVersions.push(draft);
+                  });
+                }
+                
+                if (allVersions.length === 0) {
+                  alert('No saved drafts or previous submissions found');
+                  return;
+                }
+                
+                displayVersionSelector(allVersions);
+              })
+              .withFailureHandler(function(error) {
+                console.error('Error loading drafts:', error);
+                alert('Error loading drafts: ' + error);
+              })
+              .getToolDraftFromProperties(currentUserId, 'tool1');
+          })
+          .withFailureHandler(function(error) {
+            console.error('Error loading last response:', error);
+            // Continue to load drafts even if last response fails
+            loadDraftsOnly();
+          })
+          .getLastToolResponse(currentUserId, 'tool1');
+      }
+      
+      function loadDraftsOnly() {
+        const currentUserId = typeof userId !== 'undefined' ? userId : 'TEST_USER';
         google.script.run
           .withSuccessHandler(function(drafts) {
             console.log('Retrieved drafts:', drafts);
@@ -734,6 +840,17 @@
               return;
             }
             
+            displayVersionSelector(drafts);
+          })
+          .withFailureHandler(function(error) {
+            console.error('Error loading drafts:', error);
+            alert('Error loading drafts: ' + error);
+          })
+          .getToolDraftFromProperties(currentUserId, 'tool1');
+      }
+      
+      function displayVersionSelector(versions) {
+            
             // Create modal for version selection
             const modal = document.createElement('div');
             modal.id = 'draft-modal';
@@ -742,24 +859,35 @@
               <div class="modal-backdrop" onclick="closeDraftModal()"></div>
               <div class="modal-content">
                 <div class="modal-header">
-                  <h2>Select Draft Version</h2>
+                  <h2>Select Version to Load</h2>
                   <button class="close-btn" onclick="closeDraftModal()">×</button>
                 </div>
                 <div class="modal-body">
                   <div class="draft-list">
-                    ${drafts.map((draft, index) => {
-                      const timestamp = draft.timestamp ? new Date(draft.timestamp).toLocaleString() : 'Unknown time';
-                      const progress = draft.progress || 0;
+                    ${versions.map((version, index) => {
+                      const timestamp = version.timestamp ? new Date(version.timestamp).toLocaleString() : 'Unknown time';
+                      const progress = version.progress || 0;
+                      const label = version.label || 'Version';
+                      const bgColor = version.isSubmitted ? 'rgba(76, 175, 80, 0.1)' : 'rgba(173, 145, 104, 0.05)';
+                      const borderColor = version.isSubmitted ? 'rgba(76, 175, 80, 0.3)' : 'rgba(173, 145, 104, 0.2)';
+                      const icon = version.isSubmitted ? '✅' : '📝';
+                      
                       return `
-                        <div class="draft-item card" onclick="selectDraftVersion(${index})" style="cursor: pointer; margin-bottom: 10px; padding: 15px;">
+                        <div class="draft-item card" onclick="selectDraftVersion(${index})" 
+                             style="cursor: pointer; margin-bottom: 10px; padding: 15px; 
+                                    background: ${bgColor}; border: 1px solid ${borderColor};">
                           <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
-                              <strong>Version ${index + 1}</strong>
+                              <strong>${icon} ${label} ${!version.isSubmitted ? (index + 1) : ''}</strong>
                               <div style="font-size: 0.9em; color: var(--muted);">${timestamp}</div>
                             </div>
                             <div style="text-align: right;">
-                              <div style="font-size: 1.2em; font-weight: bold; color: var(--gold);">${progress}%</div>
-                              <div style="font-size: 0.8em; color: var(--muted);">Complete</div>
+                              <div style="font-size: 1.2em; font-weight: bold; color: ${version.isSubmitted ? '#4CAF50' : 'var(--gold)'};">
+                                ${progress}%
+                              </div>
+                              <div style="font-size: 0.8em; color: var(--muted);">
+                                ${version.isSubmitted ? 'Submitted' : 'Draft'}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -772,8 +900,8 @@
             
             document.body.appendChild(modal);
             
-            // Store drafts globally for selection
-            window.availableDrafts = drafts;
+            // Store versions globally for selection
+            window.availableDrafts = versions;
           })
           .withFailureHandler(function(error) {
             console.error('Error loading drafts:', error);
@@ -1571,7 +1699,7 @@
                   Continue to Tool 2
                 </button>
               ` : ''}
-              <button onclick="window.top.location.href = '${window.location.origin}${window.location.pathname}?route=dashboard&client=${userId}'" class="btn-secondary" style="background: var(--card-bg); color: var(--text);">
+              <button onclick="navigateBackToDashboard()" class="btn-secondary" style="background: var(--card-bg); color: var(--text);">
                 Return to Dashboard
               </button>
             </div>

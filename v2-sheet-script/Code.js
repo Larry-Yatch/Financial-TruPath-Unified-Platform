@@ -1020,6 +1020,51 @@ function getCurrentWeek() {
  * @param {Object} data - Data to save
  * @returns {Object} Success status
  */
+function getLastToolResponse(userId, toolId) {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const sheet = ss.getSheetByName('RESPONSES');
+    
+    if (!sheet) {
+      console.log('RESPONSES sheet not found');
+      return null;
+    }
+    
+    const data = sheet.getDataRange().getValues();
+    if (data.length <= 1) return null; // Only headers
+    
+    // Find the last response for this user and tool
+    // Starting from the end (most recent)
+    for (let i = data.length - 1; i >= 1; i--) {
+      const row = data[i];
+      // Assuming columns: Timestamp, SessionId, ClientId, ToolId, Data...
+      if (row[2] === userId && row[3] === toolId) {
+        // Found the last response
+        const headers = data[0];
+        const response = {};
+        
+        // Build response object from row data
+        for (let j = 4; j < headers.length; j++) {
+          if (headers[j] && row[j] !== '') {
+            response[headers[j]] = row[j];
+          }
+        }
+        
+        return {
+          timestamp: row[0],
+          sessionId: row[1],
+          data: response
+        };
+      }
+    }
+    
+    return null; // No response found
+  } catch (error) {
+    console.error('Error getting last tool response:', error);
+    return null;
+  }
+}
+
 function saveUserData(userId, toolId, data) {
   try {
     // console.log(`saveUserData called - userId: ${userId}, toolId: ${toolId}, data fields: ${Object.keys(data).length}`);
