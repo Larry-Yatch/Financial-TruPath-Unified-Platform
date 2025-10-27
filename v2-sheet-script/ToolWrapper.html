@@ -334,7 +334,7 @@ const ToolWrapper = {
             this.showNotification('Saved locally (offline mode)', 'warning');
           }
         })
-        .saveToolDraft(currentUserId, toolId, draft);
+        .saveToolDraft(currentUserId, toolId, data, progress, 'DRAFT');
     } else {
       // Offline mode
       this.updateSaveIndicator('local');
