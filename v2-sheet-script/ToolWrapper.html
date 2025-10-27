@@ -671,32 +671,39 @@ const ToolWrapper = {
     
     // Build dashboard URL with necessary parameters
     const baseUrl = window.location.href.split('?')[0];
-    let dashboardUrl = baseUrl + '?route=dashboard';
-    // Always include client (required)
-    dashboardUrl += '&client=' + clientParam;
-    // Include session if available
-    if (sessionParam) {
-      dashboardUrl += '&session=' + sessionParam;
+    
+    // Create or update hidden form for navigation
+    let navForm = document.getElementById('dashboard-nav-form');
+    if (!navForm) {
+      navForm = document.createElement('form');
+      navForm.id = 'dashboard-nav-form';
+      navForm.method = 'GET';
+      navForm.action = baseUrl;
+      navForm.target = '_top';
+      navForm.style.display = 'none';
+      navForm.innerHTML = `
+        <input type="hidden" name="route" value="dashboard">
+        <input type="hidden" name="client" id="nav-client" value="">
+        <input type="hidden" name="session" id="nav-session" value="">
+      `;
+      document.body.appendChild(navForm);
     } else {
+      navForm.action = baseUrl;
+    }
+    
+    // Update form values
+    document.getElementById('nav-client').value = clientParam;
+    document.getElementById('nav-session').value = sessionParam;
+    
+    if (!sessionParam) {
       console.warn('No session found - dashboard may redirect to login');
     }
     
-    // Helper function to navigate safely
+    // Helper function to navigate using form submission
     const navigateToDashboard = () => {
-      try {
-        // Use window.top to break out of all iframes (fix for white screen issue)
-        // This was the solution from DEBUGGING-GUIDE.md for iframe navigation
-        window.top.location.href = dashboardUrl;
-      } catch (e) {
-        // If cross-origin issue, try regular navigation
-        console.log('Navigation fallback:', e);
-        try {
-          window.location.href = dashboardUrl;
-        } catch (e2) {
-          // Last resort - use location.replace
-          window.location.replace(dashboardUrl);
-        }
-      }
+      console.log('Navigating to dashboard using form submission');
+      console.log('Client:', clientParam, 'Session:', sessionParam);
+      navForm.submit();
     };
     
     if (hasUnsavedChanges) {

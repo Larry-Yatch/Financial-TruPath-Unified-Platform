@@ -583,8 +583,18 @@
             console.log('Progress update:', progress);
           },
           backToDashboard: function() {
-            // Use window.top to break out of iframe (fix for white screen)
-            window.top.location.href = '?route=dashboard';
+            // Use form submission for reliable navigation
+            const baseUrl = window.location.href.split('?')[0];
+            let navForm = document.createElement('form');
+            navForm.method = 'GET';
+            navForm.action = baseUrl;
+            navForm.target = '_top';
+            navForm.style.display = 'none';
+            navForm.innerHTML = `
+              <input type="hidden" name="route" value="dashboard">
+            `;
+            document.body.appendChild(navForm);
+            navForm.submit();
           },
           showNotification: function(msg, type) {
             alert(msg);
@@ -720,52 +730,38 @@
       
       // Navigation function for returning to dashboard after report
       window.navigateBackToDashboard = function() {
-        console.log('Navigating back to dashboard...');
+        console.log('Navigating back to dashboard using form submission...');
         
-        // Try multiple approaches in order
         const baseUrl = window.location.href.split('?')[0];
         const currentUserId = typeof userId !== 'undefined' ? userId : 'TEST001';
         const currentSessionId = typeof sessionId !== 'undefined' ? sessionId : '';
         
-        // Build the dashboard URL
-        let dashboardUrl = baseUrl + '?route=dashboard&client=' + currentUserId;
-        if (currentSessionId) {
-          dashboardUrl += '&session=' + currentSessionId;
+        // Create hidden form for navigation
+        let navForm = document.getElementById('report-dashboard-nav-form');
+        if (!navForm) {
+          navForm = document.createElement('form');
+          navForm.id = 'report-dashboard-nav-form';
+          navForm.method = 'GET';
+          navForm.action = baseUrl;
+          navForm.target = '_top';
+          navForm.style.display = 'none';
+          navForm.innerHTML = `
+            <input type="hidden" name="route" value="dashboard">
+            <input type="hidden" name="client" id="report-nav-client" value="${currentUserId}">
+            <input type="hidden" name="session" id="report-nav-session" value="${currentSessionId}">
+          `;
+          document.body.appendChild(navForm);
+        } else {
+          // Update values if form already exists
+          navForm.action = baseUrl;
+          document.getElementById('report-nav-client').value = currentUserId;
+          document.getElementById('report-nav-session').value = currentSessionId;
         }
         
-        console.log('Dashboard URL:', dashboardUrl);
+        console.log('Dashboard navigation - Client:', currentUserId, 'Session:', currentSessionId);
         
-        // Method 1: Try using google.script.host if available (for Apps Script iframe)
-        if (typeof google !== 'undefined' && google.script && google.script.host) {
-          try {
-            google.script.host.setHeight(1); // Collapse the iframe
-            setTimeout(() => {
-              window.location.assign(dashboardUrl);
-            }, 100);
-            return;
-          } catch (e) {
-            console.log('google.script.host method failed:', e);
-          }
-        }
-        
-        // Method 2: Try location.replace (doesn't add to history)
-        try {
-          window.location.replace(dashboardUrl);
-          return;
-        } catch (e) {
-          console.log('location.replace failed:', e);
-        }
-        
-        // Method 3: Try location.assign
-        try {
-          window.location.assign(dashboardUrl);
-          return;
-        } catch (e) {
-          console.log('location.assign failed:', e);
-        }
-        
-        // Method 4: Last resort - set href directly
-        window.location.href = dashboardUrl;
+        // Submit the form to navigate
+        navForm.submit();
       }
       
       // Draft version selection functions (from TestTool pattern)
