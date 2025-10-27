@@ -583,7 +583,8 @@
             console.log('Progress update:', progress);
           },
           backToDashboard: function() {
-            window.location.href = '?route=dashboard';
+            // Use window.top to break out of iframe (fix for white screen)
+            window.top.location.href = '?route=dashboard';
           },
           showNotification: function(msg, type) {
             alert(msg);
@@ -867,7 +868,7 @@
                 <button onclick="startTool1Form()" class="btn-primary" style="font-size: 16px; padding: 12px 30px;">
                   🚀 Start Assessment
                 </button>
-                <button onclick="ToolWrapper.loadDraft()" class="btn-secondary" id="continue-draft-btn" style="display:none;">
+                <button onclick="loadDraftWithVersions()" class="btn-secondary" id="continue-draft-btn" style="display:none;">
                   📂 Continue Previous
                 </button>
               </div>

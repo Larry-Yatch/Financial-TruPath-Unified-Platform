@@ -661,14 +661,25 @@ const ToolWrapper = {
     
     // Get current URL parameters
     const urlParams = new URLSearchParams(window.location.search);
-    const sessionParam = urlParams.get('session') || '';
-    const clientParam = urlParams.get('client') || (typeof userId !== 'undefined' ? userId : '');
+    // Check multiple possible session sources
+    const sessionParam = urlParams.get('session') || 
+                        (typeof sessionId !== 'undefined' ? sessionId : '') || 
+                        '';
+    const clientParam = urlParams.get('client') || 
+                       (typeof userId !== 'undefined' ? userId : '') || 
+                       'TEST001';
     
     // Build dashboard URL with necessary parameters
     const baseUrl = window.location.href.split('?')[0];
     let dashboardUrl = baseUrl + '?route=dashboard';
-    if (sessionParam) dashboardUrl += '&session=' + sessionParam;
-    if (clientParam) dashboardUrl += '&client=' + clientParam;
+    // Always include client (required)
+    dashboardUrl += '&client=' + clientParam;
+    // Include session if available
+    if (sessionParam) {
+      dashboardUrl += '&session=' + sessionParam;
+    } else {
+      console.warn('No session found - dashboard may redirect to login');
+    }
     
     // Helper function to navigate safely
     const navigateToDashboard = () => {
