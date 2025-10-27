@@ -367,7 +367,11 @@
       // Save as completed response (not draft)
       google.script.run
         .withSuccessHandler(function(result) {
-          if (result.success) {
+          // Handle both null result and result object
+          if (result === null || result === undefined) {
+            alert('Form submitted! Check Google Sheets to confirm.');
+            console.log('Submission completed (no result object returned)');
+          } else if (result.success) {
             alert('Form submitted successfully! Data saved to Google Sheets.');
             console.log('Submission result:', result);
           } else {
