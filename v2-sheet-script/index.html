@@ -902,12 +902,6 @@
             
             // Store versions globally for selection
             window.availableDrafts = versions;
-          })
-          .withFailureHandler(function(error) {
-            console.error('Error loading drafts:', error);
-            alert('Error loading drafts: ' + error);
-          })
-          .getToolDraftFromProperties(currentUserId, 'tool1');
       }
       
       window.closeDraftModal = function() {
