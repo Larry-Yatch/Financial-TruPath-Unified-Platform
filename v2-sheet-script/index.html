@@ -583,8 +583,21 @@
             console.log('Progress update:', progress);
           },
           backToDashboard: function() {
-            // Use form submission for reliable navigation
-            const baseUrl = window.location.href.split('?')[0];
+            // Use form submission with correct Apps Script URL
+            let baseUrl;
+            try {
+              const scriptPattern = /\/macros\/s\/(.*?)\/exec/;
+              const parentUrl = window.parent ? window.parent.location.href : window.location.href;
+              const match = parentUrl.match(scriptPattern);
+              if (match) {
+                baseUrl = 'https://script.google.com/macros/s/' + match[1] + '/exec';
+              } else {
+                baseUrl = 'https://script.google.com/macros/s/AKfycbw-xZaXS8yLYZk2rf-hGsgQvCAMP3ACjmxBeDWyl6WyIrVeBUTEWLmfau4RRLfuETp7/exec';
+              }
+            } catch(e) {
+              baseUrl = 'https://script.google.com/macros/s/AKfycbw-xZaXS8yLYZk2rf-hGsgQvCAMP3ACjmxBeDWyl6WyIrVeBUTEWLmfau4RRLfuETp7/exec';
+            }
+            
             let navForm = document.createElement('form');
             navForm.method = 'GET';
             navForm.action = baseUrl;
@@ -732,9 +745,29 @@
       window.navigateBackToDashboard = function() {
         console.log('Navigating back to dashboard using form submission...');
         
-        const baseUrl = window.location.href.split('?')[0];
+        // Get the correct Apps Script URL, not the iframe URL
+        let baseUrl;
+        try {
+          // Try to get from parent frame URL
+          const scriptPattern = /\/macros\/s\/(.*?)\/exec/;
+          const parentUrl = window.parent ? window.parent.location.href : window.location.href;
+          const match = parentUrl.match(scriptPattern);
+          if (match) {
+            baseUrl = 'https://script.google.com/macros/s/' + match[1] + '/exec';
+          } else {
+            // Hardcoded fallback to current deployment
+            baseUrl = 'https://script.google.com/macros/s/AKfycbw-xZaXS8yLYZk2rf-hGsgQvCAMP3ACjmxBeDWyl6WyIrVeBUTEWLmfau4RRLfuETp7/exec';
+          }
+        } catch(e) {
+          // If we can't access parent, use hardcoded URL
+          baseUrl = 'https://script.google.com/macros/s/AKfycbw-xZaXS8yLYZk2rf-hGsgQvCAMP3ACjmxBeDWyl6WyIrVeBUTEWLmfau4RRLfuETp7/exec';
+        }
+        
         const currentUserId = typeof userId !== 'undefined' ? userId : 'TEST001';
         const currentSessionId = typeof sessionId !== 'undefined' ? sessionId : '';
+        
+        console.log('Dashboard navigation - using base URL:', baseUrl);
+        console.log('Client:', currentUserId, 'Session:', currentSessionId);
         
         // Create hidden form for navigation
         let navForm = document.getElementById('report-dashboard-nav-form');
@@ -757,8 +790,6 @@
           document.getElementById('report-nav-client').value = currentUserId;
           document.getElementById('report-nav-session').value = currentSessionId;
         }
-        
-        console.log('Dashboard navigation - Client:', currentUserId, 'Session:', currentSessionId);
         
         // Submit the form to navigate
         navForm.submit();

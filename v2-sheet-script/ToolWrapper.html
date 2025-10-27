@@ -669,8 +669,29 @@ const ToolWrapper = {
                        (typeof userId !== 'undefined' ? userId : '') || 
                        'TEST001';
     
-    // Build dashboard URL with necessary parameters
-    const baseUrl = window.location.href.split('?')[0];
+    // Get the Apps Script URL from the server or reconstruct it
+    // We need to use the main script URL, not the iframe URL
+    let baseUrl;
+    if (typeof google !== 'undefined' && google.script && google.script.url) {
+      // Try to get URL from Apps Script if available
+      baseUrl = google.script.url.getLocation();
+    } else {
+      // Reconstruct the Apps Script URL from what we know
+      // The script ID is in the parent frame URL
+      const scriptPattern = /\/macros\/s\/(.*?)\/exec/;
+      const parentUrl = window.parent ? window.parent.location.href : window.location.href;
+      const match = parentUrl.match(scriptPattern);
+      if (match) {
+        baseUrl = 'https://script.google.com/macros/s/' + match[1] + '/exec';
+      } else {
+        // Fallback: try to extract from current URL
+        baseUrl = window.location.origin + window.location.pathname;
+        // Replace googleusercontent domain with script.google.com
+        baseUrl = baseUrl.replace(/https:\/\/.*?googleusercontent\.com.*/, 'https://script.google.com/macros/s/AKfycbw-xZaXS8yLYZk2rf-hGsgQvCAMP3ACjmxBeDWyl6WyIrVeBUTEWLmfau4RRLfuETp7/exec');
+      }
+    }
+    
+    console.log('Dashboard navigation - using base URL:', baseUrl);
     
     // Create or update hidden form for navigation
     let navForm = document.getElementById('dashboard-nav-form');
