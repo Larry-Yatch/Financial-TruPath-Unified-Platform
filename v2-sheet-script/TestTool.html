@@ -312,6 +312,7 @@
         <div class="button-group">
           <button type="button" class="btn btn-secondary" onclick="ToolWrapper.loadDraft()">Load Draft</button>
           <button type="button" class="btn btn-primary" onclick="ToolWrapper.saveDraft()">Save Progress</button>
+          <button type="submit" class="btn btn-success" onclick="submitForm(event)">Submit Form</button>
         </div>
         
       </form>
@@ -344,9 +345,45 @@
     });
     
     // Simple validation feedback
+    // Handle form submission
+    window.submitForm = function(e) {
+      e.preventDefault();
+      
+      console.log('Submitting form as completed...');
+      
+      // Collect form data
+      const formData = ToolWrapper.collectToolData();
+      
+      if (!formData || Object.keys(formData).length === 0) {
+        alert('Please fill in the form before submitting.');
+        return;
+      }
+      
+      // Get user info
+      const userId = document.getElementById('userId')?.value || 'TEST_USER';
+      
+      // Save as completed response (not draft)
+      google.script.run
+        .withSuccessHandler(function(result) {
+          if (result.success) {
+            alert('Form submitted successfully! Data saved to Google Sheets.');
+            console.log('Submission result:', result);
+          } else {
+            alert('Error submitting form: ' + (result.error || 'Unknown error'));
+          }
+        })
+        .withFailureHandler(function(error) {
+          alert('Error submitting form: ' + error.toString());
+          console.error('Submission error:', error);
+        })
+        .saveUserData(userId, 'test', formData);
+      
+      return false;
+    };
+    
     document.getElementById('tool-form').addEventListener('submit', function(e) {
       e.preventDefault();
-      alert('Form submitted! (Test mode - no actual submission)');
+      submitForm(e);
     });
     
     // Log form changes for debugging
