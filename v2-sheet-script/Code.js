@@ -88,6 +88,7 @@ function doGet(e) {
         template.currentWeek = getCurrentWeek();
         template.config = CONFIG;
         template.baseUrl = ScriptApp.getService().getUrl();
+        template.baseUrlJs = `<script>window.BASE_URL = '${ScriptApp.getService().getUrl()}';</script>`;
         
         // console.log('Loading Tool 1 for client:', clientId, 'session:', sessionId);
         
