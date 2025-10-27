@@ -673,17 +673,18 @@ const ToolWrapper = {
     // Helper function to navigate safely
     const navigateToDashboard = () => {
       try {
-        // Try to navigate in parent frame first (if in iframe)
-        if (window.parent && window.parent !== window) {
-          window.parent.location.href = dashboardUrl;
-        } else {
-          // Otherwise use regular navigation
-          window.location.href = dashboardUrl;
-        }
+        // Use window.top to break out of all iframes (fix for white screen issue)
+        // This was the solution from DEBUGGING-GUIDE.md for iframe navigation
+        window.top.location.href = dashboardUrl;
       } catch (e) {
-        // If cross-origin issue, use regular navigation
+        // If cross-origin issue, try regular navigation
         console.log('Navigation fallback:', e);
-        window.location.href = dashboardUrl;
+        try {
+          window.location.href = dashboardUrl;
+        } catch (e2) {
+          // Last resort - use location.replace
+          window.location.replace(dashboardUrl);
+        }
       }
     };
     

@@ -717,6 +717,115 @@
         }
       }
       
+      // Draft version selection functions (from TestTool pattern)
+      // MOVED HERE: Must be defined BEFORE loadOrientationTool which uses it
+      window.loadDraftWithVersions = function() {
+        console.log('Loading draft versions...');
+        const currentUserId = typeof userId !== 'undefined' ? userId : 'TEST_USER';
+        console.log('Using userId:', currentUserId);
+        
+        google.script.run
+          .withSuccessHandler(function(drafts) {
+            console.log('Retrieved drafts:', drafts);
+            
+            if (!drafts || drafts.length === 0) {
+              alert('No saved drafts found');
+              return;
+            }
+            
+            // Create modal for version selection
+            const modal = document.createElement('div');
+            modal.id = 'draft-modal';
+            modal.className = 'tool-modal show';
+            modal.innerHTML = `
+              <div class="modal-backdrop" onclick="closeDraftModal()"></div>
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h2>Select Draft Version</h2>
+                  <button class="close-btn" onclick="closeDraftModal()">×</button>
+                </div>
+                <div class="modal-body">
+                  <div class="draft-list">
+                    ${drafts.map((draft, index) => {
+                      const timestamp = draft.timestamp ? new Date(draft.timestamp).toLocaleString() : 'Unknown time';
+                      const progress = draft.progress || 0;
+                      return `
+                        <div class="draft-item card" onclick="selectDraftVersion(${index})" style="cursor: pointer; margin-bottom: 10px; padding: 15px;">
+                          <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                              <strong>Version ${index + 1}</strong>
+                              <div style="font-size: 0.9em; color: var(--muted);">${timestamp}</div>
+                            </div>
+                            <div style="text-align: right;">
+                              <div style="font-size: 1.2em; font-weight: bold; color: var(--gold);">${progress}%</div>
+                              <div style="font-size: 0.8em; color: var(--muted);">Complete</div>
+                            </div>
+                          </div>
+                        </div>
+                      `;
+                    }).join('')}
+                  </div>
+                </div>
+              </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Store drafts globally for selection
+            window.availableDrafts = drafts;
+          })
+          .withFailureHandler(function(error) {
+            console.error('Error loading drafts:', error);
+            alert('Error loading drafts: ' + error);
+          })
+          .getToolDraftFromProperties(currentUserId, 'tool1');
+      }
+      
+      window.closeDraftModal = function() {
+        const modal = document.getElementById('draft-modal');
+        if (modal) {
+          modal.remove();
+        }
+      }
+      
+      window.selectDraftVersion = function(index) {
+        if (!window.availableDrafts || !window.availableDrafts[index]) {
+          console.error('Invalid draft selection');
+          return;
+        }
+        
+        const selectedDraft = window.availableDrafts[index];
+        console.log('Selected draft:', selectedDraft);
+        
+        // Use ToolWrapper to restore the draft
+        if (typeof ToolWrapper !== 'undefined' && ToolWrapper.restoreDraft) {
+          ToolWrapper.restoreDraft(selectedDraft);
+        } else {
+          // Fallback: manually restore form data
+          if (selectedDraft.data) {
+            Object.keys(selectedDraft.data).forEach(key => {
+              const element = document.querySelector(`[name="${key}"]`);
+              if (element) {
+                if (element.type === 'checkbox' || element.type === 'radio') {
+                  element.checked = element.value === selectedDraft.data[key];
+                } else {
+                  element.value = selectedDraft.data[key];
+                }
+              }
+            });
+          }
+        }
+        
+        closeDraftModal();
+        
+        // Show notification
+        const notification = document.createElement('div');
+        notification.className = 'notification notification-success show';
+        notification.innerHTML = '<div class="notification-content">✅ Draft loaded successfully</div>';
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+      }
+      
       // Load Comprehensive Orientation Tool (25 Questions)
       window.loadOrientationTool = function() {
         // Check if ToolWrapper is available
@@ -1184,114 +1293,6 @@
         return saveOrientationData(event);
       }
       
-      // Draft version selection functions (from TestTool pattern)
-      window.loadDraftWithVersions = function() {
-        console.log('Loading draft versions...');
-        const currentUserId = typeof userId !== 'undefined' ? userId : 'TEST_USER';
-        console.log('Using userId:', currentUserId);
-        
-        google.script.run
-          .withSuccessHandler(function(drafts) {
-            console.log('Retrieved drafts:', drafts);
-            
-            if (!drafts || drafts.length === 0) {
-              alert('No saved drafts found');
-              return;
-            }
-            
-            // Create modal for version selection
-            const modal = document.createElement('div');
-            modal.id = 'draft-modal';
-            modal.className = 'tool-modal show';
-            modal.innerHTML = `
-              <div class="modal-backdrop" onclick="closeDraftModal()"></div>
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h2>Select Draft Version</h2>
-                  <button class="close-btn" onclick="closeDraftModal()">×</button>
-                </div>
-                <div class="modal-body">
-                  <div class="draft-list">
-                    ${drafts.map((draft, index) => {
-                      const timestamp = draft.timestamp ? new Date(draft.timestamp).toLocaleString() : 'Unknown time';
-                      const progress = draft.progress || 0;
-                      return `
-                        <div class="draft-item card" onclick="selectDraftVersion(${index})" style="cursor: pointer; margin-bottom: 10px; padding: 15px;">
-                          <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                              <strong>Version ${index + 1}</strong>
-                              <div style="font-size: 0.9em; color: var(--muted);">${timestamp}</div>
-                            </div>
-                            <div style="text-align: right;">
-                              <div style="font-size: 1.2em; font-weight: bold; color: var(--gold);">${progress}%</div>
-                              <div style="font-size: 0.8em; color: var(--muted);">Complete</div>
-                            </div>
-                          </div>
-                        </div>
-                      `;
-                    }).join('')}
-                  </div>
-                </div>
-              </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            // Store drafts globally for selection
-            window.availableDrafts = drafts;
-          })
-          .withFailureHandler(function(error) {
-            console.error('Error loading drafts:', error);
-            alert('Error loading drafts: ' + error);
-          })
-          .getToolDraftFromProperties(currentUserId, 'tool1');
-      }
-      
-      window.closeDraftModal = function() {
-        const modal = document.getElementById('draft-modal');
-        if (modal) {
-          modal.remove();
-        }
-      }
-      
-      window.selectDraftVersion = function(index) {
-        if (!window.availableDrafts || !window.availableDrafts[index]) {
-          console.error('Invalid draft selection');
-          return;
-        }
-        
-        const selectedDraft = window.availableDrafts[index];
-        console.log('Selected draft:', selectedDraft);
-        
-        // Use ToolWrapper to restore the draft
-        if (typeof ToolWrapper !== 'undefined' && ToolWrapper.restoreDraft) {
-          ToolWrapper.restoreDraft(selectedDraft);
-        } else {
-          // Fallback: manually restore form data
-          if (selectedDraft.data) {
-            Object.keys(selectedDraft.data).forEach(key => {
-              const element = document.querySelector(`[name="${key}"]`);
-              if (element) {
-                if (element.type === 'checkbox' || element.type === 'radio') {
-                  element.checked = element.value === selectedDraft.data[key];
-                } else {
-                  element.value = selectedDraft.data[key];
-                }
-              }
-            });
-          }
-        }
-        
-        closeDraftModal();
-        
-        // Show notification
-        const notification = document.createElement('div');
-        notification.className = 'notification notification-success show';
-        notification.innerHTML = '<div class="notification-content">✅ Draft loaded successfully</div>';
-        document.body.appendChild(notification);
-        setTimeout(() => notification.remove(), 3000);
-      }
-      
       // Save Orientation Data and Generate Insights Report
       window.saveOrientationData = function(event) {
         event.preventDefault();
@@ -1569,7 +1570,7 @@
                   Continue to Tool 2
                 </button>
               ` : ''}
-              <button onclick="window.location.href = '${window.location.origin}${window.location.pathname}?route=dashboard&client=${userId}'" class="btn-secondary" style="background: var(--card-bg); color: var(--text);">
+              <button onclick="window.top.location.href = '${window.location.origin}${window.location.pathname}?route=dashboard&client=${userId}'" class="btn-secondary" style="background: var(--card-bg); color: var(--text);">
                 Return to Dashboard
               </button>
             </div>

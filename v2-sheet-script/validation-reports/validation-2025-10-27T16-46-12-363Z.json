@@ -1,0 +1,48 @@
+{
+  "timestamp": "2025-10-27T16:46:12.364Z",
+  "changes": {
+    "v2-sheet-script/DEPLOYMENT-PROCESS.md": {
+      "status": "added",
+      "staged": true
+    },
+    ".daddy/daddy-validation.db": {
+      "status": "modified",
+      "staged": false
+    },
+    "v2-sheet-script/validation-reports/validation-2025-10-27T16-42-07-002Z.json": {
+      "status": "new",
+      "staged": false
+    }
+  },
+  "issues": [
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    }
+  ],
+  "warnings": [
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete",
+      "message": "Found 8 TODO/FIXME markers",
+      "line": 12
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-27T16-42-07-002Z.json",
+      "type": "incomplete",
+      "message": "Found 2 TODO/FIXME markers",
+      "line": 119
+    }
+  ],
+  "suggestions": [],
+  "summary": {
+    "filesChanged": 3,
+    "criticalIssues": 0,
+    "totalIssues": 1,
+    "totalWarnings": 2,
+    "totalSuggestions": 0,
+    "passed": false
+  }
+}
