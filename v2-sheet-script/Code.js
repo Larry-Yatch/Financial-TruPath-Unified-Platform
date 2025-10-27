@@ -1082,8 +1082,10 @@ function saveToolDraft(userId, toolId, draftData, progress, status) {
     const enrichedData = {
       ...draftData,
       progress: progress || 0,
-      status: status || 'DRAFT'
+      status: status || 'DRAFT',
+      savedAt: new Date().toISOString()
     };
+    // Call the PropertiesService version (3 params), not the Sheets version (5 params)
     return DataService.saveToolDraft(userId, toolId, enrichedData);
   } catch (error) {
     // console.error('Error saving draft:', error);
