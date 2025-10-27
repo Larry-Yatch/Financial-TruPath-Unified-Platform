@@ -1131,10 +1131,11 @@ function saveUserData(userId, toolId, data) {
  * @param {Object} draftData - Draft data to save
  * @param {number} progress - Progress percentage
  * @param {string} status - Status (DRAFT, etc.)
+ * @param {string} saveType - 'AUTO' (autosave) or 'MANUAL' (user-triggered)
  */
-function saveToolDraft(userId, toolId, draftData, progress, status) {
+function saveToolDraft(userId, toolId, draftData, progress, status, saveType = 'AUTO') {
   try {
-    // console.log(`saveToolDraft called - userId: ${userId}, toolId: ${toolId}, progress: ${progress}, status: ${status}`);
+    // console.log(`saveToolDraft called - userId: ${userId}, toolId: ${toolId}, progress: ${progress}, status: ${status}, saveType: ${saveType}`);
     // Include progress and status in the draft data
     const enrichedData = {
       ...draftData,
@@ -1142,8 +1143,8 @@ function saveToolDraft(userId, toolId, draftData, progress, status) {
       status: status || 'DRAFT',
       savedAt: new Date().toISOString()
     };
-    // Call the PropertiesService version for draft versioning
-    return DataService.saveToolDraftToProperties(userId, toolId, enrichedData);
+    // Call the PropertiesService version for draft versioning with saveType
+    return DataService.saveToolDraftToProperties(userId, toolId, enrichedData, saveType);
   } catch (error) {
     // console.error('Error saving draft:', error);
     return {
@@ -1177,10 +1178,27 @@ function getToolDraft(userId, toolId, getAllVersions = false) {
 function getAllDraftVersions(userId, toolId) {
   try {
     // console.log(`getAllDraftVersions called - userId: ${userId}, toolId: ${toolId}`);
-    return DataService.getToolDraftFromProperties(userId, toolId, true);
+    const result = DataService.getToolDraftFromProperties(userId, toolId, true);
+    
+    // Convert new format to legacy format for backward compatibility
+    return {
+      versions: result.manualVersions || [],
+      count: result.manualCount || 0,
+      latest: result.latest || null,
+      manualVersions: result.manualVersions || [],
+      manualCount: result.manualCount || 0,
+      hasData: result.hasData || false
+    };
   } catch (error) {
     // console.error('Error getting draft versions:', error);
-    return { versions: [], count: 0, latest: null };
+    return { 
+      versions: [], 
+      count: 0, 
+      latest: null, 
+      manualVersions: [], 
+      manualCount: 0, 
+      hasData: false 
+    };
   }
 }
 
@@ -1998,5 +2016,27 @@ function testDataSaving() {
     }
   } catch (error) {
     SpreadsheetApp.getUi().alert('❌ Error: ' + error.toString());
+  }
+}
+
+/**
+ * Clear all draft data for a specific user (for testing)
+ */
+function clearUserDrafts(userId = 'TEST002') {
+  try {
+    const props = PropertiesService.getScriptProperties();
+    const draftKey = `draft_${userId}_tool1`;
+    const versionsKey = `draft_versions_${userId}_tool1`;
+    
+    props.deleteProperty(draftKey);
+    props.deleteProperty(versionsKey);
+    
+    console.log(`Cleared all drafts for user: ${userId}`);
+    SpreadsheetApp.getUi().alert(`✅ Cleared all drafts for user: ${userId}`);
+    return `✅ Cleared all drafts for user: ${userId}`;
+  } catch (error) {
+    console.error('Error clearing drafts:', error);
+    SpreadsheetApp.getUi().alert(`❌ Error: ${error.toString()}`);
+    return `❌ Error: ${error.toString()}`;
   }
 }

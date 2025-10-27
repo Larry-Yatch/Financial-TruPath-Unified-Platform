@@ -24,7 +24,7 @@ const ToolWrapper = {
       sectionCount: 5,
       canSaveDraft: true,
       hasReport: true,
-      navigation: ['save', 'load', 'dashboard', 'help'], // Removed 'print' - only show on report
+      navigation: ['load', 'dashboard', 'help', 'logout'], // Removed 'save' from landing - only show on form
       autoSaveInterval: 120000 // 2 minutes
     },
     'pattern2': { // Tool 2: Financial Clarity
@@ -153,10 +153,10 @@ const ToolWrapper = {
       </div>
     `;
     
-    // Set up auto-save after rendering
+    // Set up auto-save only after form is loaded, not on landing page
     setTimeout(() => {
-      this.initAutoSave(config.autoSaveInterval);
       this.checkForExistingDraft(toolId);
+      // Don't start autosave until form is actually shown
     }, 100);
     
     return wrapperHtml;
@@ -187,6 +187,10 @@ const ToolWrapper = {
                  <span class="nav-icon">📊</span>
                  <span class="nav-text">Export</span>
                </button>`,
+      logout: `<button onclick="ToolWrapper.logout()" class="btn-nav" title="Sign out">
+                 <span class="nav-icon">🚪</span>
+                 <span class="nav-text">Logout</span>
+               </button>`,
       help: `<button onclick="ToolWrapper.showHelp()" class="btn-nav" title="Get help">
                <span class="nav-icon">❓</span>
                <span class="nav-text">Help</span>
@@ -203,7 +207,7 @@ const ToolWrapper = {
           ${navItems.slice(0, 3).map(item => buttons[item] || '').join('')}
         </div>
         <div class="nav-center">
-          <div class="auto-save-indicator" id="auto-save-status">
+          <div class="auto-save-indicator" id="auto-save-status" style="display: none;">
             <span class="save-dot" id="save-dot"></span>
             <span class="save-text" id="save-text">Auto-save: On</span>
           </div>
@@ -282,6 +286,14 @@ const ToolWrapper = {
     const data = this.collectToolData(pattern);
     const progress = this.calculateProgress(pattern);
     
+    // Check if form has any meaningful data before saving
+    const hasData = this.hasFormData(data);
+    if (!hasData && isAutoSave) {
+      console.log('Skipping autosave - no form data entered yet');
+      this.savingInProgress = false;
+      return;
+    }
+    
     // Create draft object with all the data
     const draft = {
       toolId,
@@ -334,7 +346,7 @@ const ToolWrapper = {
             this.showNotification('Saved locally (offline mode)', 'warning');
           }
         })
-        .saveToolDraft(currentUserId, toolId, data, progress, 'DRAFT');
+        .saveToolDraft(currentUserId, toolId, data, progress, 'DRAFT', isAutoSave ? 'AUTO' : 'MANUAL');
     } else {
       // Offline mode
       this.updateSaveIndicator('local');
@@ -607,7 +619,7 @@ const ToolWrapper = {
         this.updateSaveIndicator('pending');
         saveTimeout = setTimeout(() => {
           this.saveDraft(true);
-        }, 5000); // 5 second debounce
+        }, 10000); // 10 second debounce (reduced frequency)
       }
     });
     
@@ -650,6 +662,43 @@ const ToolWrapper = {
         dot.className = 'save-dot';
         text.textContent = 'Auto-save: On';
     }
+  },
+  
+  /**
+   * Logout function - redirects to login page
+   */
+  logout() {
+    if (confirm('Are you sure you want to sign out?')) {
+      // Use server-provided baseUrl as JavaScript variable
+      const baseUrl = window.BASE_URL || 'https://script.google.com/macros/s/AKfycbwQJSoDlw_FMqikLTlwrYN6iD1_24sjsPajpC7_oqpSAuWXDvgOTJdR74evLF0bRsbd/exec';
+      
+      // Navigate to login page
+      window.top.location.href = baseUrl + '?route=login';
+    }
+  },
+  
+  /**
+   * Check if form has meaningful data (not just empty fields)
+   */
+  hasFormData(data) {
+    if (!data || typeof data !== 'object') return false;
+    
+    // Check if any field has non-empty, meaningful content
+    const meaningfulFields = Object.entries(data).filter(([key, value]) => {
+      // Skip empty, null, undefined values
+      if (!value || value === '' || value === null || value === undefined) return false;
+      
+      // Skip default/placeholder values that indicate no real input
+      if (value === 'Select option' || value === 'Choose...' || value === '0') return false;
+      
+      // Skip fields that are just numbers representing no selection
+      if (typeof value === 'string' && value.trim() === '') return false;
+      
+      return true;
+    });
+    
+    console.log('Form data check:', { totalFields: Object.keys(data).length, meaningfulFields: meaningfulFields.length });
+    return meaningfulFields.length > 0;
   },
   
   /**

@@ -287,61 +287,94 @@ const DataService = {
   
   /**
    * Save tool draft (for auto-save and manual save)
-   * Maintains up to 3 versions per tool per student
+   * AUTO saves overwrite latest only, MANUAL saves create versions (up to 3)
    * @param {string} clientId - Student's unique ID
    * @param {string} toolId - Tool identifier
    * @param {Object} draftData - Draft data to save
+   * @param {string} saveType - 'AUTO' (overwrites latest) or 'MANUAL' (creates version)
    * @returns {Object} Result with success status
    */
-  saveToolDraftToProperties(clientId, toolId, draftData) {
+  saveToolDraftToProperties(clientId, toolId, draftData, saveType = 'AUTO') {
     try {
       const userProperties = PropertiesService.getUserProperties();
-      const versionsKey = `drafts_${clientId}_${toolId}_versions`;
+      const latestKey = `draft_${clientId}_${toolId}_latest`;
+      const manualVersionsKey = `drafts_${clientId}_${toolId}_manual_versions`;
       
-      // Get existing versions or initialize empty array
-      let versions = [];
-      const existingVersions = userProperties.getProperty(versionsKey);
-      if (existingVersions) {
-        try {
-          versions = JSON.parse(existingVersions);
-        } catch (e) {
-          console.warn('Error parsing existing versions, starting fresh');
-          versions = [];
-        }
-      }
-      
-      // Create new draft with unique ID
+      // Create base draft object
       const draft = {
         id: Utilities.getUuid(),
         data: draftData,
         timestamp: new Date().toISOString(),
         clientId: clientId,
         toolId: toolId,
-        version: versions.length + 1
+        saveType: saveType
       };
       
-      // Add new draft to beginning of array
-      versions.unshift(draft);
-      
-      // Keep only the 3 most recent versions
-      if (versions.length > 3) {
-        versions = versions.slice(0, 3);
+      if (saveType === 'AUTO') {
+        // AUTO saves: Just overwrite the latest draft, no versioning
+        userProperties.setProperty(latestKey, JSON.stringify(draft));
+        
+        return {
+          success: true,
+          message: 'Auto-draft saved successfully',
+          timestamp: draft.timestamp,
+          saveType: 'AUTO',
+          versionCount: 0
+        };
+        
+      } else if (saveType === 'MANUAL') {
+        // MANUAL saves: Create version AND update latest
+        
+        // Get existing manual versions or initialize empty array
+        let manualVersions = [];
+        const existingVersions = userProperties.getProperty(manualVersionsKey);
+        if (existingVersions) {
+          try {
+            manualVersions = JSON.parse(existingVersions);
+          } catch (e) {
+            console.warn('Error parsing existing manual versions, starting fresh');
+            manualVersions = [];
+          }
+        }
+        
+        // Get global version counter for this user/tool
+        const versionCounterKey = `draft_counter_${clientId}_${toolId}`;
+        let versionCounter = parseInt(userProperties.getProperty(versionCounterKey) || '0');
+        versionCounter++;
+        
+        // Add version number for manual saves
+        draft.version = versionCounter;
+        draft.label = `Manual Save - ${Math.round(draftData.progress || 0)}% Complete`;
+        
+        // Update version counter
+        userProperties.setProperty(versionCounterKey, versionCounter.toString());
+        
+        // Add to beginning of manual versions array
+        manualVersions.unshift(draft);
+        
+        // Keep only the 3 most recent manual versions
+        if (manualVersions.length > 3) {
+          manualVersions = manualVersions.slice(0, 3);
+        }
+        
+        // Save the manual versions array
+        userProperties.setProperty(manualVersionsKey, JSON.stringify(manualVersions));
+        
+        // Also update the latest draft
+        userProperties.setProperty(latestKey, JSON.stringify(draft));
+        
+        return {
+          success: true,
+          message: 'Manual save created successfully',
+          timestamp: draft.timestamp,
+          saveType: 'MANUAL',
+          versionCount: manualVersions.length,
+          version: draft.version,
+          label: draft.label
+        };
+      } else {
+        throw new Error(`Invalid saveType: ${saveType}. Must be 'AUTO' or 'MANUAL'`);
       }
-      
-      // Save the versions array
-      userProperties.setProperty(versionsKey, JSON.stringify(versions));
-      
-      // Also save the latest as the "current" draft for quick access
-      const currentKey = `draft_${clientId}_${toolId}_current`;
-      userProperties.setProperty(currentKey, JSON.stringify(draft));
-      
-      return {
-        success: true,
-        message: 'Draft saved successfully',
-        timestamp: draft.timestamp,
-        versionCount: versions.length,
-        version: draft.version
-      };
     } catch (error) {
       console.error('Error saving draft:', error);
       return {
@@ -352,57 +385,68 @@ const DataService = {
   },
   
   /**
-   * Get tool draft(s)
+   * Get tool draft(s) - updated for new versioning strategy
    * @param {string} clientId - Student's unique ID
    * @param {string} toolId - Tool identifier
-   * @param {boolean} getAllVersions - If true, returns all versions (up to 3)
-   * @returns {Object} Draft data or array of drafts or null
+   * @param {boolean} getAllVersions - If true, returns manual versions + latest
+   * @returns {Object} Draft data or object with versions info
    */
   getToolDraftFromProperties(clientId, toolId, getAllVersions = false) {
     try {
       const userProperties = PropertiesService.getUserProperties();
+      const latestKey = `draft_${clientId}_${toolId}_latest`;
+      const manualVersionsKey = `drafts_${clientId}_${toolId}_manual_versions`;
       
       if (getAllVersions) {
-        // Return all versions (up to 3)
-        const versionsKey = `drafts_${clientId}_${toolId}_versions`;
-        const versionsJson = userProperties.getProperty(versionsKey);
+        // Return manual versions + latest
+        const manualVersionsJson = userProperties.getProperty(manualVersionsKey);
+        const latestJson = userProperties.getProperty(latestKey);
         
-        if (versionsJson) {
-          const versions = JSON.parse(versionsJson);
-          return {
-            versions: versions,
-            count: versions.length,
-            latest: versions[0] || null
-          };
+        let manualVersions = [];
+        if (manualVersionsJson) {
+          try {
+            manualVersions = JSON.parse(manualVersionsJson);
+          } catch (e) {
+            console.warn('Error parsing manual versions');
+          }
         }
+        
+        let latest = null;
+        if (latestJson) {
+          try {
+            latest = JSON.parse(latestJson);
+          } catch (e) {
+            console.warn('Error parsing latest draft');
+          }
+        }
+        
         return {
-          versions: [],
-          count: 0,
-          latest: null
+          manualVersions: manualVersions,
+          manualCount: manualVersions.length,
+          latest: latest,
+          hasData: (manualVersions.length > 0 || latest !== null)
         };
       } else {
-        // Return just the current/latest draft
-        const currentKey = `draft_${clientId}_${toolId}_current`;
-        const currentJson = userProperties.getProperty(currentKey);
+        // Return just the latest draft (for backward compatibility, wrap in array format)
+        const latestJson = userProperties.getProperty(latestKey);
         
-        if (currentJson) {
-          return JSON.parse(currentJson);
+        if (latestJson) {
+          try {
+            const latest = JSON.parse(latestJson);
+            // Return as array for backward compatibility with existing code
+            return [latest];
+          } catch (e) {
+            console.warn('Error parsing latest draft');
+            return [];
+          }
         }
         
-        // Fallback to checking versions array
-        const versionsKey = `drafts_${clientId}_${toolId}_versions`;
-        const versionsJson = userProperties.getProperty(versionsKey);
-        
-        if (versionsJson) {
-          const versions = JSON.parse(versionsJson);
-          return versions[0] || null;
-        }
-        
-        return null;
+        // No latest draft found - return empty array for backward compatibility
+        return [];
       }
     } catch (error) {
       console.error('Error getting draft:', error);
-      return null;
+      return []; // Return empty array for backward compatibility
     }
   },
   
