@@ -1085,8 +1085,8 @@ function saveToolDraft(userId, toolId, draftData, progress, status) {
       status: status || 'DRAFT',
       savedAt: new Date().toISOString()
     };
-    // Call the PropertiesService version (3 params), not the Sheets version (5 params)
-    return DataService.saveToolDraft(userId, toolId, enrichedData);
+    // Call the PropertiesService version for draft versioning
+    return DataService.saveToolDraftToProperties(userId, toolId, enrichedData);
   } catch (error) {
     // console.error('Error saving draft:', error);
     return {
@@ -1105,7 +1105,7 @@ function saveToolDraft(userId, toolId, draftData, progress, status) {
 function getToolDraft(userId, toolId, getAllVersions = false) {
   try {
     // console.log(`getToolDraft called - userId: ${userId}, toolId: ${toolId}, getAllVersions: ${getAllVersions}`);
-    return DataService.getToolDraft(userId, toolId, getAllVersions);
+    return DataService.getToolDraftFromProperties(userId, toolId, getAllVersions);
   } catch (error) {
     // console.error('Error getting draft:', error);
     return null;
@@ -1120,7 +1120,7 @@ function getToolDraft(userId, toolId, getAllVersions = false) {
 function getAllDraftVersions(userId, toolId) {
   try {
     // console.log(`getAllDraftVersions called - userId: ${userId}, toolId: ${toolId}`);
-    return DataService.getToolDraft(userId, toolId, true);
+    return DataService.getToolDraftFromProperties(userId, toolId, true);
   } catch (error) {
     // console.error('Error getting draft versions:', error);
     return { versions: [], count: 0, latest: null };

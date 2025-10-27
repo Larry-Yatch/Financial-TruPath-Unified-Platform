@@ -36,7 +36,7 @@ const DataService = {
    * @param {string} status - 'DRAFT' or 'COMPLETED'
    * @returns {Object} Result with success status
    */
-  saveToolDraft(clientId, toolId, data, progress, status = 'DRAFT') {
+  saveToolDraftToSheet(clientId, toolId, data, progress, status = 'DRAFT') {
     try {
       if (!clientId || !toolId) {
         throw new Error(`Invalid parameters: clientId=${clientId}, toolId=${toolId}`);
@@ -101,7 +101,7 @@ const DataService = {
    * @param {string} toolId - Tool identifier
    * @returns {Object|null} Draft data or null
    */
-  getToolDraft(clientId, toolId) {
+  getToolDraftFromSheet(clientId, toolId) {
     try {
       const ss = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
       const responseSheet = ss.getSheetByName(CONFIG.SHEETS.RESPONSES);
@@ -280,7 +280,7 @@ const DataService = {
    * @param {Object} draftData - Draft data to save
    * @returns {Object} Result with success status
    */
-  saveToolDraft(clientId, toolId, draftData) {
+  saveToolDraftToProperties(clientId, toolId, draftData) {
     try {
       const userProperties = PropertiesService.getUserProperties();
       const versionsKey = `drafts_${clientId}_${toolId}_versions`;
@@ -345,7 +345,7 @@ const DataService = {
    * @param {boolean} getAllVersions - If true, returns all versions (up to 3)
    * @returns {Object} Draft data or array of drafts or null
    */
-  getToolDraft(clientId, toolId, getAllVersions = false) {
+  getToolDraftFromProperties(clientId, toolId, getAllVersions = false) {
     try {
       const userProperties = PropertiesService.getUserProperties();
       
@@ -428,7 +428,7 @@ const DataService = {
   getAllDraftVersions(clientId, toolId) {
     try {
       // Use the existing getToolDraft function with getAllVersions=true
-      return this.getToolDraft(clientId, toolId, true);
+      return this.getToolDraftFromProperties(clientId, toolId, true);
     } catch (error) {
       console.error('Error getting all draft versions:', error);
       return {
