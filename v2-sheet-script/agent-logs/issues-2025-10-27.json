@@ -30014,5 +30014,3141 @@
         "appsscript.json"
       ]
     }
+  },
+  {
+    "timestamp": "2025-10-27T04:16:39.082Z",
+    "issueCount": 51,
+    "issues": [
+      {
+        "type": "IFRAME_NAVIGATION",
+        "severity": "HIGH",
+        "message": "Found 1 iframe navigation issues (use window.top.location instead)",
+        "lines": [
+          416
+        ],
+        "autoFix": true,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sessionId' (previously declared as const)",
+        "line": 59,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 60,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const validation' (previously declared as const)",
+        "line": 65,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const template' (previously declared as const)",
+        "line": 85,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 384,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 482,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const dashboardUrl' (previously declared as const)",
+        "line": 483,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 537,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 803,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1372,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1406,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const firstName' (previously declared as const)",
+        "line": 1423,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const lastName' (previously declared as const)",
+        "line": 1424,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 1425,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const message' (previously declared as let)",
+        "line": 1453,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ui' (previously declared as const)",
+        "line": 1500,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const url' (previously declared as const)",
+        "line": 1513,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const message' (previously declared as let)",
+        "line": 1514,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1528,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1571,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1572,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1586,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1587,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const url' (previously declared as const)",
+        "line": 1860,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const result' (previously declared as const)",
+        "line": 1933,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n        .withSuccessHandler(func...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n        .withSuccessHandler(func...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n              .withSuccessHandle...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "CONSOLE_LOGS",
+        "severity": "LOW",
+        "message": "Found 26 console statements in production code",
+        "lines": [
+          14,
+          30,
+          31,
+          91,
+          104,
+          428,
+          500,
+          514,
+          1025,
+          1030,
+          1055,
+          1080,
+          1089,
+          1105,
+          1108,
+          1120,
+          1123,
+          1135,
+          1139,
+          1152,
+          1161,
+          1164,
+          1178,
+          1225,
+          1259,
+          1848
+        ],
+        "autoFix": true,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "UNSAFE_PARAMETER_ACCESS",
+        "severity": "MEDIUM",
+        "message": "Accessing e.parameter without null check",
+        "hint": "Add: if (e.parameter && e.parameter.value)",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #1: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "Call #2: Missing withFailureHandler",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add .withFailureHandler(function(error) { ... })",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #2: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #3: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(ses...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #4: No function call at the end",
+        "snippet": "google.script.run.withSuccessHandler(showResult).w...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #5: No function call at the end",
+        "snippet": "google.script.run.withSuccessHandler(showResult).w...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #6: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(showResult) ...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #1: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #1: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #2: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #2: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #3: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #3: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "EXECUTION_RISK",
+        "category": "loops",
+        "message": "Loop contains SpreadsheetApp call - potential timeout risk",
+        "count": 1,
+        "severity": "HIGH",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "EXECUTION_RISK",
+        "category": "recursion",
+        "message": "Possible recursion detected - risk of stack overflow",
+        "count": 7,
+        "severity": "MEDIUM",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "SHEETS_IN_LOOP",
+        "message": "reads operations inside loops - use batch operations instead",
+        "severity": "HIGH",
+        "count": 1,
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "SHEETS_IN_LOOP",
+        "message": "writes operations inside loops - use batch operations instead",
+        "severity": "HIGH",
+        "count": 1,
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "INEFFICIENT_SHEETS",
+        "message": "Using getCell/getValue in loops - use getValues() for batch reads",
+        "severity": "HIGH",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "MISSING_FLUSH",
+        "message": "Multiple setValue without flush() - changes may not persist immediately",
+        "severity": "LOW",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "OPTIMIZATIONS_AVAILABLE",
+        "message": "2 optimization opportunities found",
+        "severity": "INFO",
+        "details": [
+          {
+            "type": "ADD_CACHING",
+            "message": "Consider using CacheService for frequently accessed data",
+            "impact": "HIGH"
+          },
+          {
+            "type": "ADD_LOCK_SERVICE",
+            "message": "Consider LockService for concurrent write operations",
+            "impact": "MEDIUM"
+          }
+        ],
+        "agent": "QuotaKeeper"
+      }
+    ],
+    "config": {
+      "codeFile": "Code.js",
+      "monitoring": {
+        "enabled": true,
+        "interval": 30000,
+        "autoFix": false
+      },
+      "agents": {
+        "gasDoctor": {
+          "enabled": true,
+          "autoFix": false
+        },
+        "deployGuardian": {
+          "enabled": true
+        },
+        "sheetsMonitor": {
+          "enabled": true
+        },
+        "callbackSurgeon": {
+          "enabled": true,
+          "autoFix": false
+        },
+        "quotaKeeper": {
+          "enabled": true
+        }
+      },
+      "alerts": {
+        "console": true,
+        "file": true,
+        "sound": false
+      },
+      "watchFiles": [
+        "Code.js",
+        "appsscript.json"
+      ]
+    }
+  },
+  {
+    "timestamp": "2025-10-27T04:17:09.083Z",
+    "issueCount": 51,
+    "issues": [
+      {
+        "type": "IFRAME_NAVIGATION",
+        "severity": "HIGH",
+        "message": "Found 1 iframe navigation issues (use window.top.location instead)",
+        "lines": [
+          416
+        ],
+        "autoFix": true,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sessionId' (previously declared as const)",
+        "line": 59,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 60,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const validation' (previously declared as const)",
+        "line": 65,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const template' (previously declared as const)",
+        "line": 85,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 384,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 482,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const dashboardUrl' (previously declared as const)",
+        "line": 483,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 537,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 803,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1372,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1406,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const firstName' (previously declared as const)",
+        "line": 1423,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const lastName' (previously declared as const)",
+        "line": 1424,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 1425,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const message' (previously declared as let)",
+        "line": 1453,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ui' (previously declared as const)",
+        "line": 1500,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const url' (previously declared as const)",
+        "line": 1513,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const message' (previously declared as let)",
+        "line": 1514,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1528,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1571,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1572,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1586,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1587,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const url' (previously declared as const)",
+        "line": 1860,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const result' (previously declared as const)",
+        "line": 1933,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n        .withSuccessHandler(func...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n        .withSuccessHandler(func...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n              .withSuccessHandle...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "CONSOLE_LOGS",
+        "severity": "LOW",
+        "message": "Found 26 console statements in production code",
+        "lines": [
+          14,
+          30,
+          31,
+          91,
+          104,
+          428,
+          500,
+          514,
+          1025,
+          1030,
+          1055,
+          1080,
+          1089,
+          1105,
+          1108,
+          1120,
+          1123,
+          1135,
+          1139,
+          1152,
+          1161,
+          1164,
+          1178,
+          1225,
+          1259,
+          1848
+        ],
+        "autoFix": true,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "UNSAFE_PARAMETER_ACCESS",
+        "severity": "MEDIUM",
+        "message": "Accessing e.parameter without null check",
+        "hint": "Add: if (e.parameter && e.parameter.value)",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #1: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "Call #2: Missing withFailureHandler",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add .withFailureHandler(function(error) { ... })",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #2: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #3: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(ses...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #4: No function call at the end",
+        "snippet": "google.script.run.withSuccessHandler(showResult).w...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #5: No function call at the end",
+        "snippet": "google.script.run.withSuccessHandler(showResult).w...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #6: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(showResult) ...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #1: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #1: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #2: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #2: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #3: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #3: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "EXECUTION_RISK",
+        "category": "loops",
+        "message": "Loop contains SpreadsheetApp call - potential timeout risk",
+        "count": 1,
+        "severity": "HIGH",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "EXECUTION_RISK",
+        "category": "recursion",
+        "message": "Possible recursion detected - risk of stack overflow",
+        "count": 7,
+        "severity": "MEDIUM",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "SHEETS_IN_LOOP",
+        "message": "reads operations inside loops - use batch operations instead",
+        "severity": "HIGH",
+        "count": 1,
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "SHEETS_IN_LOOP",
+        "message": "writes operations inside loops - use batch operations instead",
+        "severity": "HIGH",
+        "count": 1,
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "INEFFICIENT_SHEETS",
+        "message": "Using getCell/getValue in loops - use getValues() for batch reads",
+        "severity": "HIGH",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "MISSING_FLUSH",
+        "message": "Multiple setValue without flush() - changes may not persist immediately",
+        "severity": "LOW",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "OPTIMIZATIONS_AVAILABLE",
+        "message": "2 optimization opportunities found",
+        "severity": "INFO",
+        "details": [
+          {
+            "type": "ADD_CACHING",
+            "message": "Consider using CacheService for frequently accessed data",
+            "impact": "HIGH"
+          },
+          {
+            "type": "ADD_LOCK_SERVICE",
+            "message": "Consider LockService for concurrent write operations",
+            "impact": "MEDIUM"
+          }
+        ],
+        "agent": "QuotaKeeper"
+      }
+    ],
+    "config": {
+      "codeFile": "Code.js",
+      "monitoring": {
+        "enabled": true,
+        "interval": 30000,
+        "autoFix": false
+      },
+      "agents": {
+        "gasDoctor": {
+          "enabled": true,
+          "autoFix": false
+        },
+        "deployGuardian": {
+          "enabled": true
+        },
+        "sheetsMonitor": {
+          "enabled": true
+        },
+        "callbackSurgeon": {
+          "enabled": true,
+          "autoFix": false
+        },
+        "quotaKeeper": {
+          "enabled": true
+        }
+      },
+      "alerts": {
+        "console": true,
+        "file": true,
+        "sound": false
+      },
+      "watchFiles": [
+        "Code.js",
+        "appsscript.json"
+      ]
+    }
+  },
+  {
+    "timestamp": "2025-10-27T04:17:39.092Z",
+    "issueCount": 51,
+    "issues": [
+      {
+        "type": "IFRAME_NAVIGATION",
+        "severity": "HIGH",
+        "message": "Found 1 iframe navigation issues (use window.top.location instead)",
+        "lines": [
+          416
+        ],
+        "autoFix": true,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sessionId' (previously declared as const)",
+        "line": 59,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 60,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const validation' (previously declared as const)",
+        "line": 65,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const template' (previously declared as const)",
+        "line": 85,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 384,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 482,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const dashboardUrl' (previously declared as const)",
+        "line": 483,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 537,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 803,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1372,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1406,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const firstName' (previously declared as const)",
+        "line": 1423,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const lastName' (previously declared as const)",
+        "line": 1424,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 1425,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const message' (previously declared as let)",
+        "line": 1453,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ui' (previously declared as const)",
+        "line": 1500,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const url' (previously declared as const)",
+        "line": 1513,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const message' (previously declared as let)",
+        "line": 1514,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1528,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1571,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1572,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1586,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1587,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const url' (previously declared as const)",
+        "line": 1860,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const result' (previously declared as const)",
+        "line": 1933,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n        .withSuccessHandler(func...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n        .withSuccessHandler(func...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n              .withSuccessHandle...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "CONSOLE_LOGS",
+        "severity": "LOW",
+        "message": "Found 26 console statements in production code",
+        "lines": [
+          14,
+          30,
+          31,
+          91,
+          104,
+          428,
+          500,
+          514,
+          1025,
+          1030,
+          1055,
+          1080,
+          1089,
+          1105,
+          1108,
+          1120,
+          1123,
+          1135,
+          1139,
+          1152,
+          1161,
+          1164,
+          1178,
+          1225,
+          1259,
+          1848
+        ],
+        "autoFix": true,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "UNSAFE_PARAMETER_ACCESS",
+        "severity": "MEDIUM",
+        "message": "Accessing e.parameter without null check",
+        "hint": "Add: if (e.parameter && e.parameter.value)",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #1: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "Call #2: Missing withFailureHandler",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add .withFailureHandler(function(error) { ... })",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #2: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #3: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(ses...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #4: No function call at the end",
+        "snippet": "google.script.run.withSuccessHandler(showResult).w...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #5: No function call at the end",
+        "snippet": "google.script.run.withSuccessHandler(showResult).w...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #6: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(showResult) ...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #1: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #1: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #2: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #2: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #3: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #3: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "EXECUTION_RISK",
+        "category": "loops",
+        "message": "Loop contains SpreadsheetApp call - potential timeout risk",
+        "count": 1,
+        "severity": "HIGH",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "EXECUTION_RISK",
+        "category": "recursion",
+        "message": "Possible recursion detected - risk of stack overflow",
+        "count": 7,
+        "severity": "MEDIUM",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "SHEETS_IN_LOOP",
+        "message": "reads operations inside loops - use batch operations instead",
+        "severity": "HIGH",
+        "count": 1,
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "SHEETS_IN_LOOP",
+        "message": "writes operations inside loops - use batch operations instead",
+        "severity": "HIGH",
+        "count": 1,
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "INEFFICIENT_SHEETS",
+        "message": "Using getCell/getValue in loops - use getValues() for batch reads",
+        "severity": "HIGH",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "MISSING_FLUSH",
+        "message": "Multiple setValue without flush() - changes may not persist immediately",
+        "severity": "LOW",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "OPTIMIZATIONS_AVAILABLE",
+        "message": "2 optimization opportunities found",
+        "severity": "INFO",
+        "details": [
+          {
+            "type": "ADD_CACHING",
+            "message": "Consider using CacheService for frequently accessed data",
+            "impact": "HIGH"
+          },
+          {
+            "type": "ADD_LOCK_SERVICE",
+            "message": "Consider LockService for concurrent write operations",
+            "impact": "MEDIUM"
+          }
+        ],
+        "agent": "QuotaKeeper"
+      }
+    ],
+    "config": {
+      "codeFile": "Code.js",
+      "monitoring": {
+        "enabled": true,
+        "interval": 30000,
+        "autoFix": false
+      },
+      "agents": {
+        "gasDoctor": {
+          "enabled": true,
+          "autoFix": false
+        },
+        "deployGuardian": {
+          "enabled": true
+        },
+        "sheetsMonitor": {
+          "enabled": true
+        },
+        "callbackSurgeon": {
+          "enabled": true,
+          "autoFix": false
+        },
+        "quotaKeeper": {
+          "enabled": true
+        }
+      },
+      "alerts": {
+        "console": true,
+        "file": true,
+        "sound": false
+      },
+      "watchFiles": [
+        "Code.js",
+        "appsscript.json"
+      ]
+    }
+  },
+  {
+    "timestamp": "2025-10-27T04:18:09.086Z",
+    "issueCount": 51,
+    "issues": [
+      {
+        "type": "IFRAME_NAVIGATION",
+        "severity": "HIGH",
+        "message": "Found 1 iframe navigation issues (use window.top.location instead)",
+        "lines": [
+          416
+        ],
+        "autoFix": true,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sessionId' (previously declared as const)",
+        "line": 59,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 60,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const validation' (previously declared as const)",
+        "line": 65,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const template' (previously declared as const)",
+        "line": 85,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 384,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 482,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const dashboardUrl' (previously declared as const)",
+        "line": 483,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 537,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 803,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1372,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1406,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const firstName' (previously declared as const)",
+        "line": 1423,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const lastName' (previously declared as const)",
+        "line": 1424,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 1425,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const message' (previously declared as let)",
+        "line": 1453,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ui' (previously declared as const)",
+        "line": 1500,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const url' (previously declared as const)",
+        "line": 1513,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const message' (previously declared as let)",
+        "line": 1514,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1528,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1571,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1572,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1586,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1587,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const url' (previously declared as const)",
+        "line": 1860,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const result' (previously declared as const)",
+        "line": 1933,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n        .withSuccessHandler(func...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n        .withSuccessHandler(func...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n              .withSuccessHandle...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "CONSOLE_LOGS",
+        "severity": "LOW",
+        "message": "Found 26 console statements in production code",
+        "lines": [
+          14,
+          30,
+          31,
+          91,
+          104,
+          428,
+          500,
+          514,
+          1025,
+          1030,
+          1055,
+          1080,
+          1089,
+          1105,
+          1108,
+          1120,
+          1123,
+          1135,
+          1139,
+          1152,
+          1161,
+          1164,
+          1178,
+          1225,
+          1259,
+          1848
+        ],
+        "autoFix": true,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "UNSAFE_PARAMETER_ACCESS",
+        "severity": "MEDIUM",
+        "message": "Accessing e.parameter without null check",
+        "hint": "Add: if (e.parameter && e.parameter.value)",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #1: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "Call #2: Missing withFailureHandler",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add .withFailureHandler(function(error) { ... })",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #2: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #3: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(ses...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #4: No function call at the end",
+        "snippet": "google.script.run.withSuccessHandler(showResult).w...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #5: No function call at the end",
+        "snippet": "google.script.run.withSuccessHandler(showResult).w...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #6: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(showResult) ...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #1: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #1: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #2: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #2: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #3: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #3: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "EXECUTION_RISK",
+        "category": "loops",
+        "message": "Loop contains SpreadsheetApp call - potential timeout risk",
+        "count": 1,
+        "severity": "HIGH",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "EXECUTION_RISK",
+        "category": "recursion",
+        "message": "Possible recursion detected - risk of stack overflow",
+        "count": 7,
+        "severity": "MEDIUM",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "SHEETS_IN_LOOP",
+        "message": "reads operations inside loops - use batch operations instead",
+        "severity": "HIGH",
+        "count": 1,
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "SHEETS_IN_LOOP",
+        "message": "writes operations inside loops - use batch operations instead",
+        "severity": "HIGH",
+        "count": 1,
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "INEFFICIENT_SHEETS",
+        "message": "Using getCell/getValue in loops - use getValues() for batch reads",
+        "severity": "HIGH",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "MISSING_FLUSH",
+        "message": "Multiple setValue without flush() - changes may not persist immediately",
+        "severity": "LOW",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "OPTIMIZATIONS_AVAILABLE",
+        "message": "2 optimization opportunities found",
+        "severity": "INFO",
+        "details": [
+          {
+            "type": "ADD_CACHING",
+            "message": "Consider using CacheService for frequently accessed data",
+            "impact": "HIGH"
+          },
+          {
+            "type": "ADD_LOCK_SERVICE",
+            "message": "Consider LockService for concurrent write operations",
+            "impact": "MEDIUM"
+          }
+        ],
+        "agent": "QuotaKeeper"
+      }
+    ],
+    "config": {
+      "codeFile": "Code.js",
+      "monitoring": {
+        "enabled": true,
+        "interval": 30000,
+        "autoFix": false
+      },
+      "agents": {
+        "gasDoctor": {
+          "enabled": true,
+          "autoFix": false
+        },
+        "deployGuardian": {
+          "enabled": true
+        },
+        "sheetsMonitor": {
+          "enabled": true
+        },
+        "callbackSurgeon": {
+          "enabled": true,
+          "autoFix": false
+        },
+        "quotaKeeper": {
+          "enabled": true
+        }
+      },
+      "alerts": {
+        "console": true,
+        "file": true,
+        "sound": false
+      },
+      "watchFiles": [
+        "Code.js",
+        "appsscript.json"
+      ]
+    }
+  },
+  {
+    "timestamp": "2025-10-27T04:18:39.099Z",
+    "issueCount": 51,
+    "issues": [
+      {
+        "type": "IFRAME_NAVIGATION",
+        "severity": "HIGH",
+        "message": "Found 1 iframe navigation issues (use window.top.location instead)",
+        "lines": [
+          416
+        ],
+        "autoFix": true,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sessionId' (previously declared as const)",
+        "line": 59,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 60,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const validation' (previously declared as const)",
+        "line": 65,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const template' (previously declared as const)",
+        "line": 85,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 384,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 482,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const dashboardUrl' (previously declared as const)",
+        "line": 483,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 537,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 803,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1372,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1406,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const firstName' (previously declared as const)",
+        "line": 1423,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const lastName' (previously declared as const)",
+        "line": 1424,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 1425,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const message' (previously declared as let)",
+        "line": 1453,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ui' (previously declared as const)",
+        "line": 1500,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const url' (previously declared as const)",
+        "line": 1513,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const message' (previously declared as let)",
+        "line": 1514,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1528,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1571,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1572,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1586,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1587,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const url' (previously declared as const)",
+        "line": 1860,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const result' (previously declared as const)",
+        "line": 1933,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n        .withSuccessHandler(func...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n        .withSuccessHandler(func...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n              .withSuccessHandle...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "CONSOLE_LOGS",
+        "severity": "LOW",
+        "message": "Found 26 console statements in production code",
+        "lines": [
+          14,
+          30,
+          31,
+          91,
+          104,
+          428,
+          500,
+          514,
+          1025,
+          1030,
+          1055,
+          1080,
+          1089,
+          1105,
+          1108,
+          1120,
+          1123,
+          1135,
+          1139,
+          1152,
+          1161,
+          1164,
+          1178,
+          1225,
+          1259,
+          1848
+        ],
+        "autoFix": true,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "UNSAFE_PARAMETER_ACCESS",
+        "severity": "MEDIUM",
+        "message": "Accessing e.parameter without null check",
+        "hint": "Add: if (e.parameter && e.parameter.value)",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #1: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "Call #2: Missing withFailureHandler",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add .withFailureHandler(function(error) { ... })",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #2: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #3: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(ses...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #4: No function call at the end",
+        "snippet": "google.script.run.withSuccessHandler(showResult).w...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #5: No function call at the end",
+        "snippet": "google.script.run.withSuccessHandler(showResult).w...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #6: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(showResult) ...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #1: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #1: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #2: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #2: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #3: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #3: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "EXECUTION_RISK",
+        "category": "loops",
+        "message": "Loop contains SpreadsheetApp call - potential timeout risk",
+        "count": 1,
+        "severity": "HIGH",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "EXECUTION_RISK",
+        "category": "recursion",
+        "message": "Possible recursion detected - risk of stack overflow",
+        "count": 7,
+        "severity": "MEDIUM",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "SHEETS_IN_LOOP",
+        "message": "reads operations inside loops - use batch operations instead",
+        "severity": "HIGH",
+        "count": 1,
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "SHEETS_IN_LOOP",
+        "message": "writes operations inside loops - use batch operations instead",
+        "severity": "HIGH",
+        "count": 1,
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "INEFFICIENT_SHEETS",
+        "message": "Using getCell/getValue in loops - use getValues() for batch reads",
+        "severity": "HIGH",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "MISSING_FLUSH",
+        "message": "Multiple setValue without flush() - changes may not persist immediately",
+        "severity": "LOW",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "OPTIMIZATIONS_AVAILABLE",
+        "message": "2 optimization opportunities found",
+        "severity": "INFO",
+        "details": [
+          {
+            "type": "ADD_CACHING",
+            "message": "Consider using CacheService for frequently accessed data",
+            "impact": "HIGH"
+          },
+          {
+            "type": "ADD_LOCK_SERVICE",
+            "message": "Consider LockService for concurrent write operations",
+            "impact": "MEDIUM"
+          }
+        ],
+        "agent": "QuotaKeeper"
+      }
+    ],
+    "config": {
+      "codeFile": "Code.js",
+      "monitoring": {
+        "enabled": true,
+        "interval": 30000,
+        "autoFix": false
+      },
+      "agents": {
+        "gasDoctor": {
+          "enabled": true,
+          "autoFix": false
+        },
+        "deployGuardian": {
+          "enabled": true
+        },
+        "sheetsMonitor": {
+          "enabled": true
+        },
+        "callbackSurgeon": {
+          "enabled": true,
+          "autoFix": false
+        },
+        "quotaKeeper": {
+          "enabled": true
+        }
+      },
+      "alerts": {
+        "console": true,
+        "file": true,
+        "sound": false
+      },
+      "watchFiles": [
+        "Code.js",
+        "appsscript.json"
+      ]
+    }
+  },
+  {
+    "timestamp": "2025-10-27T04:19:09.095Z",
+    "issueCount": 51,
+    "issues": [
+      {
+        "type": "IFRAME_NAVIGATION",
+        "severity": "HIGH",
+        "message": "Found 1 iframe navigation issues (use window.top.location instead)",
+        "lines": [
+          416
+        ],
+        "autoFix": true,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sessionId' (previously declared as const)",
+        "line": 59,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 60,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const validation' (previously declared as const)",
+        "line": 65,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const template' (previously declared as const)",
+        "line": 85,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 384,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 482,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const dashboardUrl' (previously declared as const)",
+        "line": 483,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 537,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 803,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1372,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1406,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const firstName' (previously declared as const)",
+        "line": 1423,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const lastName' (previously declared as const)",
+        "line": 1424,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 1425,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const message' (previously declared as let)",
+        "line": 1453,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ui' (previously declared as const)",
+        "line": 1500,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const url' (previously declared as const)",
+        "line": 1513,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const message' (previously declared as let)",
+        "line": 1514,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1528,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1571,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1572,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1586,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1587,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const url' (previously declared as const)",
+        "line": 1860,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const result' (previously declared as const)",
+        "line": 1933,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n        .withSuccessHandler(func...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n        .withSuccessHandler(func...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n              .withSuccessHandle...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "CONSOLE_LOGS",
+        "severity": "LOW",
+        "message": "Found 26 console statements in production code",
+        "lines": [
+          14,
+          30,
+          31,
+          91,
+          104,
+          428,
+          500,
+          514,
+          1025,
+          1030,
+          1055,
+          1080,
+          1089,
+          1105,
+          1108,
+          1120,
+          1123,
+          1135,
+          1139,
+          1152,
+          1161,
+          1164,
+          1178,
+          1225,
+          1259,
+          1848
+        ],
+        "autoFix": true,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "UNSAFE_PARAMETER_ACCESS",
+        "severity": "MEDIUM",
+        "message": "Accessing e.parameter without null check",
+        "hint": "Add: if (e.parameter && e.parameter.value)",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #1: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "Call #2: Missing withFailureHandler",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add .withFailureHandler(function(error) { ... })",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #2: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #3: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(ses...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #4: No function call at the end",
+        "snippet": "google.script.run.withSuccessHandler(showResult).w...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #5: No function call at the end",
+        "snippet": "google.script.run.withSuccessHandler(showResult).w...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #6: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(showResult) ...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #1: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #1: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #2: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #2: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #3: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #3: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "EXECUTION_RISK",
+        "category": "loops",
+        "message": "Loop contains SpreadsheetApp call - potential timeout risk",
+        "count": 1,
+        "severity": "HIGH",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "EXECUTION_RISK",
+        "category": "recursion",
+        "message": "Possible recursion detected - risk of stack overflow",
+        "count": 7,
+        "severity": "MEDIUM",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "SHEETS_IN_LOOP",
+        "message": "reads operations inside loops - use batch operations instead",
+        "severity": "HIGH",
+        "count": 1,
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "SHEETS_IN_LOOP",
+        "message": "writes operations inside loops - use batch operations instead",
+        "severity": "HIGH",
+        "count": 1,
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "INEFFICIENT_SHEETS",
+        "message": "Using getCell/getValue in loops - use getValues() for batch reads",
+        "severity": "HIGH",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "MISSING_FLUSH",
+        "message": "Multiple setValue without flush() - changes may not persist immediately",
+        "severity": "LOW",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "OPTIMIZATIONS_AVAILABLE",
+        "message": "2 optimization opportunities found",
+        "severity": "INFO",
+        "details": [
+          {
+            "type": "ADD_CACHING",
+            "message": "Consider using CacheService for frequently accessed data",
+            "impact": "HIGH"
+          },
+          {
+            "type": "ADD_LOCK_SERVICE",
+            "message": "Consider LockService for concurrent write operations",
+            "impact": "MEDIUM"
+          }
+        ],
+        "agent": "QuotaKeeper"
+      }
+    ],
+    "config": {
+      "codeFile": "Code.js",
+      "monitoring": {
+        "enabled": true,
+        "interval": 30000,
+        "autoFix": false
+      },
+      "agents": {
+        "gasDoctor": {
+          "enabled": true,
+          "autoFix": false
+        },
+        "deployGuardian": {
+          "enabled": true
+        },
+        "sheetsMonitor": {
+          "enabled": true
+        },
+        "callbackSurgeon": {
+          "enabled": true,
+          "autoFix": false
+        },
+        "quotaKeeper": {
+          "enabled": true
+        }
+      },
+      "alerts": {
+        "console": true,
+        "file": true,
+        "sound": false
+      },
+      "watchFiles": [
+        "Code.js",
+        "appsscript.json"
+      ]
+    }
+  },
+  {
+    "timestamp": "2025-10-27T04:19:39.086Z",
+    "issueCount": 51,
+    "issues": [
+      {
+        "type": "IFRAME_NAVIGATION",
+        "severity": "HIGH",
+        "message": "Found 1 iframe navigation issues (use window.top.location instead)",
+        "lines": [
+          416
+        ],
+        "autoFix": true,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sessionId' (previously declared as const)",
+        "line": 59,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 60,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const validation' (previously declared as const)",
+        "line": 65,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const template' (previously declared as const)",
+        "line": 85,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 384,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 482,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const dashboardUrl' (previously declared as const)",
+        "line": 483,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 537,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const baseUrl' (previously declared as const)",
+        "line": 803,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1372,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1406,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const firstName' (previously declared as const)",
+        "line": 1423,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const lastName' (previously declared as const)",
+        "line": 1424,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const clientId' (previously declared as const)",
+        "line": 1425,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const message' (previously declared as let)",
+        "line": 1453,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ui' (previously declared as const)",
+        "line": 1500,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const url' (previously declared as const)",
+        "line": 1513,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const message' (previously declared as let)",
+        "line": 1514,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1528,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1571,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1572,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const ss' (previously declared as const)",
+        "line": 1586,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const sheet' (previously declared as const)",
+        "line": 1587,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const url' (previously declared as const)",
+        "line": 1860,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "DUPLICATE_DECLARATION",
+        "severity": "HIGH",
+        "message": "Duplicate declaration: 'const result' (previously declared as const)",
+        "line": 1933,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n        .withSuccessHandler(func...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n        .withSuccessHandler(func...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "google.script.run call missing withFailureHandler",
+        "snippet": "google.script.run\n              .withSuccessHandle...",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "CONSOLE_LOGS",
+        "severity": "LOW",
+        "message": "Found 26 console statements in production code",
+        "lines": [
+          14,
+          30,
+          31,
+          91,
+          104,
+          428,
+          500,
+          514,
+          1025,
+          1030,
+          1055,
+          1080,
+          1089,
+          1105,
+          1108,
+          1120,
+          1123,
+          1135,
+          1139,
+          1152,
+          1161,
+          1164,
+          1178,
+          1225,
+          1259,
+          1848
+        ],
+        "autoFix": true,
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "UNSAFE_PARAMETER_ACCESS",
+        "severity": "MEDIUM",
+        "message": "Accessing e.parameter without null check",
+        "hint": "Add: if (e.parameter && e.parameter.value)",
+        "agent": "GasDoctor"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #1: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "MISSING_FAILURE_HANDLER",
+        "severity": "MEDIUM",
+        "message": "Call #2: Missing withFailureHandler",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add .withFailureHandler(function(error) { ... })",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #2: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(res...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #3: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(function(ses...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #4: No function call at the end",
+        "snippet": "google.script.run.withSuccessHandler(showResult).w...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #5: No function call at the end",
+        "snippet": "google.script.run.withSuccessHandler(showResult).w...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "INCOMPLETE_CALL",
+        "severity": "CRITICAL",
+        "message": "Call #6: No function call at the end",
+        "snippet": "google.script.run .withSuccessHandler(showResult) ...",
+        "fix": "Add the actual function call at the end",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #1: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #1: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #2: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #2: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "SILENT_FAILURE",
+        "severity": "MEDIUM",
+        "message": "Failure handler #3: Only logs error, user won't see it",
+        "fix": "Add user-visible error handling (alert, UI update, etc.)",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "NO_RETRY_LOGIC",
+        "severity": "LOW",
+        "message": "Failure handler #3: No retry mechanism",
+        "fix": "Consider adding retry logic for transient failures",
+        "agent": "CallbackSurgeon"
+      },
+      {
+        "type": "EXECUTION_RISK",
+        "category": "loops",
+        "message": "Loop contains SpreadsheetApp call - potential timeout risk",
+        "count": 1,
+        "severity": "HIGH",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "EXECUTION_RISK",
+        "category": "recursion",
+        "message": "Possible recursion detected - risk of stack overflow",
+        "count": 7,
+        "severity": "MEDIUM",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "SHEETS_IN_LOOP",
+        "message": "reads operations inside loops - use batch operations instead",
+        "severity": "HIGH",
+        "count": 1,
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "SHEETS_IN_LOOP",
+        "message": "writes operations inside loops - use batch operations instead",
+        "severity": "HIGH",
+        "count": 1,
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "INEFFICIENT_SHEETS",
+        "message": "Using getCell/getValue in loops - use getValues() for batch reads",
+        "severity": "HIGH",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "MISSING_FLUSH",
+        "message": "Multiple setValue without flush() - changes may not persist immediately",
+        "severity": "LOW",
+        "agent": "QuotaKeeper"
+      },
+      {
+        "type": "OPTIMIZATIONS_AVAILABLE",
+        "message": "2 optimization opportunities found",
+        "severity": "INFO",
+        "details": [
+          {
+            "type": "ADD_CACHING",
+            "message": "Consider using CacheService for frequently accessed data",
+            "impact": "HIGH"
+          },
+          {
+            "type": "ADD_LOCK_SERVICE",
+            "message": "Consider LockService for concurrent write operations",
+            "impact": "MEDIUM"
+          }
+        ],
+        "agent": "QuotaKeeper"
+      }
+    ],
+    "config": {
+      "codeFile": "Code.js",
+      "monitoring": {
+        "enabled": true,
+        "interval": 30000,
+        "autoFix": false
+      },
+      "agents": {
+        "gasDoctor": {
+          "enabled": true,
+          "autoFix": false
+        },
+        "deployGuardian": {
+          "enabled": true
+        },
+        "sheetsMonitor": {
+          "enabled": true
+        },
+        "callbackSurgeon": {
+          "enabled": true,
+          "autoFix": false
+        },
+        "quotaKeeper": {
+          "enabled": true
+        }
+      },
+      "alerts": {
+        "console": true,
+        "file": true,
+        "sound": false
+      },
+      "watchFiles": [
+        "Code.js",
+        "appsscript.json"
+      ]
+    }
   }
 ]

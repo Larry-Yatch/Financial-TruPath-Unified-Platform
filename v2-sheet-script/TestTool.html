@@ -351,8 +351,10 @@
       
       console.log('Submitting form as completed...');
       
-      // Collect form data
-      const formData = ToolWrapper.collectToolData();
+      // Collect form data (pass the pattern type)
+      const formData = ToolWrapper.collectToolData('pattern1');
+      
+      console.log('Collected form data:', formData);
       
       if (!formData || Object.keys(formData).length === 0) {
         alert('Please fill in the form before submitting.');
