@@ -347,6 +347,15 @@ const ToolWrapper = {
           }
         })
         .saveToolDraft(currentUserId, toolId, data, progress, 'DRAFT', isAutoSave ? 'AUTO' : 'MANUAL');
+      
+      // Debug logging
+      console.log('🐛 SAVE DEBUG:', {
+        isAutoSave: isAutoSave,
+        saveType: isAutoSave ? 'AUTO' : 'MANUAL',
+        userId: currentUserId,
+        toolId: toolId,
+        progress: progress
+      });
     } else {
       // Offline mode
       this.updateSaveIndicator('local');

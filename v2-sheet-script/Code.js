@@ -2024,19 +2024,31 @@ function testDataSaving() {
  */
 function clearUserDrafts(userId = 'TEST002') {
   try {
-    const props = PropertiesService.getScriptProperties();
-    const draftKey = `draft_${userId}_tool1`;
-    const versionsKey = `draft_versions_${userId}_tool1`;
+    const props = PropertiesService.getUserProperties();
     
-    props.deleteProperty(draftKey);
-    props.deleteProperty(versionsKey);
+    // Clear all old and new draft keys
+    const oldKeys = [
+      `draft_${userId}_tool1`,
+      `draft_versions_${userId}_tool1`,
+      `drafts_${userId}_tool1_versions`
+    ];
     
-    console.log(`Cleared all drafts for user: ${userId}`);
-    SpreadsheetApp.getUi().alert(`✅ Cleared all drafts for user: ${userId}`);
-    return `✅ Cleared all drafts for user: ${userId}`;
+    const newKeys = [
+      `draft_${userId}_tool1_latest`,
+      `drafts_${userId}_tool1_manual_versions`, 
+      `draft_counter_${userId}_tool1`
+    ];
+    
+    const allKeys = [...oldKeys, ...newKeys];
+    
+    allKeys.forEach(key => {
+      props.deleteProperty(key);
+    });
+    
+    console.log(`Cleared all drafts (old + new format) for user: ${userId}`);
+    return `✅ Cleared all drafts (old + new format) for user: ${userId}`;
   } catch (error) {
     console.error('Error clearing drafts:', error);
-    SpreadsheetApp.getUi().alert(`❌ Error: ${error.toString()}`);
     return `❌ Error: ${error.toString()}`;
   }
 }
