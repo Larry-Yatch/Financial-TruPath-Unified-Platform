@@ -1072,6 +1072,108 @@ function getLastToolResponse(userId, toolId) {
   }
 }
 
+/**
+ * Get last submitted response for viewing (bypasses DataService)
+ * Direct sheet access for better reliability
+ * @param {string} userId - User ID
+ * @param {string} toolId - Tool ID
+ * @returns {Object|null} Last submission or null
+ */
+function getLastSubmissionForViewing(userId, toolId) {
+  try {
+    console.log(`🔍 getLastSubmissionForViewing - userId: ${userId}, toolId: ${toolId}`);
+    
+    const ss = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
+    const responseSheet = ss.getSheetByName(CONFIG.SHEETS.RESPONSES);
+    
+    if (!responseSheet || responseSheet.getLastRow() < 2) {
+      console.log('❌ No response sheet or no data');
+      return null;
+    }
+    
+    // Get all data
+    const data = responseSheet.getDataRange().getValues();
+    const headers = data[0];
+    
+    console.log(`📊 Headers: ${headers.join(', ')}`);
+    console.log(`📈 Total rows: ${data.length}`);
+    
+    // Find column indices - from analysis doc, data is in 'Version' column
+    const clientIdCol = headers.indexOf('Client_ID');
+    const toolIdCol = headers.indexOf('Tool_ID');
+    const versionCol = headers.indexOf('Version'); // JSON data is here!
+    const responseIdCol = headers.indexOf('Response_ID'); // Timestamp is here!
+    
+    console.log(`🔍 Columns - Client: ${clientIdCol}, Tool: ${toolIdCol}, Version: ${versionCol}, ResponseID: ${responseIdCol}`);
+    
+    if (clientIdCol === -1 || toolIdCol === -1 || versionCol === -1) {
+      console.error('❌ Required columns not found');
+      return null;
+    }
+    
+    // Find the most recent completed submission for this user/tool
+    let latestSubmission = null;
+    let latestTimestamp = null;
+    let matchCount = 0;
+    
+    console.log(`🔎 Searching for userId: "${userId}", toolId: "${toolId}"`);
+    
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      
+      if (row[clientIdCol] === userId && row[toolIdCol] === toolId) {
+        matchCount++;
+        console.log(`✅ Match ${matchCount} found at row ${i}`);
+        
+        const timestamp = row[responseIdCol] ? new Date(row[responseIdCol]) : null;
+        
+        if (!latestTimestamp || (timestamp && timestamp > latestTimestamp)) {
+          latestTimestamp = timestamp;
+          
+          try {
+            // Parse the JSON data from Version column
+            const jsonData = JSON.parse(row[versionCol]);
+            latestSubmission = {
+              data: jsonData,
+              timestamp: timestamp,
+              userId: userId,
+              toolId: toolId,
+              found: true,
+              source: 'direct_sheet_access'
+            };
+            console.log(`📝 Updated latest submission from row ${i}`);
+          } catch (parseError) {
+            console.warn(`⚠️ JSON parse failed for row ${i}:`, parseError);
+            // Try storing raw data if JSON parse fails
+            latestSubmission = {
+              data: row[versionCol],
+              timestamp: timestamp,
+              userId: userId,
+              toolId: toolId,
+              found: true,
+              source: 'direct_sheet_access_raw'
+            };
+          }
+        }
+      }
+    }
+    
+    console.log(`🏁 Search complete - Total matches: ${matchCount}`);
+    
+    if (latestSubmission) {
+      console.log(`✅ Returning submission from ${latestSubmission.timestamp}`);
+      return latestSubmission;
+    }
+    
+    console.log('❌ No submissions found');
+    return null;
+    
+  } catch (error) {
+    console.error('💥 Error in getLastSubmissionForViewing:', error);
+    return null;
+  }
+}
+
 function saveUserData(userId, toolId, data) {
   try {
     // console.log(`saveUserData called - userId: ${userId}, toolId: ${toolId}, data fields: ${Object.keys(data).length}`);
