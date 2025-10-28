@@ -2052,3 +2052,53 @@ function clearUserDrafts(userId = 'TEST002') {
     return `❌ Error: ${error.toString()}`;
   }
 }
+
+/**
+ * NUCLEAR OPTION: Clear ALL test data for ALL test users
+ * This wipes everything from PropertiesService for any TEST* users
+ */
+function clearAllTestData() {
+  try {
+    const props = PropertiesService.getUserProperties();
+    const allProperties = props.getProperties();
+    let clearedCount = 0;
+    const clearedKeys = [];
+    
+    // Find and delete ALL properties that contain TEST user patterns
+    Object.keys(allProperties).forEach(key => {
+      // Check if key contains common test user patterns
+      if (key.includes('TEST') || 
+          key.includes('test') || 
+          key.includes('TEST002') || 
+          key.includes('TEST999') ||
+          key.includes('TEST_USER') ||
+          key.includes('draft_') ||
+          key.includes('drafts_') ||
+          key.includes('_tool1') ||
+          key.includes('_tool2') ||
+          key.includes('_tool3') ||
+          key.includes('_tool4') ||
+          key.includes('_tool5')) {
+        props.deleteProperty(key);
+        clearedKeys.push(key);
+        clearedCount++;
+      }
+    });
+    
+    console.log(`🧹 CLEARED ALL TEST DATA: ${clearedCount} properties deleted`);
+    console.log('Deleted keys:', clearedKeys);
+    
+    return {
+      success: true,
+      message: `✅ Cleared ${clearedCount} test data properties`,
+      clearedKeys: clearedKeys,
+      count: clearedCount
+    };
+  } catch (error) {
+    console.error('Error clearing all test data:', error);
+    return {
+      success: false,
+      error: error.toString()
+    };
+  }
+}
