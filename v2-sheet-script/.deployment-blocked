@@ -1,0 +1,13 @@
+{
+  "blocked": true,
+  "reason": "Callback issues found",
+  "errors": [
+    "Call #1: No function call at the end",
+    "Call #2: No function call at the end",
+    "Call #3: No function call at the end",
+    "Call #4: No function call at the end",
+    "Call #5: No function call at the end",
+    "Call #6: No function call at the end"
+  ],
+  "timestamp": "2025-10-28T17:54:43.464Z"
+}

@@ -37,7 +37,7 @@ function doGet(e) {
       const clientId = e.parameter.client || 'TEST001';
       
       // Skip session validation during development
-//       console.log('Dashboard route - clientId:', clientId, 'sessionId:', sessionId);
+      console.log('Dashboard route - clientId:', clientId, 'sessionId:', sessionId);
       return createSimpleDashboard(clientId, sessionId);
       
       /* Original session validation - commented out for testing
@@ -411,7 +411,7 @@ function createLoginPage(message) {
           // Check if result is null or undefined
           if (!result) {
             if (attempt < maxAttempts) {
-//               console.log('Retry attempt ' + (attempt + 1) + ' due to null response');
+              console.log('Retry attempt ' + (attempt + 1) + ' due to null response');
               setTimeout(function() {
                 attemptAuthentication(clientId, attempt + 1);
               }, 1000);
@@ -435,7 +435,7 @@ function createLoginPage(message) {
             
             // Navigate to dashboard after a brief delay
             setTimeout(function() {
-              window.top.location.href = dashboardUrl;
+              window.location.href = dashboardUrl;
             }, 500);
           } else {
             document.getElementById('loginForm').style.display = 'block';
@@ -445,7 +445,7 @@ function createLoginPage(message) {
         })
         .withFailureHandler(function(error) {
           if (attempt < maxAttempts) {
-//             console.log('Retry attempt ' + (attempt + 1) + ' due to failure:', error);
+            console.log('Retry attempt ' + (attempt + 1) + ' due to failure:', error);
             setTimeout(function() {
               attemptAuthentication(clientId, attempt + 1);
             }, 1000);
@@ -455,7 +455,7 @@ function createLoginPage(message) {
           document.getElementById('loginForm').style.display = 'block';
           document.getElementById('loadingSpinner').style.display = 'none';
           showAlert('System error. Please refresh the page and try again.', 'error');
-//           console.error('Final authentication failure:', error);
+          console.error('Final authentication failure:', error);
         })
         .authenticateAndCreateSession(clientId);
     }
@@ -1067,7 +1067,7 @@ function getLastToolResponse(userId, toolId) {
     return null;
     
   } catch (error) {
-//     console.error('Error getting last tool response:', error);
+    console.error('Error getting last tool response:', error);
     return null;
   }
 }
@@ -1081,33 +1081,33 @@ function getLastToolResponse(userId, toolId) {
  */
 function getLastSubmissionForViewing(userId, toolId) {
   try {
-//     console.log(`🔍 getLastSubmissionForViewing - userId: ${userId}, toolId: ${toolId}`);
+    console.log(`🔍 getLastSubmissionForViewing - userId: ${userId}, toolId: ${toolId}`);
     
     const ss = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
     const responseSheet = ss.getSheetByName(CONFIG.SHEETS.RESPONSES);
     
     if (!responseSheet || responseSheet.getLastRow() < 2) {
-//       console.log('❌ No response sheet or no data');
+      console.log('❌ No response sheet or no data');
       return null;
     }
     
     // Get all data
     const data = responseSheet.getDataRange().getValues();
     const headers = data[0];
-//     
+    
     console.log(`📊 Headers: ${headers.join(', ')}`);
-//     console.log(`📈 Total rows: ${data.length}`);
+    console.log(`📈 Total rows: ${data.length}`);
     
     // Find column indices - from analysis doc, data is in 'Version' column
     const clientIdCol = headers.indexOf('Client_ID');
     const toolIdCol = headers.indexOf('Tool_ID');
     const versionCol = headers.indexOf('Version'); // JSON data is here!
     const responseIdCol = headers.indexOf('Response_ID'); // Timestamp is here!
-//     
+    
     console.log(`🔍 Columns - Client: ${clientIdCol}, Tool: ${toolIdCol}, Version: ${versionCol}, ResponseID: ${responseIdCol}`);
     
     if (clientIdCol === -1 || toolIdCol === -1 || versionCol === -1) {
-//       console.error('❌ Required columns not found');
+      console.error('❌ Required columns not found');
       return null;
     }
     
@@ -1116,7 +1116,7 @@ function getLastSubmissionForViewing(userId, toolId) {
     let latestSubmission = null;
     let matchCount = 0;
     let lastMatchingRowIndex = -1;
-//     
+    
     console.log(`🔎 Searching for userId: "${userId}", toolId: "${toolId}"`);
     
     // First pass: find all matching rows and get the last one
@@ -1126,14 +1126,14 @@ function getLastSubmissionForViewing(userId, toolId) {
       if (row[clientIdCol] === userId && row[toolIdCol] === toolId) {
         matchCount++;
         lastMatchingRowIndex = i;
-//         console.log(`✅ Match ${matchCount} found at row ${i}`);
+        console.log(`✅ Match ${matchCount} found at row ${i}`);
       }
     }
     
     // If we found matches, process the last one
     if (lastMatchingRowIndex > 0) {
       const row = data[lastMatchingRowIndex];
-//       console.log(`📝 Processing last matching row: ${lastMatchingRowIndex}`);
+      console.log(`📝 Processing last matching row: ${lastMatchingRowIndex}`);
       
       try {
         // Parse the JSON data from Version column
@@ -1147,9 +1147,9 @@ function getLastSubmissionForViewing(userId, toolId) {
           source: 'direct_sheet_access',
           rowIndex: lastMatchingRowIndex
         };
-//         console.log(`✅ Successfully parsed JSON data from row ${lastMatchingRowIndex}`);
+        console.log(`✅ Successfully parsed JSON data from row ${lastMatchingRowIndex}`);
       } catch (parseError) {
-//         console.warn(`⚠️ JSON parse failed for row ${lastMatchingRowIndex}:`, parseError);
+        console.warn(`⚠️ JSON parse failed for row ${lastMatchingRowIndex}:`, parseError);
         // Try storing raw data if JSON parse fails
         latestSubmission = {
           data: row[versionCol],
@@ -1163,19 +1163,19 @@ function getLastSubmissionForViewing(userId, toolId) {
         };
       }
     }
-//     
+    
     console.log(`🏁 Search complete - Total matches: ${matchCount}`);
     
     if (latestSubmission) {
-//       console.log(`✅ Returning submission from ${latestSubmission.timestamp}`);
+      console.log(`✅ Returning submission from ${latestSubmission.timestamp}`);
       return latestSubmission;
     }
-//     
+    
     console.log('❌ No submissions found');
     return null;
     
   } catch (error) {
-//     console.error('💥 Error in getLastSubmissionForViewing:', error);
+    console.error('💥 Error in getLastSubmissionForViewing:', error);
     return null;
   }
 }
@@ -1299,7 +1299,7 @@ function getToolDraftFromProperties(userId, toolId, getAllVersions = false) {
  */
 function getUserToolData(params) {
   try {
-//     console.log('🚀 Batched getUserToolData called:', params);
+    console.log('🚀 Batched getUserToolData called:', params);
     
     const { userId, toolId, includeDrafts, includeSubmissions } = params;
     const result = {};
@@ -1308,9 +1308,9 @@ function getUserToolData(params) {
     if (includeDrafts) {
       try {
         result.drafts = DataService.getToolDraftFromProperties(userId, toolId, true);
-//         console.log(`✅ Got ${result.drafts?.length || 0} drafts for ${userId}`);
+        console.log(`✅ Got ${result.drafts?.length || 0} drafts for ${userId}`);
       } catch (error) {
-//         console.error('❌ Error getting drafts:', error);
+        console.error('❌ Error getting drafts:', error);
         result.drafts = null;
         result.draftError = error.toString();
       }
@@ -1320,14 +1320,14 @@ function getUserToolData(params) {
     if (includeSubmissions) {
       try {
         result.submissions = getLastSubmissionForViewing(userId, toolId);
-//         console.log(`✅ Got submission data for ${userId}:`, !!result.submissions);
+        console.log(`✅ Got submission data for ${userId}:`, !!result.submissions);
       } catch (error) {
-//         console.error('❌ Error getting submissions:', error);
+        console.error('❌ Error getting submissions:', error);
         result.submissions = null;
         result.submissionError = error.toString();
       }
     }
-//     
+    
     console.log('🎯 Batched result summary:', {
       hasDrafts: !!result.drafts,
       hasSubmissions: !!result.submissions,
@@ -1340,7 +1340,7 @@ function getUserToolData(params) {
     return result;
     
   } catch (error) {
-//     console.error('💥 Error in getUserToolData:', error);
+    console.error('💥 Error in getUserToolData:', error);
     return {
       error: error.toString(),
       drafts: null,
@@ -2223,11 +2223,11 @@ function clearUserDrafts(userId = 'TEST002') {
     allKeys.forEach(key => {
       props.deleteProperty(key);
     });
-//     
+    
     console.log(`Cleared all drafts (old + new format) for user: ${userId}`);
     return `✅ Cleared all drafts (old + new format) for user: ${userId}`;
   } catch (error) {
-//     console.error('Error clearing drafts:', error);
+    console.error('Error clearing drafts:', error);
     return `❌ Error: ${error.toString()}`;
   }
 }
@@ -2263,9 +2263,9 @@ function clearAllTestData() {
         clearedCount++;
       }
     });
-//     
+    
     console.log(`🧹 CLEARED ALL TEST DATA: ${clearedCount} properties deleted`);
-//     console.log('Deleted keys:', clearedKeys);
+    console.log('Deleted keys:', clearedKeys);
     
     return {
       success: true,
@@ -2274,7 +2274,7 @@ function clearAllTestData() {
       count: clearedCount
     };
   } catch (error) {
-//     console.error('Error clearing all test data:', error);
+    console.error('Error clearing all test data:', error);
     return {
       success: false,
       error: error.toString()
