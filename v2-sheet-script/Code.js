@@ -1112,11 +1112,236 @@ function getLastSubmissionForViewing(userId, toolId) {
     }
     
     // Find the most recent completed submission for this user/tool
+    // Simplified: just take the LAST matching row (highest row number = most recent)
+    let latestSubmission = null;
+    let matchCount = 0;
+    let lastMatchingRowIndex = -1;
+    
+    console.log(`🔎 Searching for userId: "${userId}", toolId: "${toolId}"`);
+    
+    // First pass: find all matching rows and get the last one
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      
+      if (row[clientIdCol] === userId && row[toolIdCol] === toolId) {
+        matchCount++;
+        lastMatchingRowIndex = i;
+        console.log(`✅ Match ${matchCount} found at row ${i}`);
+      }
+    }
+    
+    // If we found matches, process the last one
+    if (lastMatchingRowIndex > 0) {
+      const row = data[lastMatchingRowIndex];
+      console.log(`📝 Processing last matching row: ${lastMatchingRowIndex}`);
+      
+      try {
+        // Parse the JSON data from Version column
+        const jsonData = JSON.parse(row[versionCol]);
+        latestSubmission = {
+          data: jsonData,
+          timestamp: row[responseIdCol], // Keep raw timestamp
+          userId: userId,
+          toolId: toolId,
+          found: true,
+          source: 'direct_sheet_access',
+          rowIndex: lastMatchingRowIndex
+        };
+        console.log(`✅ Successfully parsed JSON data from row ${lastMatchingRowIndex}`);
+      } catch (parseError) {
+        console.warn(`⚠️ JSON parse failed for row ${lastMatchingRowIndex}:`, parseError);
+        // Try storing raw data if JSON parse fails
+        latestSubmission = {
+          data: row[versionCol],
+          timestamp: row[responseIdCol],
+          userId: userId,
+          toolId: toolId,
+          found: true,
+          source: 'direct_sheet_access_raw',
+          parseError: parseError.toString(),
+          rowIndex: lastMatchingRowIndex
+        };
+      }
+    }
+    
+    console.log(`🏁 Search complete - Total matches: ${matchCount}`);
+    
+    if (latestSubmission) {
+      console.log(`✅ Returning submission from ${latestSubmission.timestamp}`);
+      return latestSubmission;
+    }
+    
+    console.log('❌ No submissions found');
+    return null;
+    
+  } catch (error) {
+    console.error('💥 Error in getLastSubmissionForViewing:', error);
+    return null;
+  }
+}
+
+/**
+ * DEBUG STEP 1: Test basic sheet connectivity
+ */
+function testSheetConnectivity() {
+  try {
+    console.log('🔍 TEST 1: Basic sheet connectivity');
+    
+    const ss = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
+    console.log(`✅ Opened spreadsheet: ${ss.getName()}`);
+    
+    const responseSheet = ss.getSheetByName(CONFIG.SHEETS.RESPONSES);
+    console.log(`✅ Found RESPONSES sheet: ${responseSheet ? 'YES' : 'NO'}`);
+    
+    if (responseSheet) {
+      const rowCount = responseSheet.getLastRow();
+      console.log(`✅ Row count: ${rowCount}`);
+      
+      return {
+        success: true,
+        spreadsheetName: ss.getName(),
+        sheetFound: true,
+        rowCount: rowCount
+      };
+    }
+    
+    return { success: false, error: 'RESPONSES sheet not found' };
+    
+  } catch (error) {
+    console.error('❌ Sheet connectivity test failed:', error);
+    return { success: false, error: error.toString() };
+  }
+}
+
+/**
+ * DEBUG STEP 2: Test reading headers
+ */
+function testReadHeaders() {
+  try {
+    console.log('🔍 TEST 2: Reading headers');
+    
+    const ss = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
+    const responseSheet = ss.getSheetByName(CONFIG.SHEETS.RESPONSES);
+    
+    if (!responseSheet) {
+      return { success: false, error: 'No sheet found' };
+    }
+    
+    const data = responseSheet.getDataRange().getValues();
+    const headers = data[0];
+    
+    console.log(`✅ Headers: ${headers.join(', ')}`);
+    console.log(`✅ Total rows: ${data.length}`);
+    
+    return {
+      success: true,
+      headers: headers,
+      totalRows: data.length,
+      clientIdCol: headers.indexOf('Client_ID'),
+      toolIdCol: headers.indexOf('Tool_ID'),
+      versionCol: headers.indexOf('Version'),
+      responseIdCol: headers.indexOf('Response_ID')
+    };
+    
+  } catch (error) {
+    console.error('❌ Headers test failed:', error);
+    return { success: false, error: error.toString() };
+  }
+}
+
+/**
+ * DEBUG STEP 3: Test finding TEST001 rows
+ */
+function testFindTest001Rows() {
+  try {
+    console.log('🔍 TEST 3: Finding TEST001 rows');
+    
+    const ss = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
+    const responseSheet = ss.getSheetByName(CONFIG.SHEETS.RESPONSES);
+    
+    if (!responseSheet) {
+      return { success: false, error: 'No sheet found' };
+    }
+    
+    const data = responseSheet.getDataRange().getValues();
+    const headers = data[0];
+    
+    const clientIdCol = headers.indexOf('Client_ID');
+    const toolIdCol = headers.indexOf('Tool_ID');
+    
+    console.log(`🔍 Looking for TEST001 in column ${clientIdCol} and tool1 in column ${toolIdCol}`);
+    
+    const matchingRows = [];
+    
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      console.log(`Row ${i}: ClientID="${row[clientIdCol]}", ToolID="${row[toolIdCol]}"`);
+      
+      if (row[clientIdCol] === 'TEST001' && row[toolIdCol] === 'tool1') {
+        matchingRows.push({
+          rowIndex: i,
+          responseId: row[headers.indexOf('Response_ID')],
+          clientId: row[clientIdCol],
+          toolId: row[toolIdCol],
+          versionData: row[headers.indexOf('Version')]
+        });
+        console.log(`✅ MATCH found at row ${i}`);
+      }
+    }
+    
+    return {
+      success: true,
+      totalRowsChecked: data.length - 1,
+      matchingRows: matchingRows,
+      matchCount: matchingRows.length
+    };
+    
+  } catch (error) {
+    console.error('❌ Find rows test failed:', error);
+    return { success: false, error: error.toString() };
+  }
+}
+
+/**
+ * DEBUG STEP 4: Test the exact same logic as getLastSubmissionForViewing
+ */
+function testGetLastSubmissionLogic() {
+  try {
+    console.log('🔍 TEST 4: Testing exact getLastSubmissionForViewing logic');
+    
+    // Use the exact same parameters and logic as the real function
+    const userId = 'TEST001';
+    const toolId = 'tool1';
+    
+    console.log(`🔍 Calling with userId: ${userId}, toolId: ${toolId}`);
+    
+    const ss = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
+    const responseSheet = ss.getSheetByName(CONFIG.SHEETS.RESPONSES);
+    
+    if (!responseSheet || responseSheet.getLastRow() < 2) {
+      return { success: false, error: 'No response sheet or no data' };
+    }
+    
+    // Get all data
+    const data = responseSheet.getDataRange().getValues();
+    const headers = data[0];
+    
+    // Find column indices - exact same as getLastSubmissionForViewing
+    const clientIdCol = headers.indexOf('Client_ID');
+    const toolIdCol = headers.indexOf('Tool_ID');
+    const versionCol = headers.indexOf('Version'); // JSON data is here!
+    const responseIdCol = headers.indexOf('Response_ID'); // Timestamp is here!
+    
+    console.log(`🔍 Columns - Client: ${clientIdCol}, Tool: ${toolIdCol}, Version: ${versionCol}, ResponseID: ${responseIdCol}`);
+    
+    if (clientIdCol === -1 || toolIdCol === -1 || versionCol === -1) {
+      return { success: false, error: 'Required columns not found' };
+    }
+    
+    // Find the most recent completed submission - EXACT SAME LOGIC
     let latestSubmission = null;
     let latestTimestamp = null;
     let matchCount = 0;
-    
-    console.log(`🔎 Searching for userId: "${userId}", toolId: "${toolId}"`);
     
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
@@ -1139,38 +1364,61 @@ function getLastSubmissionForViewing(userId, toolId) {
               userId: userId,
               toolId: toolId,
               found: true,
-              source: 'direct_sheet_access'
+              source: 'debug_test_exact_logic',
+              rawVersionData: row[versionCol] // Include raw data for inspection
             };
             console.log(`📝 Updated latest submission from row ${i}`);
           } catch (parseError) {
             console.warn(`⚠️ JSON parse failed for row ${i}:`, parseError);
-            // Try storing raw data if JSON parse fails
             latestSubmission = {
               data: row[versionCol],
               timestamp: timestamp,
               userId: userId,
               toolId: toolId,
               found: true,
-              source: 'direct_sheet_access_raw'
+              source: 'debug_test_exact_logic_raw',
+              parseError: parseError.toString(),
+              rawVersionData: row[versionCol]
             };
           }
         }
       }
     }
     
-    console.log(`🏁 Search complete - Total matches: ${matchCount}`);
-    
-    if (latestSubmission) {
-      console.log(`✅ Returning submission from ${latestSubmission.timestamp}`);
-      return latestSubmission;
-    }
-    
-    console.log('❌ No submissions found');
-    return null;
+    return {
+      success: true,
+      matchCount: matchCount,
+      latestSubmission: latestSubmission,
+      foundData: latestSubmission !== null
+    };
     
   } catch (error) {
-    console.error('💥 Error in getLastSubmissionForViewing:', error);
-    return null;
+    console.error('❌ Test exact logic failed:', error);
+    return { success: false, error: error.toString() };
+  }
+}
+
+/**
+ * DEBUG STEP 5: Test the actual getLastSubmissionForViewing function
+ */
+function testActualFunction() {
+  try {
+    console.log('🔍 TEST 5: Testing actual getLastSubmissionForViewing function');
+    
+    const result = getLastSubmissionForViewing('TEST001', 'tool1');
+    
+    return {
+      success: true,
+      result: result,
+      resultType: typeof result,
+      isNull: result === null,
+      hasData: result && result.data,
+      resultKeys: result ? Object.keys(result) : null
+    };
+    
+  } catch (error) {
+    console.error('❌ Test actual function failed:', error);
+    return { success: false, error: error.toString() };
   }
 }
 

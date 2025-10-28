@@ -855,7 +855,7 @@
       function displaySubmissionResults(submission) {
         console.log('Displaying submission results:', submission);
         
-        // Create modal for viewing results
+        // Create modal for viewing results using safer DOM methods
         const modal = document.createElement('div');
         modal.id = 'results-modal';
         modal.className = 'tool-modal show';
@@ -863,37 +863,100 @@
         const submissionDate = submission.timestamp ? 
           new Date(submission.timestamp).toLocaleDateString() : 'Unknown date';
         
-        modal.innerHTML = `
-          <div class="modal-backdrop" onclick="closeResultsModal()"></div>
-          <div class="modal-content" style="max-width: 800px;">
-            <div class="modal-header">
-              <h2>🎯 Last Submission Results</h2>
-              <button class="close-btn" onclick="closeResultsModal()">×</button>
-            </div>
-            <div class="modal-body" style="padding: 30px;">
-              <div style="text-align: center; margin-bottom: 30px;">
-                <h3 style="color: var(--accent); margin-bottom: 10px;">Financial Orientation Results</h3>
-                <p style="color: var(--muted);">Submitted on ${submissionDate}</p>
-              </div>
-              
-              <div id="results-content">
-                <div style="background: var(--light-bg); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                  <h4>📊 Your Responses:</h4>
-                  <pre style="white-space: pre-wrap; font-family: inherit;">${JSON.stringify(submission.data, null, 2)}</pre>
-                </div>
-              </div>
-              
-              <div style="text-align: center; margin-top: 30px;">
-                <button onclick="closeResultsModal()" class="btn btn-secondary" style="margin-right: 10px;">
-                  Close
-                </button>
-                <button onclick="generateNewReport()" class="btn btn-primary">
-                  Generate New Report
-                </button>
-              </div>
-            </div>
-          </div>
-        `;
+        // Create backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop';
+        backdrop.onclick = closeResultsModal;
+        
+        // Create modal content
+        const modalContent = document.createElement('div');
+        modalContent.className = 'modal-content';
+        modalContent.style.maxWidth = '800px';
+        
+        // Create header
+        const header = document.createElement('div');
+        header.className = 'modal-header';
+        
+        const title = document.createElement('h2');
+        title.textContent = '🎯 Last Submission Results';
+        
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'close-btn';
+        closeBtn.textContent = '×';
+        closeBtn.onclick = closeResultsModal;
+        
+        header.appendChild(title);
+        header.appendChild(closeBtn);
+        
+        // Create body
+        const body = document.createElement('div');
+        body.className = 'modal-body';
+        body.style.padding = '30px';
+        
+        // Title section
+        const titleSection = document.createElement('div');
+        titleSection.style.textAlign = 'center';
+        titleSection.style.marginBottom = '30px';
+        
+        const resultsTitle = document.createElement('h3');
+        resultsTitle.textContent = 'Financial Orientation Results';
+        resultsTitle.style.color = 'var(--accent)';
+        resultsTitle.style.marginBottom = '10px';
+        
+        const dateText = document.createElement('p');
+        dateText.textContent = `Submitted on ${submissionDate}`;
+        dateText.style.color = 'var(--muted)';
+        
+        titleSection.appendChild(resultsTitle);
+        titleSection.appendChild(dateText);
+        
+        // Results content
+        const resultsContent = document.createElement('div');
+        resultsContent.style.background = 'var(--light-bg)';
+        resultsContent.style.padding = '20px';
+        resultsContent.style.borderRadius = '8px';
+        resultsContent.style.marginBottom = '20px';
+        
+        const responsesTitle = document.createElement('h4');
+        responsesTitle.textContent = '📊 Your Responses:';
+        
+        const responsesData = document.createElement('pre');
+        responsesData.style.whiteSpace = 'pre-wrap';
+        responsesData.style.fontFamily = 'inherit';
+        responsesData.textContent = JSON.stringify(submission.data, null, 2);
+        
+        resultsContent.appendChild(responsesTitle);
+        resultsContent.appendChild(responsesData);
+        
+        // Buttons section
+        const buttonsSection = document.createElement('div');
+        buttonsSection.style.textAlign = 'center';
+        buttonsSection.style.marginTop = '30px';
+        
+        const closeButton = document.createElement('button');
+        closeButton.className = 'btn btn-secondary';
+        closeButton.style.marginRight = '10px';
+        closeButton.textContent = 'Close';
+        closeButton.onclick = closeResultsModal;
+        
+        const newReportButton = document.createElement('button');
+        newReportButton.className = 'btn btn-primary';
+        newReportButton.textContent = 'Generate New Report';
+        newReportButton.onclick = generateNewReport;
+        
+        buttonsSection.appendChild(closeButton);
+        buttonsSection.appendChild(newReportButton);
+        
+        // Assemble modal
+        body.appendChild(titleSection);
+        body.appendChild(resultsContent);
+        body.appendChild(buttonsSection);
+        
+        modalContent.appendChild(header);
+        modalContent.appendChild(body);
+        
+        modal.appendChild(backdrop);
+        modal.appendChild(modalContent);
         
         document.body.appendChild(modal);
       }
@@ -912,6 +975,152 @@
         // Scroll to top and focus on form
         window.scrollTo(0, 0);
         alert('You can modify your responses below and submit for a new report.');
+      }
+      
+      // DEBUG FUNCTIONS FOR STEP-BY-STEP TESTING
+      
+      function runDebugStep1() {
+        console.log('🔧 Running Debug Step 1: Sheet Connectivity');
+        google.script.run
+          .withSuccessHandler(function(result) {
+            console.log('📋 Step 1 Result:', result);
+            alert(`Step 1 - Sheet Connectivity:\n${JSON.stringify(result, null, 2)}`);
+          })
+          .withFailureHandler(function(error) {
+            console.error('❌ Step 1 Failed:', error);
+            alert(`Step 1 FAILED: ${error}`);
+          })
+          .testSheetConnectivity();
+      }
+      
+      function runDebugStep2() {
+        console.log('🔧 Running Debug Step 2: Headers');
+        google.script.run
+          .withSuccessHandler(function(result) {
+            console.log('📋 Step 2 Result:', result);
+            alert(`Step 2 - Headers:\n${JSON.stringify(result, null, 2)}`);
+          })
+          .withFailureHandler(function(error) {
+            console.error('❌ Step 2 Failed:', error);
+            alert(`Step 2 FAILED: ${error}`);
+          })
+          .testReadHeaders();
+      }
+      
+      function runDebugStep3() {
+        console.log('🔧 Running Debug Step 3: Find TEST001 Rows');
+        google.script.run
+          .withSuccessHandler(function(result) {
+            console.log('📋 Step 3 Result:', result);
+            
+            // Create detailed alert for row findings
+            let message = `Step 3 - Find TEST001 Rows:\n`;
+            message += `Total rows checked: ${result.totalRowsChecked}\n`;
+            message += `Matches found: ${result.matchCount}\n\n`;
+            
+            if (result.matchingRows && result.matchingRows.length > 0) {
+              message += 'Matching rows:\n';
+              result.matchingRows.forEach((row, index) => {
+                message += `${index + 1}. Row ${row.rowIndex}: ${row.responseId}\n`;
+              });
+            } else {
+              message += 'No matching rows found!';
+            }
+            
+            alert(message);
+          })
+          .withFailureHandler(function(error) {
+            console.error('❌ Step 3 Failed:', error);
+            alert(`Step 3 FAILED: ${error}`);
+          })
+          .testFindTest001Rows();
+      }
+      
+      function runDebugStep4() {
+        console.log('🔧 Running Debug Step 4: Test Real Function Logic');
+        google.script.run
+          .withSuccessHandler(function(result) {
+            console.log('📋 Step 4 Result:', result);
+            
+            let message = `Step 4 - Real Function Logic Test:\n`;
+            message += `Success: ${result.success}\n`;
+            message += `Match count: ${result.matchCount}\n`;
+            message += `Found data: ${result.foundData}\n\n`;
+            
+            if (result.latestSubmission) {
+              message += `Latest submission found:\n`;
+              message += `- Source: ${result.latestSubmission.source}\n`;
+              message += `- Timestamp: ${result.latestSubmission.timestamp}\n`;
+              message += `- Has data: ${!!result.latestSubmission.data}\n`;
+              if (result.latestSubmission.parseError) {
+                message += `- Parse error: ${result.latestSubmission.parseError}\n`;
+              }
+            } else {
+              message += 'No latest submission found!';
+            }
+            
+            alert(message);
+          })
+          .withFailureHandler(function(error) {
+            console.error('❌ Step 4 Failed:', error);
+            alert(`Step 4 FAILED: ${error}`);
+          })
+          .testGetLastSubmissionLogic();
+      }
+      
+      function runDebugStep5() {
+        console.log('🔧 Running Debug Step 5: Test Actual Function');
+        google.script.run
+          .withSuccessHandler(function(result) {
+            console.log('📋 Step 5 Result:', result);
+            
+            let message = `Step 5 - Actual Function Test:\n`;
+            message += `Success: ${result.success}\n`;
+            message += `Result type: ${result.resultType}\n`;
+            message += `Is null: ${result.isNull}\n`;
+            message += `Has data: ${result.hasData}\n\n`;
+            
+            if (result.result) {
+              message += `Result keys: ${result.resultKeys}\n`;
+              message += `Full result: ${JSON.stringify(result.result, null, 2)}`;
+            } else {
+              message += 'Result is null or undefined!';
+            }
+            
+            alert(message);
+          })
+          .withFailureHandler(function(error) {
+            console.error('❌ Step 5 Failed:', error);
+            alert(`Step 5 FAILED: ${error}`);
+          })
+          .testActualFunction();
+      }
+      
+      // Fix missing restoreFormData function
+      function restoreFormData(data) {
+        if (!data) {
+          console.warn('No data provided to restoreFormData');
+          return;
+        }
+        
+        try {
+          // Restore form field values
+          for (const [fieldName, value] of Object.entries(data)) {
+            const field = document.querySelector(`[name="${fieldName}"]`);
+            if (field) {
+              field.value = value;
+              
+              // Trigger any change events for range inputs
+              if (field.type === 'range') {
+                field.dispatchEvent(new Event('input'));
+              }
+            }
+          }
+          
+          console.log('Form data restored successfully');
+        } catch (error) {
+          console.error('Error restoring form data:', error);
+        }
       }
       
       function displayVersionSelector(versions) {
@@ -1574,6 +1783,28 @@
                 </button>
                 <button type="button" class="btn btn-secondary" onclick="ToolWrapper.saveDraft()">
                   💾 Save Progress
+                </button>
+              </div>
+              
+              <!-- DEBUG BUTTONS -->
+              <div style="margin-bottom: 20px; border-top: 1px solid #ddd; padding-top: 15px;">
+                <div style="text-align: center; margin-bottom: 10px; color: #666; font-size: 12px;">
+                  🔧 Debug Tools (Step-by-Step Testing)
+                </div>
+                <button type="button" class="btn btn-warning" onclick="runDebugStep1()" style="margin: 5px; font-size: 11px;">
+                  1️⃣ Test Sheet Access
+                </button>
+                <button type="button" class="btn btn-warning" onclick="runDebugStep2()" style="margin: 5px; font-size: 11px;">
+                  2️⃣ Test Headers
+                </button>
+                <button type="button" class="btn btn-warning" onclick="runDebugStep3()" style="margin: 5px; font-size: 11px;">
+                  3️⃣ Find TEST001 Rows
+                </button>
+                <button type="button" class="btn btn-warning" onclick="runDebugStep4()" style="margin: 5px; font-size: 11px;">
+                  4️⃣ Test Real Function Logic
+                </button>
+                <button type="button" class="btn btn-warning" onclick="runDebugStep5()" style="margin: 5px; font-size: 11px;">
+                  5️⃣ Test Actual Function
                 </button>
               </div>
               <!-- Submit button -->
