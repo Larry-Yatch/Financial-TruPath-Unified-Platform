@@ -1054,6 +1054,12 @@ const ToolWrapper = {
             if (draft.data.progress) {
               this.updateProgressDisplay(draft.data.progress);
             }
+            // Navigate to form after loading from landing page
+            if (typeof startTool1Form === 'function') {
+              setTimeout(() => {
+                startTool1Form();
+              }, 1000); // Small delay to show the success message
+            }
           } else {
             this.showNotification('Draft not found or invalid', 'error');
           }
