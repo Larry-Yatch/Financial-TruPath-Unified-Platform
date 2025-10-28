@@ -1,0 +1,318 @@
+<script>
+/**
+ * API Batch Service for TruPath Financial Platform V2.0
+ * Eliminates HTTP 429 rate limiting by batching and caching API calls
+ * Version: V11.41+ (API Performance Optimized)
+ */
+
+window.APIBatchService = {
+  cache: new Map(),
+  pendingRequests: new Map(),
+  batchQueue: [],
+  batchTimeout: null,
+  BATCH_DELAY: 100, // ms - batch multiple requests
+  CACHE_TTL: 30000, // 30 seconds cache for draft/submission data
+  
+  /**
+   * Get cached data or make batched request
+   */
+  async getData(operation, params) {
+    const cacheKey = this.getCacheKey(operation, params);
+    
+    // Return cached data if available and fresh
+    if (this.cache.has(cacheKey)) {
+      const cached = this.cache.get(cacheKey);
+      if (Date.now() - cached.timestamp < this.CACHE_TTL) {
+        console.log(`🎯 Cache hit for ${operation}:`, params);
+        return cached.data;
+      } else {
+        this.cache.delete(cacheKey);
+      }
+    }
+    
+    // Check if request is already pending
+    if (this.pendingRequests.has(cacheKey)) {
+      console.log(`⏳ Waiting for pending ${operation}:`, params);
+      return this.pendingRequests.get(cacheKey);
+    }
+    
+    // Create new batched request
+    const promise = this.createBatchedRequest(operation, params, cacheKey);
+    this.pendingRequests.set(cacheKey, promise);
+    
+    return promise;
+  },
+  
+  /**
+   * Create a batched request that waits for other similar requests
+   */
+  createBatchedRequest(operation, params, cacheKey) {
+    return new Promise((resolve, reject) => {
+      // Add to batch queue
+      this.batchQueue.push({
+        operation,
+        params,
+        cacheKey,
+        resolve,
+        reject
+      });
+      
+      // Process batch after delay (allows multiple requests to accumulate)
+      if (this.batchTimeout) {
+        clearTimeout(this.batchTimeout);
+      }
+      
+      this.batchTimeout = setTimeout(() => {
+        this.processBatch();
+      }, this.BATCH_DELAY);
+    });
+  },
+  
+  /**
+   * Process accumulated batch requests
+   */
+  async processBatch() {
+    if (this.batchQueue.length === 0) return;
+    
+    const batch = [...this.batchQueue];
+    this.batchQueue = [];
+    this.batchTimeout = null;
+    
+    console.log(`🚀 Processing batch of ${batch.length} requests`);
+    
+    // Group by operation type for efficient processing
+    const groupedBatch = batch.reduce((groups, request) => {
+      if (!groups[request.operation]) {
+        groups[request.operation] = [];
+      }
+      groups[request.operation].push(request);
+      return groups;
+    }, {});
+    
+    // Process each operation group
+    for (const [operation, requests] of Object.entries(groupedBatch)) {
+      try {
+        await this.processOperationGroup(operation, requests);
+      } catch (error) {
+        console.error(`❌ Batch error for ${operation}:`, error);
+        // Reject all requests in this group
+        requests.forEach(req => req.reject(error));
+      }
+    }
+  },
+  
+  /**
+   * Process a group of requests for the same operation
+   */
+  async processOperationGroup(operation, requests) {
+    switch (operation) {
+      case 'getDraftAndSubmission':
+        await this.processDraftAndSubmissionRequests(requests);
+        break;
+      case 'saveDraft':
+        await this.processSaveDraftRequests(requests);
+        break;
+      default:
+        // Fallback: process individually
+        for (const request of requests) {
+          await this.processSingleRequest(request);
+        }
+    }
+  },
+  
+  /**
+   * Process draft and submission requests together (most common pattern)
+   */
+  async processDraftAndSubmissionRequests(requests) {
+    // Group by userId to batch per user
+    const userGroups = requests.reduce((groups, req) => {
+      const userId = req.params.userId;
+      if (!groups[userId]) {
+        groups[userId] = { drafts: [], submissions: [] };
+      }
+      
+      if (req.params.type === 'draft') {
+        groups[userId].drafts.push(req);
+      } else if (req.params.type === 'submission') {
+        groups[userId].submissions.push(req);
+      }
+      
+      return groups;
+    }, {});
+    
+    // Process each user's requests
+    for (const [userId, userRequests] of Object.entries(userGroups)) {
+      try {
+        // Make a single call to get both draft and submission data
+        const result = await this.callServerFunction('getUserToolData', {
+          userId,
+          toolId: 'tool1',
+          includeDrafts: userRequests.drafts.length > 0,
+          includeSubmissions: userRequests.submissions.length > 0
+        });
+        
+        // Resolve draft requests (extract array from server response)
+        userRequests.drafts.forEach(req => {
+          // Server returns {drafts: {manualVersions: Array}} - extract the array
+          const serverData = result.drafts || null;
+          const data = (serverData && serverData.manualVersions) ? serverData.manualVersions : serverData;
+          console.log('🔧 Extracting draft array:', serverData, '->', data);
+          this.cacheResult(req.cacheKey, data);
+          this.pendingRequests.delete(req.cacheKey);
+          req.resolve(data);  // Return the actual array, not wrapped object
+        });
+        
+        // Resolve submission requests (return direct data, not wrapped)
+        userRequests.submissions.forEach(req => {
+          const data = result.submissions || null;
+          this.cacheResult(req.cacheKey, data);
+          this.pendingRequests.delete(req.cacheKey);
+          req.resolve(data);  // This should be the direct object, not wrapped
+        });
+        
+      } catch (error) {
+        console.error(`❌ Error processing user ${userId} requests:`, error);
+        [...userRequests.drafts, ...userRequests.submissions].forEach(req => {
+          this.pendingRequests.delete(req.cacheKey);
+          req.reject(error);
+        });
+      }
+    }
+  },
+  
+  /**
+   * Process save draft requests (can be batched by user)
+   */
+  async processSaveDraftRequests(requests) {
+    // For now, process individually but with rate limiting
+    for (let i = 0; i < requests.length; i++) {
+      const request = requests[i];
+      
+      try {
+        // Add small delay between saves to prevent rate limiting
+        if (i > 0) {
+          await new Promise(resolve => setTimeout(resolve, 200));
+        }
+        
+        const result = await this.callServerFunction('saveToolDraftToSheet', request.params);
+        
+        this.cacheResult(request.cacheKey, result);
+        this.pendingRequests.delete(request.cacheKey);
+        request.resolve(result);
+        
+      } catch (error) {
+        console.error(`❌ Error saving draft:`, error);
+        this.pendingRequests.delete(request.cacheKey);
+        request.reject(error);
+      }
+    }
+  },
+  
+  /**
+   * Process single request (fallback)
+   */
+  async processSingleRequest(request) {
+    try {
+      const result = await this.callServerFunction(request.operation, request.params);
+      this.cacheResult(request.cacheKey, result);
+      this.pendingRequests.delete(request.cacheKey);
+      request.resolve(result);
+    } catch (error) {
+      this.pendingRequests.delete(request.cacheKey);
+      request.reject(error);
+    }
+  },
+  
+  /**
+   * Call server function with proper error handling
+   */
+  callServerFunction(functionName, params) {
+    return new Promise((resolve, reject) => {
+      if (typeof google === 'undefined' || !google.script || !google.script.run) {
+        reject(new Error('Google Apps Script not available'));
+        return;
+      }
+      
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        [functionName](params);
+    });
+  },
+  
+  /**
+   * Cache result with timestamp
+   */
+  cacheResult(cacheKey, data) {
+    this.cache.set(cacheKey, {
+      data,
+      timestamp: Date.now()
+    });
+  },
+  
+  /**
+   * Generate cache key
+   */
+  getCacheKey(operation, params) {
+    return `${operation}:${JSON.stringify(params)}`;
+  },
+  
+  /**
+   * Clear cache (useful for testing)
+   */
+  clearCache() {
+    this.cache.clear();
+    console.log('🧹 API cache cleared');
+  },
+  
+  /**
+   * Get cache stats
+   */
+  getCacheStats() {
+    return {
+      size: this.cache.size,
+      pendingRequests: this.pendingRequests.size,
+      queuedBatches: this.batchQueue.length
+    };
+  }
+};
+
+// High-level wrapper functions to replace direct google.script.run calls
+window.ApiUtils = {
+  /**
+   * Get tool draft (replaces direct getToolDraftFromProperties calls)
+   */
+  async getToolDraft(userId, toolId) {
+    return APIBatchService.getData('getDraftAndSubmission', {
+      userId,
+      toolId,
+      type: 'draft'
+    });
+  },
+  
+  /**
+   * Get last submission (replaces direct getLastSubmissionForViewing calls)
+   */
+  async getLastSubmission(userId, toolId) {
+    return APIBatchService.getData('getDraftAndSubmission', {
+      userId,
+      toolId,  
+      type: 'submission'
+    });
+  },
+  
+  /**
+   * Save draft (replaces direct saveToolDraftToSheet calls)
+   */
+  async saveDraft(userId, toolId, data, progress) {
+    return APIBatchService.getData('saveDraft', {
+      userId,
+      toolId,
+      data,
+      progress
+    });
+  }
+};
+
+console.log('🚀 API Batch Service loaded - Ready to eliminate HTTP 429 errors!');
+</script>
