@@ -245,8 +245,37 @@
           document.getElementById('report-nav-session').value = currentSessionId;
         }
         
-        // Submit the form to navigate
-        navForm.submit();
+        // Show loading indicator before navigation
+        document.body.style.opacity = '0.7';
+        document.body.style.transition = 'opacity 0.2s ease';
+        
+        // Add loading overlay
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.id = 'navigation-loading';
+        loadingOverlay.style.cssText = `
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: var(--card);
+          border: 1px solid var(--border);
+          border-radius: 15px;
+          padding: 20px 30px;
+          color: var(--text);
+          font-family: 'Rubik', sans-serif;
+          font-size: 16px;
+          z-index: 10000;
+          box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        `;
+        loadingOverlay.innerHTML = '🔄 Loading dashboard...';
+        document.body.appendChild(loadingOverlay);
+        
+        console.log('🔄 Navigation loading indicator shown');
+        
+        // Submit the form to navigate (slight delay for visual feedback)
+        setTimeout(() => {
+          navForm.submit();
+        }, 150);
       }
       
       // Draft version selection functions (from TestTool pattern)
