@@ -460,13 +460,37 @@ const DataService = {
   getSpecificDraftVersion(clientId, toolId, draftId) {
     try {
       const userProperties = PropertiesService.getUserProperties();
-      const versionsKey = `drafts_${clientId}_${toolId}_versions`;
-      const versionsJson = userProperties.getProperty(versionsKey);
+      const latestKey = `draft_${clientId}_${toolId}_latest`;
+      const manualVersionsKey = `drafts_${clientId}_${toolId}_manual_versions`;
       
-      if (versionsJson) {
-        const versions = JSON.parse(versionsJson);
-        const draft = versions.find(v => v.id === draftId);
-        return draft || null;
+      // Check if it's the latest draft
+      const latestJson = userProperties.getProperty(latestKey);
+      if (latestJson) {
+        const latest = JSON.parse(latestJson);
+        if (latest.id === draftId) {
+          return latest;
+        }
+      }
+      
+      // Check manual versions
+      const manualVersionsJson = userProperties.getProperty(manualVersionsKey);
+      if (manualVersionsJson) {
+        const manualVersions = JSON.parse(manualVersionsJson);
+        const draft = manualVersions.find(v => v.id === draftId);
+        if (draft) {
+          return draft;
+        }
+      }
+      
+      // Fallback: check old storage format for backward compatibility
+      const oldVersionsKey = `drafts_${clientId}_${toolId}_versions`;
+      const oldVersionsJson = userProperties.getProperty(oldVersionsKey);
+      if (oldVersionsJson) {
+        const oldVersions = JSON.parse(oldVersionsJson);
+        const draft = oldVersions.find(v => v.id === draftId);
+        if (draft) {
+          return draft;
+        }
       }
       
       return null;
