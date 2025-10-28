@@ -1666,7 +1666,7 @@
                 <button onclick="startTool1Form()" class="btn-primary" style="font-size: 16px; padding: 12px 30px;">
                   🚀 Start Assessment
                 </button>
-                <button onclick="loadDraftWithVersions()" class="btn-secondary" id="continue-draft-btn" style="display:none;">
+                <button onclick="ToolWrapper.showLoadOptions()" class="btn-secondary" id="continue-draft-btn" style="display:none;">
                   📂 Continue Previous
                 </button>
               </div>
@@ -2002,7 +2002,7 @@
             <div style="margin-top: 30px; text-align: center;">
               <!-- Draft management buttons -->
               <div style="margin-bottom: 20px;">
-                <button type="button" class="btn btn-secondary" onclick="loadDraftWithVersions()" style="margin-right: 10px;">
+                <button type="button" class="btn btn-secondary" onclick="ToolWrapper.showLoadOptions()" style="margin-right: 10px;">
                   📂 Load Draft
                 </button>
                 <button type="button" class="btn btn-secondary" onclick="ToolWrapper.saveDraft()">
