@@ -1076,9 +1076,54 @@ const ToolWrapper = {
    * Get help content for tool
    */
   getToolHelp(toolId) {
-    const helps = {
+    // Navigation buttons help section (shown on all tools)
+    const navigationHelp = `
+      <h3>📋 Navigation Buttons Guide</h3>
+      <div style="margin-bottom: 20px; padding: 15px; background: var(--section-bg, #f8f9fa); border-radius: 8px;">
+        <div style="display: grid; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 16px;">📂</span>
+            <div>
+              <strong>Load</strong> - Restore previous work or drafts from cloud storage
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 16px;">🏠</span>
+            <div>
+              <strong>Dashboard</strong> - Return to main menu and view your progress
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 16px;">💡</span>
+            <div>
+              <strong>Insights</strong> - View personalized insights from completed tools
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 16px;">📊</span>
+            <div>
+              <strong>Export</strong> - Download your data and reports in various formats
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 16px;">🚪</span>
+            <div>
+              <strong>Logout</strong> - Sign out and securely end your session
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 16px;">❓</span>
+            <div>
+              <strong>Help</strong> - Show this guide and tool-specific instructions
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const toolSpecificHelp = {
       'tool1': `
-        <h3>How to Complete the Orientation Assessment</h3>
+        <h3>🚀 How to Complete the Orientation Assessment</h3>
         <ul>
           <li>Answer all questions honestly - there are no wrong answers</li>
           <li>Your progress is saved automatically every 2 minutes</li>
@@ -1088,13 +1133,14 @@ const ToolWrapper = {
         </ul>
       `,
       'tool2': `
-        <h3>Financial Clarity Assessment Help</h3>
+        <h3>💰 Financial Clarity Assessment Help</h3>
         <p>This tool builds on your Orientation Assessment results...</p>
       `
       // Add more tool helps as needed
     };
     
-    return helps[toolId] || '<p>Help content for this tool is being developed.</p>';
+    const toolHelp = toolSpecificHelp[toolId] || '<p>Help content for this tool is being developed.</p>';
+    return navigationHelp + toolHelp;
   },
   
   /**
