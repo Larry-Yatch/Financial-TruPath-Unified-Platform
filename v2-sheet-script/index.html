@@ -8,6 +8,7 @@
     <?!= baseUrlJs ?>
     <?!= include('styles') ?>
     <?!= include('ui-utilities') ?>
+    <?!= include('api-batch-service') ?>
     <script>
       // Platform configuration (must be defined before ToolWrapper)
       const userId = '<?!= userId || "" ?>' || 'user-' + Date.now();
@@ -250,62 +251,61 @@
       
       // Draft version selection functions (from TestTool pattern)
       // MOVED HERE: Must be defined BEFORE loadOrientationTool which uses it
-      window.loadDraftWithVersions = function() {
-        console.log('Loading draft versions for editing...');
+      window.loadDraftWithVersions = async function() {
+        console.log('⚡ Loading draft versions (BATCHED)...');
         const currentUserId = typeof userId !== 'undefined' ? userId : 'TEST_USER';
         console.log('Using userId:', currentUserId);
         
-        // Load only drafts for form editing
-        google.script.run
-          .withSuccessHandler(function(drafts) {
-            console.log('Retrieved drafts:', drafts);
-            
-            if (!drafts || drafts.length === 0) {
-              alert('No saved drafts found. Start filling out the form to create drafts.');
-              return;
-            }
-            
-            // Process drafts for form editing
-            const draftVersions = [];
-            drafts.forEach(draft => {
-              draft.isSubmitted = false;
-              draft.label = 'Draft';
-              draftVersions.push(draft);
-            });
-            
-            displayVersionSelector(draftVersions);
-          })
-          .withFailureHandler(function(error) {
-            console.error('Error loading drafts:', error);
-            alert('Error loading drafts: ' + error);
-          })
-          .getToolDraftFromProperties(currentUserId, 'tool1');
+        try {
+          // Use batched API service to get drafts
+          const drafts = await ApiUtils.getToolDraft(currentUserId, 'tool1');
+          console.log('✅ Retrieved drafts via batch service:', drafts);
+          
+          if (!drafts || drafts.length === 0) {
+            alert('No saved drafts found. Start filling out the form to create drafts.');
+            return;
+          }
+          
+          // Process drafts for form editing
+          const draftVersions = [];
+          drafts.forEach(draft => {
+            draft.isSubmitted = false;
+            draft.label = 'Draft';
+            draftVersions.push(draft);
+          });
+          
+          displayVersionSelector(draftVersions);
+          
+        } catch (error) {
+          console.error('❌ Error loading drafts (batched):', error);
+          alert('Error loading drafts: ' + error);
+        }
       }
       
       // New function: View last insights report (the formatted report, not raw data)
-      window.viewLastSubmission = function() {
-        console.log('Loading last submission for insights report viewing...');
+      window.viewLastSubmission = async function() {
+        console.log('⚡ Loading last submission (BATCHED)...');
         const currentUserId = typeof userId !== 'undefined' ? userId : 'TEST_USER';
         console.log('Using userId:', currentUserId);
         
-        google.script.run
-          .withSuccessHandler(function(lastSubmission) {
-            console.log('Last submission for insights report:', lastSubmission);
-            
-            if (!lastSubmission || !lastSubmission.data) {
-              alert('No previous submissions found. Complete and submit the form first.');
-              return;
-            }
-            
-            // Generate insights report from the submission data and display it
-            const report = generateLocalInsightsReport(lastSubmission.data);
-            displayInsightsReportInModal(report, lastSubmission);
-          })
-          .withFailureHandler(function(error) {
-            console.error('Error loading last submission:', error);
-            alert('Error loading last submission: ' + error);
-          })
-          .getLastSubmissionForViewing(currentUserId, 'tool1');
+        try {
+          // Use batched API service to get last submission
+          const lastSubmission = await ApiUtils.getLastSubmission(currentUserId, 'tool1');
+          console.log('✅ Last submission via batch service:', lastSubmission);
+          
+          if (!lastSubmission || !lastSubmission.data) {
+            alert('No previous submissions found. Complete and submit the form first.');
+            return;
+          }
+          
+          // Generate insights report from the submission data and display it
+          const report = generateLocalInsightsReport(lastSubmission.data);
+          displayInsightsReportInModal(report, lastSubmission);
+          
+        } catch (error) {
+          console.error('❌ Error loading last submission (batched):', error);
+          alert('Error loading last submission: ' + error);
+        }
       }
       
       // Function moved to ui-utilities.html for performance optimization
@@ -676,23 +676,51 @@
       }
       
       // Quick load most recent draft
-      window.loadMostRecentDraft = function() {
+      window.loadMostRecentDraft = async function() {
         const currentUserId = typeof userId !== 'undefined' ? userId : 'TEST_USER';
+        console.log('🔄 loadMostRecentDraft called for:', currentUserId);
         
-        google.script.run
-          .withSuccessHandler(function(drafts) {
-            if (drafts && drafts.length > 0) {
-              // Load the most recent draft (first in array) and auto-navigate to form
-              loadSpecificDraft(drafts[0]);
-            } else {
-              alert('No draft found to load.');
-            }
-          })
-          .withFailureHandler(function(error) {
-            console.error('Error loading recent draft:', error);
+        try {
+          // Use batched API service to get drafts
+          console.log('📞 Calling ApiUtils.getToolDraft...');
+          const drafts = await ApiUtils.getToolDraft(currentUserId, 'tool1');
+          console.log('📥 Received drafts data:', drafts);
+          console.log('📊 Drafts type:', typeof drafts, 'Array?', Array.isArray(drafts), 'Length:', drafts?.length);
+          
+          if (drafts && Array.isArray(drafts) && drafts.length > 0) {
+            console.log('✅ Found', drafts.length, 'drafts, loading first one:', drafts[0]);
+            // Load the most recent draft (first in array) and auto-navigate to form
+            loadSpecificDraft(drafts[0]);
+          } else {
+            console.log('❌ No valid drafts found. Data received:', drafts);
+            alert('No draft found to load.');
+          }
+        } catch (error) {
+          console.error('❌ Error loading recent draft (batched):', error);
+          console.error('Error details:', error.message, error.stack);
+          
+          // Fallback to direct API call
+          console.log('🔄 Trying fallback to direct API call...');
+          try {
+            google.script.run
+              .withSuccessHandler(function(drafts) {
+                console.log('✅ Fallback API success:', drafts);
+                if (drafts && drafts.length > 0) {
+                  loadSpecificDraft(drafts[0]);
+                } else {
+                  alert('No draft found to load.');
+                }
+              })
+              .withFailureHandler(function(error) {
+                console.error('❌ Fallback API also failed:', error);
+                alert('Error loading draft. Please try again.');
+              })
+              .getToolDraftFromProperties(currentUserId, 'tool1');
+          } catch (fallbackError) {
+            console.error('❌ Fallback also failed:', fallbackError);
             alert('Error loading draft. Please try again.');
-          })
-          .getToolDraftFromProperties(currentUserId, 'tool1');
+          }
+        }
       }
       
       // View completed results (fixed to use working viewLastSubmission function)
@@ -702,30 +730,29 @@
       }
       
       // Check if user has previous reports and toggle View Last Report button visibility
-      function checkAndToggleViewReportButton() {
+      async function checkAndToggleViewReportButton() {
         const viewReportBtn = document.getElementById('view-last-report-btn');
         if (!viewReportBtn) return;
         
         const currentUserId = typeof userId !== 'undefined' ? userId : 'TEST_USER';
         
-        // Check if user has any previous submissions
-        google.script.run
-          .withSuccessHandler(function(lastSubmission) {
-            if (viewReportBtn) {
-              if (lastSubmission && lastSubmission.data) {
-                viewReportBtn.style.display = 'inline-block';
-              } else {
-                viewReportBtn.style.display = 'none';
-              }
-            }
-          })
-          .withFailureHandler(function(error) {
-            console.log('No previous reports found or error checking:', error);
-            if (viewReportBtn) {
+        try {
+          // Use batched API service to check for submissions
+          const lastSubmission = await ApiUtils.getLastSubmission(currentUserId, 'tool1');
+          
+          if (viewReportBtn) {
+            if (lastSubmission && lastSubmission.data) {
+              viewReportBtn.style.display = 'inline-block';
+            } else {
               viewReportBtn.style.display = 'none';
             }
-          })
-          .getLastSubmissionForViewing(currentUserId, 'tool1');
+          }
+        } catch (error) {
+          console.log('❌ No previous reports found or error checking (batched):', error);
+          if (viewReportBtn) {
+            viewReportBtn.style.display = 'none';
+          }
+        }
       }
       
       // Load a specific draft and switch to form view

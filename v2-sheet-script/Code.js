@@ -1288,6 +1288,68 @@ function getToolDraftFromProperties(userId, toolId, getAllVersions = false) {
 }
 
 /**
+ * BATCHED API FUNCTION - Get user tool data in one call
+ * Eliminates HTTP 429 rate limiting by combining draft and submission requests
+ * @param {Object} params - Parameters object
+ * @param {string} params.userId - User ID
+ * @param {string} params.toolId - Tool identifier  
+ * @param {boolean} params.includeDrafts - Whether to include draft data
+ * @param {boolean} params.includeSubmissions - Whether to include submission data
+ * @returns {Object} Combined result with drafts and submissions
+ */
+function getUserToolData(params) {
+  try {
+    console.log('🚀 Batched getUserToolData called:', params);
+    
+    const { userId, toolId, includeDrafts, includeSubmissions } = params;
+    const result = {};
+    
+    // Get drafts if requested
+    if (includeDrafts) {
+      try {
+        result.drafts = DataService.getToolDraftFromProperties(userId, toolId, true);
+        console.log(`✅ Got ${result.drafts?.length || 0} drafts for ${userId}`);
+      } catch (error) {
+        console.error('❌ Error getting drafts:', error);
+        result.drafts = null;
+        result.draftError = error.toString();
+      }
+    }
+    
+    // Get submissions if requested  
+    if (includeSubmissions) {
+      try {
+        result.submissions = getLastSubmissionForViewing(userId, toolId);
+        console.log(`✅ Got submission data for ${userId}:`, !!result.submissions);
+      } catch (error) {
+        console.error('❌ Error getting submissions:', error);
+        result.submissions = null;
+        result.submissionError = error.toString();
+      }
+    }
+    
+    console.log('🎯 Batched result summary:', {
+      hasDrafts: !!result.drafts,
+      hasSubmissions: !!result.submissions,
+      errors: {
+        draft: !!result.draftError,
+        submission: !!result.submissionError
+      }
+    });
+    
+    return result;
+    
+  } catch (error) {
+    console.error('💥 Error in getUserToolData:', error);
+    return {
+      error: error.toString(),
+      drafts: null,
+      submissions: null
+    };
+  }
+}
+
+/**
  * Get all draft versions for a tool
  * @param {string} userId - User ID
  * @param {string} toolId - Tool identifier
