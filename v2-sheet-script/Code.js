@@ -399,14 +399,28 @@ function createLoginPage(message) {
       document.getElementById('loginForm').style.display = 'none';
       document.getElementById('loadingSpinner').style.display = 'block';
       
-      // Try to authenticate and create session
+      // Try authentication with retry mechanism for iframe timing issues
+      attemptAuthentication(clientId, 1);
+    }
+    
+    function attemptAuthentication(clientId, attempt) {
+      const maxAttempts = 2;
+      
       google.script.run
         .withSuccessHandler(function(result) {
           // Check if result is null or undefined
           if (!result) {
+            if (attempt < maxAttempts) {
+              console.log('Retry attempt ' + (attempt + 1) + ' due to null response');
+              setTimeout(function() {
+                attemptAuthentication(clientId, attempt + 1);
+              }, 1000);
+              return;
+            }
+            
             document.getElementById('loginForm').style.display = 'block';
             document.getElementById('loadingSpinner').style.display = 'none';
-            showAlert('No response from server. Please refresh and try again.', 'error');
+            showAlert('Connection issue. Please refresh the page and try again.', 'error');
             return;
           }
           
@@ -430,10 +444,18 @@ function createLoginPage(message) {
           }
         })
         .withFailureHandler(function(error) {
+          if (attempt < maxAttempts) {
+            console.log('Retry attempt ' + (attempt + 1) + ' due to failure:', error);
+            setTimeout(function() {
+              attemptAuthentication(clientId, attempt + 1);
+            }, 1000);
+            return;
+          }
+          
           document.getElementById('loginForm').style.display = 'block';
           document.getElementById('loadingSpinner').style.display = 'none';
-          showAlert('System error. Please try again.', 'error');
-          // console.error(error);
+          showAlert('System error. Please refresh the page and try again.', 'error');
+          console.error('Final authentication failure:', error);
         })
         .authenticateAndCreateSession(clientId);
     }
@@ -1030,43 +1052,20 @@ function getCurrentWeek() {
  */
 function getLastToolResponse(userId, toolId) {
   try {
-    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-    const sheet = ss.getSheetByName('RESPONSES');
+    // Use the fixed DataService.getToolResponse method
+    const response = DataService.getToolResponse(userId, toolId);
     
-    if (!sheet) {
-      console.log('RESPONSES sheet not found');
-      return null;
+    if (response) {
+      return {
+        timestamp: response.timestamp,
+        data: response.data,
+        clientId: response.clientId,
+        toolId: response.toolId
+      };
     }
     
-    const data = sheet.getDataRange().getValues();
-    if (data.length <= 1) return null; // Only headers
+    return null;
     
-    // Find the last response for this user and tool
-    // Starting from the end (most recent)
-    for (let i = data.length - 1; i >= 1; i--) {
-      const row = data[i];
-      // Assuming columns: Timestamp, SessionId, ClientId, ToolId, Data...
-      if (row[2] === userId && row[3] === toolId) {
-        // Found the last response
-        const headers = data[0];
-        const response = {};
-        
-        // Build response object from row data
-        for (let j = 4; j < headers.length; j++) {
-          if (headers[j] && row[j] !== '') {
-            response[headers[j]] = row[j];
-          }
-        }
-        
-        return {
-          timestamp: row[0],
-          sessionId: row[1],
-          data: response
-        };
-      }
-    }
-    
-    return null; // No response found
   } catch (error) {
     console.error('Error getting last tool response:', error);
     return null;
@@ -1168,6 +1167,16 @@ function getToolDraft(userId, toolId, getAllVersions = false) {
     // console.error('Error getting draft:', error);
     return null;
   }
+}
+
+/**
+ * Alias for getToolDraft - for compatibility with Load menu
+ * @param {string} userId - User ID  
+ * @param {string} toolId - Tool identifier
+ * @param {boolean} getAllVersions - Whether to get all versions
+ */
+function getToolDraftFromProperties(userId, toolId, getAllVersions = false) {
+  return getToolDraft(userId, toolId, getAllVersions);
 }
 
 /**

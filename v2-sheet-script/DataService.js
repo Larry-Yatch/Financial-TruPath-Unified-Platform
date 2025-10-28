@@ -544,10 +544,15 @@ const DataService = {
    */
   getToolResponse(clientId, toolId) {
     try {
+      console.log(`🔧 DataService.getToolResponse called - clientId: ${clientId}, toolId: ${toolId}`);
+      
       const ss = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
       const responseSheet = ss.getSheetByName(CONFIG.SHEETS.RESPONSES);
       
+      console.log(`📋 Found sheet: ${responseSheet ? 'YES' : 'NO'}, rows: ${responseSheet ? responseSheet.getLastRow() : 0}`);
+      
       if (!responseSheet || responseSheet.getLastRow() < 2) {
+        console.log(`❌ No data found - sheet: ${!!responseSheet}, rows: ${responseSheet ? responseSheet.getLastRow() : 0}`);
         return null;
       }
       
@@ -555,24 +560,36 @@ const DataService = {
       const data = responseSheet.getDataRange().getValues();
       const headers = data[0];
       
+      console.log(`📊 Headers found:`, headers);
+      console.log(`📈 Total rows: ${data.length}`);
+      
       // Find column indices
       const clientIdCol = headers.indexOf('Client_ID');
       const toolIdCol = headers.indexOf('Tool_ID');
-      const responseDataCol = headers.indexOf('Response_Data');
-      const timestampCol = headers.indexOf('Timestamp');
+      const responseDataCol = headers.indexOf('Version'); // Data is actually in Version column!
+      const timestampCol = headers.indexOf('Response_ID'); // Timestamp is in Response_ID column!
+      
+      console.log(`🔍 Column indices - ClientID: ${clientIdCol}, ToolID: ${toolIdCol}, ResponseData: ${responseDataCol}`);
       
       if (clientIdCol === -1 || toolIdCol === -1 || responseDataCol === -1) {
-        console.error('Required columns not found in RESPONSES sheet');
+        console.error('❌ Required columns not found in RESPONSES sheet');
         return null;
       }
       
       // Find the most recent response for this client and tool
       let latestResponse = null;
       let latestTimestamp = null;
+      let matchCount = 0;
+      
+      console.log(`🔎 Searching for clientId: "${clientId}", toolId: "${toolId}"`);
       
       for (let i = 1; i < data.length; i++) {
         const row = data[i];
+        console.log(`📝 Row ${i}: ClientID="${row[clientIdCol]}", ToolID="${row[toolIdCol]}"`);
+        
         if (row[clientIdCol] === clientId && row[toolIdCol] === toolId) {
+          matchCount++;
+          console.log(`✅ Match found! Row ${i}`);
           const timestamp = row[timestampCol] ? new Date(row[timestampCol]) : null;
           if (!latestTimestamp || (timestamp && timestamp > latestTimestamp)) {
             latestTimestamp = timestamp;
@@ -585,6 +602,8 @@ const DataService = {
           }
         }
       }
+      
+      console.log(`🏁 Search complete - Matches found: ${matchCount}`);
       
       if (latestResponse) {
         return {
