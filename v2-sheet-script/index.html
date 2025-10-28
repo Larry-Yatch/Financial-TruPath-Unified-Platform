@@ -602,48 +602,35 @@
       }
       
       // Status-aware landing page (Option C)
-      window.checkUserStatusAndUpdateLanding = function() {
+      window.checkUserStatusAndUpdateLanding = async function() {
         const currentUserId = typeof userId !== 'undefined' ? userId : 'TEST_USER';
         
-        // Check for completed assessment first
-        google.script.run
-          .withSuccessHandler(function(lastResponse) {
-            console.log('Last submitted response:', lastResponse);
-            
-            if (lastResponse && lastResponse.data) {
-              // User has completed the assessment
-              updateLandingPageButtons('completed', lastResponse);
-            } else {
-              // Check for drafts
-              checkForDrafts();
-            }
-          })
-          .withFailureHandler(function(error) {
-            console.log('No completed response found, checking drafts');
-            checkForDrafts();
-          })
-          .getLastToolResponse(currentUserId, 'tool1');
+        try {
+          // Use batched API calls to get both submission and draft data efficiently
+          const [lastSubmission, drafts] = await Promise.all([
+            ApiUtils.getLastSubmission(currentUserId, 'tool1'),
+            ApiUtils.getToolDraft(currentUserId, 'tool1')
+          ]);
+          
+          console.log('✅ Batched load complete - Submission:', lastSubmission, 'Drafts:', drafts);
+          
+          if (lastSubmission && lastSubmission.data) {
+            // User has completed the assessment
+            updateLandingPageButtons('completed', lastSubmission);
+          } else if (drafts && drafts.length > 0) {
+            // User has drafts
+            updateLandingPageButtons('draft', drafts[0]);
+          } else {
+            // New user
+            updateLandingPageButtons('new', null);
+          }
+          
+        } catch (error) {
+          console.log('🔄 API error, showing new user options:', error);
+          updateLandingPageButtons('new', null);
+        }
       }
       
-      function checkForDrafts() {
-        const currentUserId = typeof userId !== 'undefined' ? userId : 'TEST_USER';
-        
-        google.script.run
-          .withSuccessHandler(function(drafts) {
-            if (drafts && drafts.length > 0) {
-              // User has drafts
-              updateLandingPageButtons('draft', drafts[0]);
-            } else {
-              // New user
-              updateLandingPageButtons('new', null);
-            }
-          })
-          .withFailureHandler(function(error) {
-            console.log('No drafts found, showing new user options');
-            updateLandingPageButtons('new', null);
-          })
-          .getToolDraftFromProperties(currentUserId, 'tool1');
-      }
       
       function updateLandingPageButtons(status, data) {
         const actionsDiv = document.querySelector('.tool-actions');
@@ -865,11 +852,16 @@
       
       // Load Comprehensive Orientation Tool (25 Questions)
       window.loadOrientationTool = function() {
+        // Show loading indicator for tool initialization
+        const toolContainer = document.getElementById('tool-container');
+        toolContainer.style.opacity = '0.6';
+        toolContainer.innerHTML = '<div style="text-align:center; padding:40px; color: var(--muted);"><div>🔄 Loading assessment tool...</div></div>';
+        
         // Check if ToolWrapper is available
         if (typeof ToolWrapper !== 'undefined') {
           // Use the new wrapper system
           const wrapperHtml = ToolWrapper.init('tool1');
-          document.getElementById('tool-container').innerHTML = wrapperHtml;
+          toolContainer.innerHTML = wrapperHtml;
           
           // Create the tool content (landing + form)
           const toolContent = `
@@ -917,8 +909,11 @@
           
           document.getElementById('tool-content').innerHTML = toolContent;
           
-          // Check user status and update landing page accordingly
-          checkUserStatusAndUpdateLanding();
+          // Check user status and update landing page accordingly (async)
+          checkUserStatusAndUpdateLanding().finally(() => {
+            // Restore full opacity after loading completes
+            toolContainer.style.opacity = '1';
+          });
           
         } else {
           // Fallback to legacy version without wrapper
