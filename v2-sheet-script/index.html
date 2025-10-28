@@ -910,10 +910,24 @@
           document.getElementById('tool-content').innerHTML = toolContent;
           
           // Check user status and update landing page accordingly (async)
-          checkUserStatusAndUpdateLanding().finally(() => {
-            // Restore full opacity after loading completes
-            toolContainer.style.opacity = '1';
-          });
+          checkUserStatusAndUpdateLanding()
+            .finally(() => {
+              // Restore full opacity after loading completes
+              toolContainer.style.opacity = '1';
+              console.log('🎯 Tool loading completed, opacity restored');
+            })
+            .catch((error) => {
+              console.error('❌ Tool loading error:', error);
+              toolContainer.style.opacity = '1'; // Ensure opacity restores on error
+            });
+            
+          // Fallback timeout to ensure opacity restores (emergency safety net)
+          setTimeout(() => {
+            if (toolContainer.style.opacity !== '1') {
+              console.log('⚡ Emergency opacity restore triggered');
+              toolContainer.style.opacity = '1';
+            }
+          }, 3000);
           
         } else {
           // Fallback to legacy version without wrapper
