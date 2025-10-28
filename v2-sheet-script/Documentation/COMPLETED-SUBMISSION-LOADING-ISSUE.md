@@ -130,4 +130,63 @@ When working, user should see "Last Submitted" option in Load menu alongside Loc
 
 ---
 
-**Status:** Issue persists after 6 attempts. DataService column mapping fix should work theoretically but doesn't in practice. Requires systematic debugging approach starting with basic sheet access verification.
+## ✅ ISSUE RESOLVED
+
+**Status:** ✅ **RESOLVED** - Issue fixed with simplified timestamp logic approach
+
+### 🎯 Final Solution
+
+**Root Cause Identified:** Complex timestamp parsing logic in `getLastSubmissionForViewing()` was failing, causing the function to return `null`.
+
+**Solution Applied:** Simplified the row selection logic to:
+1. Find all matching rows for the specified user and tool
+2. Select the last matching row (highest row index = most recent)
+3. Parse JSON data from that row
+4. Return the structured data object
+
+### 🔧 Technical Fix
+
+**File:** `Code.js` - `getLastSubmissionForViewing()` function
+
+**Before (Broken):**
+```javascript
+// Complex timestamp comparison that was failing
+if (!latestTimestamp || (timestamp && timestamp > latestTimestamp)) {
+  // Logic that wasn't working properly
+}
+```
+
+**After (Working):**
+```javascript
+// Simplified: find all matches, take the last one
+for (let i = 1; i < data.length; i++) {
+  if (row[clientIdCol] === userId && row[toolIdCol] === toolId) {
+    lastMatchingRowIndex = i;  // Just record the last matching row
+  }
+}
+// Process the last matching row found
+```
+
+### 🧪 Debugging Process
+
+Created systematic 5-step debugging framework:
+1. **Basic sheet connectivity** ✅ 
+2. **Column header verification** ✅
+3. **Row finding for specific users** ✅ 
+4. **Complex logic pipeline test** ❌ (Found the failure point)
+5. **Actual function verification** ✅ (Confirmed fix worked)
+
+### 🎉 Result
+
+- **View Last Results button now works** ✅
+- **System can find and display completed submissions** ✅  
+- **Proper modal display with submission data** ✅
+- **Clean separation of Load Draft vs View Results** ✅
+
+**Deployment:** V11.21 - `AKfycbx9Xw0aAfgBhcXpYHx2wdy0F9-Sbmsdi9-m2h3vkZjkemQ1qwwGTTzaGEDrTZUhLKE`
+
+---
+
+## 📚 Historical Context
+
+**Status (Historical):** Issue persisted after 6 attempts. DataService column mapping fix should have worked theoretically but didn't in practice. Required systematic debugging approach starting with basic sheet access verification.

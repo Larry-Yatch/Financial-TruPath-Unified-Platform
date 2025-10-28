@@ -1,0 +1,473 @@
+{
+  "timestamp": "2025-10-28T05:08:08.368Z",
+  "changes": {
+    "v2-sheet-script/Code.js": {
+      "status": "modified",
+      "staged": true
+    },
+    "v2-sheet-script/index.html": {
+      "status": "modified",
+      "staged": true
+    },
+    ".daddy/daddy-validation.db": {
+      "status": "modified",
+      "staged": false
+    },
+    "package-lock.json": {
+      "status": "modified",
+      "staged": false
+    },
+    "package.json": {
+      "status": "modified",
+      "staged": false
+    },
+    "v2-sheet-script/DEPLOYMENT-PROCESS.md": {
+      "status": "deleted",
+      "staged": false
+    },
+    "v2-sheet-script/Documentation/NEXT-SESSION-PROMPT.md": {
+      "status": "modified",
+      "staged": false
+    },
+    "v2-sheet-script/PROJECT-CLEANUP-LOG.md": {
+      "status": "deleted",
+      "staged": false
+    },
+    "v2-sheet-script/validation-reports/validation-2025-10-27T16-42-07-002Z.json": {
+      "status": "deleted",
+      "staged": false
+    },
+    "v2-sheet-script/validation-reports/validation-2025-10-27T16-46-12-363Z.json": {
+      "status": "deleted",
+      "staged": false
+    },
+    "v2-sheet-script/validation-reports/validation-2025-10-27T21-49-40-380Z.json": {
+      "status": "deleted",
+      "staged": false
+    },
+    "v2-sheet-script/validation-reports/validation-2025-10-27T21-58-37-179Z.json": {
+      "status": "deleted",
+      "staged": false
+    },
+    "DeploymentArchiver.js": {
+      "status": "new",
+      "staged": false
+    },
+    "chrome-monitor.js": {
+      "status": "new",
+      "staged": false
+    },
+    "console-monitor.js": {
+      "status": "new",
+      "staged": false
+    },
+    "v2-sheet-script/validation-reports/validation-2025-10-28T04-29-19-896Z.json": {
+      "status": "new",
+      "staged": false
+    },
+    "v2-sheet-script/validation-reports/validation-2025-10-28T04-29-56-580Z.json": {
+      "status": "new",
+      "staged": false
+    }
+  },
+  "issues": [
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "v2-sheet-script/index.html",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "console-monitor.js",
+      "type": "incomplete-implementation",
+      "message": "Found empty function bodies",
+      "severity": "high"
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "unreachable-code",
+      "message": "Possible unreachable code detected",
+      "severity": "medium"
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "unreachable-code",
+      "message": "Possible unreachable code detected",
+      "severity": "medium"
+    },
+    {
+      "file": "DeploymentArchiver.js",
+      "type": "unreachable-code",
+      "message": "Possible unreachable code detected",
+      "severity": "medium"
+    },
+    {
+      "file": "DeploymentArchiver.js",
+      "type": "unreachable-code",
+      "message": "Possible unreachable code detected",
+      "severity": "medium"
+    },
+    {
+      "file": "chrome-monitor.js",
+      "type": "unreachable-code",
+      "message": "Possible unreachable code detected",
+      "severity": "medium"
+    },
+    {
+      "file": "console-monitor.js",
+      "type": "incomplete-error-handling",
+      "message": "Mismatched try-catch blocks",
+      "severity": "high"
+    },
+    {
+      "file": "v2-sheet-script/index.html",
+      "type": "security",
+      "message": "Potential security issue: innerHTML",
+      "severity": "critical",
+      "occurrences": 15
+    }
+  ],
+  "warnings": [
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "debug-code",
+      "message": "Found 75 console statements",
+      "line": 14
+    },
+    {
+      "file": ".daddy/daddy-validation.db",
+      "type": "incomplete",
+      "message": "Found 8 TODO/FIXME markers",
+      "line": 12
+    },
+    {
+      "file": "DeploymentArchiver.js",
+      "type": "debug-code",
+      "message": "Found 23 console statements",
+      "line": 66
+    },
+    {
+      "file": "chrome-monitor.js",
+      "type": "debug-code",
+      "message": "Found 19 console statements",
+      "line": 26
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-28T04-29-19-896Z.json",
+      "type": "incomplete",
+      "message": "Found 4 TODO/FIXME markers",
+      "line": 122
+    },
+    {
+      "file": "v2-sheet-script/validation-reports/validation-2025-10-28T04-29-56-580Z.json",
+      "type": "incomplete",
+      "message": "Found 6 TODO/FIXME markers",
+      "line": 126
+    }
+  ],
+  "suggestions": [
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "naming",
+      "message": "Consider using more descriptive variable names",
+      "examples": [
+        "const data",
+        "const data",
+        "const data"
+      ]
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function include might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function doGet might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function createLoginPage might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function showAlert might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function showPrimaryLogin might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function showBackupLogin might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function handleLogin might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function attemptAuthentication might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function handleBackupLogin might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function createSimpleDashboard might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function navigateToTool might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function createDashboardPage might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function createErrorPage might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function handleAdminRoute might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function showResult might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function testAuth might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function include might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function generateSessionId might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getCurrentWeek might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getLastToolResponse might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getLastSubmissionForViewing might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function testSheetConnectivity might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function testReadHeaders might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function testFindTest001Rows might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function testGetLastSubmissionLogic might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function testActualFunction might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function saveUserData might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function saveToolDraft might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getToolDraft might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getToolDraftFromProperties might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getAllDraftVersions might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getRelevantInsights might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getSpecificDraft might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getUserProfile might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function authenticateAndCreateSession might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function logEvent might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getAvailableTools might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function runAllAuthTests might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function testAuthenticationSystem might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function testRosterConnection might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function getSampleClientIds might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function testSessionCreation might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function openAdminPanel might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function initializePlatform might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function createDataSheets might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function viewTool1Data might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function viewLogs might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function generatePDFReport might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function testWebApp might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function testDataSaving might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function clearUserDrafts might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "complexity",
+      "message": "Function clearAllTestData might be too long (2463 lines). Consider breaking it down."
+    },
+    {
+      "file": "v2-sheet-script/Code.js",
+      "type": "duplication",
+      "message": "Found potential duplicate code blocks. Consider refactoring."
+    },
+    {
+      "file": "chrome-monitor.js",
+      "type": "naming",
+      "message": "Consider using more descriptive variable names",
+      "examples": [
+        "let data"
+      ]
+    }
+  ],
+  "summary": {
+    "filesChanged": 17,
+    "criticalIssues": 1,
+    "totalIssues": 11,
+    "totalWarnings": 6,
+    "totalSuggestions": 55,
+    "passed": false
+  }
+}
