@@ -770,17 +770,6 @@ function createSimpleDashboard(clientId, sessionId) {
     </div>
     
     <div class="tools-grid">
-      <!-- Test Tool - V10 Foundation Testing -->
-      <div class="tool-card" onclick="navigateToTool('test')" style="border-color: #4CAF50;">
-        <div class="tool-header">
-          <span class="tool-number">🧪</span>
-          <span class="tool-status" style="background: #4CAF50;">TEST V10</span>
-        </div>
-        <h3 class="tool-title">Foundation Test Tool</h3>
-        <p class="tool-description">Test the new V10 foundation with standardized form structure.</p>
-        <span class="button">Test Now</span>
-      </div>
-      
       <!-- Tool 1 - Always Available -->
       <div class="tool-card" onclick="navigateToTool('orientation')">
         <div class="tool-header">
@@ -802,25 +791,6 @@ function createSimpleDashboard(clientId, sessionId) {
         <p class="tool-description">Deep dive into your income, expenses, and cash flow.</p>
       </div>
       
-      <!-- Tool 3 - Coming Soon -->
-      <div class="tool-card locked">
-        <div class="tool-header">
-          <span class="tool-number">3</span>
-          <span class="tool-status status-locked">COMING SOON</span>
-        </div>
-        <h3 class="tool-title">Control Fear Grounding</h3>
-        <p class="tool-description">Master your emotions around money.</p>
-      </div>
-      
-      <!-- Tool 4 - Coming Soon -->
-      <div class="tool-card locked">
-        <div class="tool-header">
-          <span class="tool-number">4</span>
-          <span class="tool-status status-locked">COMING SOON</span>
-        </div>
-        <h3 class="tool-title">SMART Goals</h3>
-        <p class="tool-description">Transform dreams into actionable goals.</p>
-      </div>
     </div>
     
     <div class="logout-container">
