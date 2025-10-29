@@ -496,9 +496,26 @@ function createLoginPage(message) {
             // Found account, now create session
             showAlert('Account found! Logging you in...', 'success');
             
-            // Create session with the found client ID
+            // Create session with the found client ID - with timeout handling
+            let sessionCallCompleted = false;
+            
+            // Set up timeout fallback
+            const sessionTimeout = setTimeout(function() {
+              if (!sessionCallCompleted) {
+                sessionCallCompleted = true;
+                document.getElementById('loadingSpinner').style.display = 'none';
+                showBackupLogin();
+                showAlert('Login timeout. Please refresh and try again.', 'error');
+                console.error('Session creation timed out after 10 seconds');
+              }
+            }, 10000); // 10 second timeout
+            
             google.script.run
               .withSuccessHandler(function(sessionResult) {
+                if (sessionCallCompleted) return; // Timeout already triggered
+                sessionCallCompleted = true;
+                clearTimeout(sessionTimeout);
+                
                 // Check if sessionResult is null or undefined
                 if (!sessionResult) {
                   document.getElementById('loadingSpinner').style.display = 'none';
@@ -514,20 +531,37 @@ function createLoginPage(message) {
                     '&client=' + encodeURIComponent(sessionResult.clientId) +
                     '&session=' + encodeURIComponent(sessionResult.sessionId);
                   
+                  // Use window.open to avoid iframe navigation restrictions
                   setTimeout(function() {
-                    window.top.location.href = dashboardUrl;
+                    try {
+                      // Try multiple navigation methods for iframe compatibility
+                      if (window.top && window.top !== window) {
+                        // In iframe, use window.open to new tab/window
+                        window.open(dashboardUrl, '_blank');
+                      } else {
+                        // Not in iframe, direct navigation
+                        window.location.href = dashboardUrl;
+                      }
+                    } catch (error) {
+                      // Fallback: show link for manual navigation
+                      showAlert('Login successful! Please click this link to continue: <br><a href="' + dashboardUrl + '" target="_blank">Open Dashboard</a>', 'success');
+                    }
                   }, 500);
                 } else {
                   document.getElementById('loadingSpinner').style.display = 'none';
                   showBackupLogin();
-                  showAlert('Failed to create session. Please try again.', 'error');
+                  showAlert('Failed to create session: ' + (sessionResult.error || 'Unknown error'), 'error');
                 }
               })
               .withFailureHandler(function(error) {
+                if (sessionCallCompleted) return; // Timeout already triggered
+                sessionCallCompleted = true;
+                clearTimeout(sessionTimeout);
+                
                 document.getElementById('loadingSpinner').style.display = 'none';
                 showBackupLogin();
-                showAlert('System error. Please try again.', 'error');
-                // console.error(error);
+                showAlert('System error during login. Please try again.', 'error');
+                console.error('Session creation error:', error);
               })
               .authenticateAndCreateSession(result.clientId);
               
@@ -1414,10 +1448,15 @@ function getUserProfile(userId) {
  */
 function authenticateAndCreateSession(clientId) {
   try {
+    console.log(`Starting authenticateAndCreateSession for clientId: ${clientId}`);
+    
     // Step 1: Authenticate the client ID
+    console.log('Step 1: Looking up client by ID...');
     const authResult = lookupClientById(clientId);
+    console.log('Step 1 result:', authResult ? 'Success' : 'Failed');
     
     if (!authResult.success) {
+      console.error('Authentication failed:', authResult.error);
       return {
         success: false,
         error: authResult.error || 'Authentication failed'
@@ -1425,16 +1464,20 @@ function authenticateAndCreateSession(clientId) {
     }
     
     // Step 2: Create a session for the authenticated user
+    console.log('Step 2: Creating session...');
     const sessionResult = createSession(authResult.clientId);
+    console.log('Step 2 result:', sessionResult ? sessionResult.success : 'No result');
     
     if (!sessionResult.success) {
+      console.error('Session creation failed:', sessionResult.error);
       return {
         success: false,
-        error: 'Failed to create session. Please try again.'
+        error: sessionResult.error || 'Failed to create session. Please try again.'
       };
     }
     
     // Step 3: Return combined result
+    console.log('Step 3: Returning combined result...');
     return {
       success: true,
       clientId: authResult.clientId,
@@ -1448,7 +1491,7 @@ function authenticateAndCreateSession(clientId) {
     };
     
   } catch (error) {
-    // console.error('Error in authenticateAndCreateSession:', error);
+    console.error('Error in authenticateAndCreateSession:', error);
     return {
       success: false,
       error: 'System error during login. Please try again.'
