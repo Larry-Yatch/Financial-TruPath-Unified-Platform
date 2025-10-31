@@ -419,12 +419,22 @@ function createLoginPage(message) {
               '&client=' + encodeURIComponent(result.clientId) +
               '&session=' + encodeURIComponent(result.sessionId);
             
-            showAlert('Login successful!', 'success');
+            showAlert('Login successful! Click Continue to proceed.', 'success');
             
-            // Navigate to dashboard after a brief delay
-            setTimeout(function() {
+            // Create a button for user-initiated navigation (required for iframe security)
+            const continueBtn = document.createElement('button');
+            continueBtn.textContent = 'Continue to Dashboard';
+            continueBtn.className = 'btn-primary';
+            continueBtn.style.marginTop = '10px';
+            continueBtn.onclick = function() {
+              // User gesture allows navigation from iframe
               window.top.location.href = dashboardUrl;
-            }, 500);
+            };
+            
+            // Replace loading spinner with continue button
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('loadingSpinner').appendChild(continueBtn);
+            document.getElementById('loadingSpinner').style.display = 'block';
           } else {
             document.getElementById('loginForm').style.display = 'block';
             document.getElementById('loadingSpinner').style.display = 'none';
