@@ -2352,3 +2352,19 @@ function clearAllTestData() {
     };
   }
 }
+
+/**
+ * Global wrapper for DataService.saveToolDraftToSheet
+ * Required for google.script.run API calls from client
+ */
+function saveToolDraftToSheet(clientId, toolId, data, progress, status = 'DRAFT') {
+  try {
+    return DataService.saveToolDraftToSheet(clientId, toolId, data, progress, status);
+  } catch (error) {
+    console.error('Error in saveToolDraftToSheet wrapper:', error);
+    return {
+      success: false,
+      error: error.toString()
+    };
+  }
+}
