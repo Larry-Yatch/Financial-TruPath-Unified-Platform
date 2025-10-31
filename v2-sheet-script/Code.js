@@ -74,21 +74,20 @@ function doGet(e) {
       
       // Route to the appropriate tool
       // Default to Tool 1 (existing index.html with sophisticated form)
-        const template = HtmlService.createTemplateFromFile('index');
-        template.userId = clientId || 'USER_' + Utilities.getUuid();
-        template.sessionId = sessionId || Utilities.getUuid();
-        template.currentWeek = getCurrentWeek();
-        template.config = CONFIG;
-        template.baseUrl = ScriptApp.getService().getUrl();
-        template.baseUrlJs = `<script>window.BASE_URL = '${ScriptApp.getService().getUrl()}';</script>`;
-        
-        // console.log('Loading Tool 1 for client:', clientId, 'session:', sessionId);
-        
-        return template.evaluate()
-          .setTitle('Financial TruPath V2.0 - Orientation Assessment')
-          .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-          .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
-      }
+      const template = HtmlService.createTemplateFromFile('index');
+      template.userId = clientId || 'USER_' + Utilities.getUuid();
+      template.sessionId = sessionId || Utilities.getUuid();
+      template.currentWeek = getCurrentWeek();
+      template.config = CONFIG;
+      template.baseUrl = ScriptApp.getService().getUrl();
+      template.baseUrlJs = `<script>window.BASE_URL = '${ScriptApp.getService().getUrl()}';</script>`;
+      
+      // console.log('Loading Tool 1 for client:', clientId, 'session:', sessionId);
+      
+      return template.evaluate()
+        .setTitle('Financial TruPath V2.0 - Orientation Assessment')
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+        .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
     }
     
     // Default: Show login page (inline HTML)
