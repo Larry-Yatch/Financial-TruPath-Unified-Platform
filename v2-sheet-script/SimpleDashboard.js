@@ -215,17 +215,6 @@ function createSimpleDashboard(clientId, sessionId) {
     </div>
     
     <div class="tools-grid">
-      <!-- Test Tool - V10 Foundation Testing -->
-      <div class="tool-card" onclick="navigateToTool('test')" style="border-color: #4CAF50;">
-        <div class="tool-header">
-          <span class="tool-number">🧪</span>
-          <span class="tool-status" style="background: #4CAF50;">TEST V10</span>
-        </div>
-        <h3 class="tool-title">Foundation Test Tool</h3>
-        <p class="tool-description">Test the new V10 foundation with standardized form structure.</p>
-        <span class="button">Test Now</span>
-      </div>
-      
       <!-- Tool 1 - Always Available -->
       <div class="tool-card" onclick="navigateToTool('orientation')">
         <div class="tool-header">

@@ -73,18 +73,7 @@ function doGet(e) {
       */
       
       // Route to the appropriate tool
-      if (toolId === 'test') {
-        // Load the TestTool for V10 foundation testing
-        const template = HtmlService.createTemplateFromFile('TestTool');
-        template.userId = clientId || 'USER_' + Utilities.getUuid();
-        template.sessionId = sessionId || Utilities.getUuid();
-        
-        return template.evaluate()
-          .setTitle('Financial TruPath V2.0 - Foundation Test Tool')
-          .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-          .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
-      } else {
-        // Default to Tool 1 (existing index.html with sophisticated form)
+      // Default to Tool 1 (existing index.html with sophisticated form)
         const template = HtmlService.createTemplateFromFile('index');
         template.userId = clientId || 'USER_' + Utilities.getUuid();
         template.sessionId = sessionId || Utilities.getUuid();
