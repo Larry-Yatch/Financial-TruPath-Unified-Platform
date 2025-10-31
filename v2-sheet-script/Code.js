@@ -285,6 +285,38 @@ function createLoginPage(message) {
       text-align: center;
       padding: 20px;
     }
+    .spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(173, 145, 104, 0.3);
+      border-radius: 50%;
+      border-top-color: #ad9168;
+      animation: spin 1s ease-in-out infinite;
+      margin-bottom: 15px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .loading-text {
+      color: #ad9168;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .loading-dots {
+      color: #94a3b8;
+      font-size: 14px;
+    }
+    .loading-dots::after {
+      content: '';
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+    @keyframes dots {
+      0%, 20% { content: ''; }
+      40% { content: '.'; }
+      60% { content: '..'; }
+      80%, 100% { content: '...'; }
+    }
   </style>
 </head>
 <body>
@@ -308,7 +340,9 @@ function createLoginPage(message) {
       </form>
       
       <div id="loadingSpinner">
-        <p style="color: #ad9168; font-size: 16px; margin-top: 10px;">Verifying...</p>
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">Authenticating</div>
+        <div class="loading-dots" id="loadingDots">Please wait</div>
       </div>
       
       <div style="text-align: center; margin: 20px 0; color: #94a3b8;">
@@ -363,6 +397,13 @@ function createLoginPage(message) {
       }
     }
     
+    function updateLoadingMessage(text, detail) {
+      const loadingText = document.getElementById('loadingText');
+      const loadingDots = document.getElementById('loadingDots');
+      if (loadingText) loadingText.textContent = text;
+      if (loadingDots) loadingDots.textContent = detail || 'Please wait';
+    }
+    
     function showPrimaryLogin() {
       document.getElementById('primaryLogin').style.display = 'block';
       document.getElementById('backupLogin').style.display = 'none';
@@ -387,12 +428,25 @@ function createLoginPage(message) {
       document.getElementById('loginForm').style.display = 'none';
       document.getElementById('loadingSpinner').style.display = 'block';
       
-      // Try authentication with retry mechanism for iframe timing issues
-      attemptAuthentication(clientId, 1);
+      // Show progress messages to keep user informed
+      updateLoadingMessage('Authenticating', 'Verifying your Student ID');
+      
+      // Add a brief delay to show initial message, then start auth
+      setTimeout(() => {
+        updateLoadingMessage('Connecting', 'Accessing secure database');
+        attemptAuthentication(clientId, 1);
+      }, 800);
     }
     
     function attemptAuthentication(clientId, attempt) {
       const maxAttempts = 2;
+      
+      // Update progress message based on attempt
+      if (attempt === 1) {
+        updateLoadingMessage('Validating', 'Checking credentials');
+      } else {
+        updateLoadingMessage('Retrying', 'Establishing connection');
+      }
       
       google.script.run
         .withSuccessHandler(function(result) {
@@ -413,13 +467,19 @@ function createLoginPage(message) {
           }
           
           if (result.success) {
+            // Update to show session creation
+            updateLoadingMessage('Success!', 'Creating secure session');
+            
             // Session created successfully, navigate with session token
             const baseUrl = '${ScriptApp.getService().getUrl()}';
             const dashboardUrl = baseUrl + '?route=dashboard' +
               '&client=' + encodeURIComponent(result.clientId) +
               '&session=' + encodeURIComponent(result.sessionId);
             
-            showAlert('Login successful! Click Continue to proceed.', 'success');
+            // Brief delay to show success message
+            setTimeout(() => {
+              showAlert('Login successful! Click Continue to proceed.', 'success');
+            }, 600);
             
             // Create a button for user-initiated navigation (required for iframe security)
             const continueBtn = document.createElement('button');
