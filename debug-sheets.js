@@ -6,70 +6,76 @@
 
 const sheets = require('./sheets');
 
+// Simple sheet display helper
+function displaySheet(name, data) {
+  console.log(`📋 ${name} Sheet:`);
+  console.table(data);
+  console.log(`Total rows: ${data.length}`);
+}
+
+// Parse JSON data helper
+function parseResponseData(data) {
+  return data.map(row => {
+    if (row.Data) {
+      try {
+        row.Data = JSON.parse(row.Data);
+      } catch (e) {
+        // Keep as string if not valid JSON
+      }
+    }
+    return row;
+  });
+}
+
+// Watch helpers
+function hasChanges(current, last) {
+  return current.sessions !== last.sessions || current.responses !== last.responses;
+}
+
+function logChanges(current, last) {
+  const time = new Date().toLocaleTimeString();
+  console.log(`[${time}] Sessions: ${current.sessions} | Responses: ${current.responses}`);
+  
+  if (current.sessions > last.sessions) {
+    console.log('  🆕 New session detected!');
+  }
+  if (current.responses > last.responses) {
+    console.log('  🆕 New response detected!');
+  }
+}
+
 // Commands
 const commands = {
   async sessions() {
-    console.log('📋 SESSIONS Sheet:');
-    const data = await sheets.fetchAsObjects(sheets.SHEETS.v2_data, 'SESSIONS!A:F');
-    console.table(data);
-    console.log(`Total sessions: ${data.length}`);
+    const data = await sheets.fetchV2Sheet('SESSIONS');
+    displaySheet('SESSIONS', data);
   },
   
   async responses() {
-    console.log('📋 RESPONSES Sheet:');
-    const data = await sheets.fetchAsObjects(sheets.SHEETS.v2_data, 'RESPONSES!A:H');
-    if (data.length > 0) {
-      // Parse JSON in Data column
-      data.forEach(row => {
-        if (row.Data) {
-          try {
-            row.Data = JSON.parse(row.Data);
-          } catch (e) {
-            // Keep as string if not valid JSON
-          }
-        }
-      });
-    }
-    console.table(data);
-    console.log(`Total responses: ${data.length}`);
+    const data = await sheets.fetchV2Sheet('RESPONSES');
+    const parsedData = parseResponseData(data);
+    displaySheet('RESPONSES', parsedData);
   },
   
   async status() {
-    console.log('📋 TOOL_STATUS Sheet:');
-    const data = await sheets.fetchAsObjects(sheets.SHEETS.v2_data, 'TOOL_STATUS!A:Z');
-    console.table(data);
-    console.log(`Students with status: ${data.length}`);
+    const data = await sheets.fetchV2Sheet('TOOL_STATUS');
+    displaySheet('TOOL_STATUS', data);
   },
   
   async students() {
-    console.log('📋 STUDENTS Sheet:');
-    const data = await sheets.fetchAsObjects(sheets.SHEETS.v2_data, 'Students!A:B');
-    console.table(data);
-    console.log(`Total students: ${data.length}`);
+    const data = await sheets.fetchV2Sheet('STUDENTS');
+    displaySheet('STUDENTS', data);
   },
   
   async summary() {
     console.log('📊 Database Summary:\n');
     
-    const sheetInfo = [
-      { name: 'SESSIONS', range: 'SESSIONS!A:F' },
-      { name: 'RESPONSES', range: 'RESPONSES!A:H' },
-      { name: 'TOOL_STATUS', range: 'TOOL_STATUS!A:Z' },
-      { name: 'TOOL_ACCESS', range: 'TOOL_ACCESS!A:L' },
-      { name: 'ACTIVITY_LOG', range: 'ACTIVITY_LOG!A:H' },
-      { name: 'ADMINS', range: 'ADMINS!A:F' },
-      { name: 'CONFIG', range: 'CONFIG!A:E' },
-      { name: 'Students', range: 'Students!A:B' },
-    ];
-    
-    for (const sheet of sheetInfo) {
-      try {
-        const data = await sheets.fetch(sheets.SHEETS.v2_data, sheet.range);
-        const rows = data.length;
-        const cols = data[0] ? data[0].length : 0;
-        console.log(`  ${sheet.name.padEnd(15)} ${rows} rows × ${cols} columns`);
-      } catch (e) {
-        console.log(`  ${sheet.name.padEnd(15)} ❌ Error: ${e.message}`);
+    for (const sheetName of sheets.REQUIRED_SHEETS) {
+      const info = await sheets.checkV2Sheet(sheetName);
+      if (info.exists) {
+        console.log(`  ${sheetName.padEnd(15)} ${info.rows} rows × ${info.cols} columns`);
+      } else {
+        console.log(`  ${sheetName.padEnd(15)} ❌ ${info.error}`);
       }
     }
   },
@@ -78,35 +84,25 @@ const commands = {
     console.log('👁️  Watching for changes (refresh every 5 seconds)...\n');
     console.log('Press Ctrl+C to stop\n');
     
-    let lastSessionCount = 0;
-    let lastResponseCount = 0;
+    let lastCounts = { sessions: 0, responses: 0 };
     
-    setInterval(async () => {
+    const checkForChanges = async () => {
       try {
-        const sessions = await sheets.fetch(sheets.SHEETS.v2_data, 'SESSIONS!A:A');
-        const responses = await sheets.fetch(sheets.SHEETS.v2_data, 'RESPONSES!A:A');
+        const currentCounts = {
+          sessions: await sheets.getV2SheetRowCount('SESSIONS'),
+          responses: await sheets.getV2SheetRowCount('RESPONSES')
+        };
         
-        const sessionCount = sessions.length - 1;
-        const responseCount = responses.length - 1;
-        
-        if (sessionCount !== lastSessionCount || responseCount !== lastResponseCount) {
-          const time = new Date().toLocaleTimeString();
-          console.log(`[${time}] Sessions: ${sessionCount} | Responses: ${responseCount}`);
-          
-          if (sessionCount > lastSessionCount) {
-            console.log(`  🆕 New session detected!`);
-          }
-          if (responseCount > lastResponseCount) {
-            console.log(`  🆕 New response detected!`);
-          }
-          
-          lastSessionCount = sessionCount;
-          lastResponseCount = responseCount;
+        if (hasChanges(currentCounts, lastCounts)) {
+          logChanges(currentCounts, lastCounts);
+          lastCounts = currentCounts;
         }
       } catch (e) {
         console.error('Watch error:', e.message);
       }
-    }, 5000);
+    };
+    
+    setInterval(checkForChanges, 5000);
   },
   
   async help() {

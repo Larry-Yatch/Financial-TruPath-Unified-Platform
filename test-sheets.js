@@ -6,48 +6,47 @@
 
 const sheets = require('./sheets');
 
+// Test individual sheet headers
+async function testSheetHeaders() {
+  const testSheets = ['SESSIONS', 'RESPONSES', 'TOOL_STATUS'];
+  
+  for (const sheetName of testSheets) {
+    console.log(`📋 Checking ${sheetName} sheet...`);
+    const data = await sheets.fetch(sheets.SPREADSHEET_IDS.V2_MAIN, `${sheetName}!A1:Z1`);
+    const headers = data[0] || [];
+    console.log('Headers:', headers.slice(0, 5)); // Show first 5
+  }
+}
+
+// Test student data specifically
+async function testStudentData() {
+  console.log('📋 Checking STUDENTS sheet...');
+  const students = await sheets.fetchV2Sheet('STUDENTS');
+  console.log(`Found ${students.length} students`);
+  if (students.length > 0) {
+    console.log('First student:', students[0]);
+  }
+}
+
+// Test all sheets summary
+async function testSheetSummary() {
+  console.log('📊 Sheet Summary:');
+  
+  for (const sheetName of sheets.REQUIRED_SHEETS) {
+    const rowCount = await sheets.getV2SheetRowCount(sheetName);
+    console.log(`  ✅ ${sheetName}: ${rowCount} rows`);
+  }
+}
+
 async function testV2Sheets() {
   console.log('🧪 Testing Financial TruPath V2 Sheets Access...\n');
   
   try {
-    // Test 1: Check SESSIONS sheet
-    console.log('📋 Checking SESSIONS sheet...');
-    const sessions = await sheets.fetch(sheets.SHEETS.v2_data, 'SESSIONS!A1:F1');
-    console.log('Headers:', sessions[0]);
-    
-    // Test 2: Check RESPONSES sheet
-    console.log('\n📋 Checking RESPONSES sheet...');
-    const responses = await sheets.fetch(sheets.SHEETS.v2_data, 'RESPONSES!A1:H1');
-    console.log('Headers:', responses[0]);
-    
-    // Test 3: Check TOOL_STATUS sheet
-    console.log('\n📋 Checking TOOL_STATUS sheet...');
-    const toolStatus = await sheets.fetch(sheets.SHEETS.v2_data, 'TOOL_STATUS!A1:Z1');
-    console.log('Headers (first 5):', toolStatus[0].slice(0, 5));
-    
-    // Test 4: Check STUDENTS sheet (roster)
-    console.log('\n📋 Checking STUDENTS sheet...');
-    const students = await sheets.fetchAsObjects(sheets.SHEETS.v2_data, 'Students!A:B');
-    console.log(`Found ${students.length} students`);
-    if (students.length > 0) {
-      console.log('First student:', students[0]);
-    }
-    
-    // Test 5: Count sheets
-    console.log('\n📊 Sheet Summary:');
-    const allSheets = [
-      'SESSIONS', 'RESPONSES', 'TOOL_STATUS', 
-      'TOOL_ACCESS', 'ACTIVITY_LOG', 'ADMINS', 'CONFIG'
-    ];
-    
-    for (const sheetName of allSheets) {
-      try {
-        const data = await sheets.fetch(sheets.SHEETS.v2_data, `${sheetName}!A:A`);
-        console.log(`  ✅ ${sheetName}: ${data.length} rows`);
-      } catch (e) {
-        console.log(`  ❌ ${sheetName}: Not found`);
-      }
-    }
+    await testSheetHeaders();
+    console.log();
+    await testStudentData();
+    console.log();
+    await testSheetSummary();
     
     console.log('\n✅ All tests passed! Sheets are accessible from VSCode.');
     

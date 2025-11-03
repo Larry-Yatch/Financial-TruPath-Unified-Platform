@@ -6,53 +6,42 @@
 
 const sheets = require('./sheets');
 
-async function checkAllSheets() {
-  const SPREADSHEET_ID = '18qpjnCvFVYDXOAN14CKb3ceoiG6G_nIFc9n3ZO5St24';
-  
-  console.log('📋 Checking ALL sheets in Financial TruPath V2 Spreadsheet\n');
-  
-  // Known sheets we should have
-  const requiredSheets = [
-    'SESSIONS',
-    'RESPONSES', 
-    'TOOL_STATUS',
-    'TOOL_ACCESS',
-    'ACTIVITY_LOG',
-    'ADMINS',
-    'CONFIG',
-    'Students',
-    'Tool1_Orientation'
-  ];
-  
-  // Sheets that might be deletable
-  const possiblyDelete = [
-    'Sheet1',
-    'CrossToolInsights',
-    'SystemLogs'
-  ];
-  
+// Sheets that might be deletable
+const LEGACY_SHEETS = ['Sheet1', 'CrossToolInsights', 'SystemLogs'];
+
+async function checkRequiredSheets() {
   console.log('✅ Required Sheets (Should Keep):');
-  for (const sheetName of requiredSheets) {
-    try {
-      const data = await sheets.fetch(SPREADSHEET_ID, `${sheetName}!A:A`);
-      const rows = data.length;
-      console.log(`   ${sheetName.padEnd(20)} ${rows} rows`);
-    } catch (e) {
+  
+  for (const sheetName of sheets.REQUIRED_SHEETS) {
+    const info = await sheets.checkV2Sheet(sheetName);
+    if (info.exists) {
+      console.log(`   ${sheetName.padEnd(20)} ${info.rows} rows`);
+    } else {
       console.log(`   ${sheetName.padEnd(20)} ❌ Not found`);
     }
   }
-  
+}
+
+async function checkLegacySheets() {
   console.log('\n🤔 Possibly Delete:');
-  for (const sheetName of possiblyDelete) {
-    try {
-      const data = await sheets.fetch(SPREADSHEET_ID, `${sheetName}!A:Z`);
-      const rows = data.length;
-      const hasData = rows > 1;
-      console.log(`   ${sheetName.padEnd(20)} ${rows} rows ${hasData ? '⚠️ HAS DATA' : '✅ Empty (safe to delete)'}`);
-    } catch (e) {
+  
+  for (const sheetName of LEGACY_SHEETS) {
+    const info = await sheets.checkV2Sheet(sheetName);
+    if (info.exists) {
+      const status = info.hasData ? '⚠️ HAS DATA' : '✅ Empty (safe to delete)';
+      console.log(`   ${sheetName.padEnd(20)} ${info.rows} rows ${status}`);
+    } else {
       console.log(`   ${sheetName.padEnd(20)} ✅ Already deleted or doesn't exist`);
     }
   }
+}
+
+async function checkAllSheets() {
+  console.log('📋 Checking ALL sheets in Financial TruPath V2 Spreadsheet\n');
+  
+  await checkRequiredSheets();
+  await checkLegacySheets();
+  
   
   console.log('\n📊 Summary:');
   console.log('- Keep all required sheets listed above');

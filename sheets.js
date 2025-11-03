@@ -23,19 +23,40 @@ const TOKEN_SEARCH_PATHS = [
   '../token.json',
 ];
 
-// Your commonly used sheets (add more as needed)
+// Main spreadsheet IDs
+const SPREADSHEET_IDS = {
+  V1_SCENARIOS: '1_c4JB4VG4q-fekL2T1s6nUo83Ko1nZbAkSkDfFM1X0M',
+  V1_ROSTER: '104pHxIgsGAcOrktL75Hi7WlEd8j0BoeadntLR9PrGYo',
+  V2_MAIN: '18qpjnCvFVYDXOAN14CKb3ceoiG6G_nIFc9n3ZO5St24',
+};
+
+// V2 sheet configuration (centralized)
+const V2_SHEETS = {
+  SESSIONS: 'SESSIONS!A:F',
+  RESPONSES: 'RESPONSES!A:H', 
+  TOOL_STATUS: 'TOOL_STATUS!A:Z',
+  TOOL_ACCESS: 'TOOL_ACCESS!A:L',
+  ACTIVITY_LOG: 'ACTIVITY_LOG!A:H',
+  ADMINS: 'ADMINS!A:F',
+  CONFIG: 'CONFIG!A:E',
+  STUDENTS: 'Students!A:B',
+  TOOL1_ORIENTATION: 'Tool1_Orientation',
+};
+
+// Required sheets for validation
+const REQUIRED_SHEETS = [
+  'SESSIONS', 'RESPONSES', 'TOOL_STATUS', 'TOOL_ACCESS', 
+  'ACTIVITY_LOG', 'ADMINS', 'CONFIG', 'Students', 'Tool1_Orientation'
+];
+
+// Legacy sheet aliases for backwards compatibility
 const SHEETS = {
-  // Investment Tool (V1)
-  scenarios: '1_c4JB4VG4q-fekL2T1s6nUo83Ko1nZbAkSkDfFM1X0M',
-  roster: '104pHxIgsGAcOrktL75Hi7WlEd8j0BoeadntLR9PrGYo',
-  
-  // Financial TruPath V2 - Main Database
-  v2_data: '18qpjnCvFVYDXOAN14CKb3ceoiG6G_nIFc9n3ZO5St24',
-  
-  // Quick access to specific V2 sheets
-  sessions: '18qpjnCvFVYDXOAN14CKb3ceoiG6G_nIFc9n3ZO5St24',
-  responses: '18qpjnCvFVYDXOAN14CKb3ceoiG6G_nIFc9n3ZO5St24',
-  tool_status: '18qpjnCvFVYDXOAN14CKb3ceoiG6G_nIFc9n3ZO5St24',
+  scenarios: SPREADSHEET_IDS.V1_SCENARIOS,
+  roster: SPREADSHEET_IDS.V1_ROSTER,
+  v2_data: SPREADSHEET_IDS.V2_MAIN,
+  sessions: SPREADSHEET_IDS.V2_MAIN,
+  responses: SPREADSHEET_IDS.V2_MAIN,
+  tool_status: SPREADSHEET_IDS.V2_MAIN,
 };
 
 // Cache auth to avoid re-reading token
@@ -145,17 +166,75 @@ async function saveLocal(spreadsheetId, filename = 'sheet-data.json') {
   return data;
 }
 
+/**
+ * Fetch V2 sheet data with consistent error handling
+ */
+async function fetchV2Sheet(sheetName) {
+  if (!V2_SHEETS[sheetName]) {
+    throw new Error(`Unknown V2 sheet: ${sheetName}`);
+  }
+  return await fetchAsObjects(SPREADSHEET_IDS.V2_MAIN, V2_SHEETS[sheetName]);
+}
+
+/**
+ * Get row count for a V2 sheet
+ */
+async function getV2SheetRowCount(sheetName) {
+  try {
+    const range = sheetName === 'STUDENTS' ? 'Students!A:A' : `${sheetName}!A:A`;
+    const data = await fetch(SPREADSHEET_IDS.V2_MAIN, range);
+    return Math.max(0, data.length - 1); // Subtract header row
+  } catch (error) {
+    return 0;
+  }
+}
+
+/**
+ * Check if V2 sheet exists and get basic info
+ */
+async function checkV2Sheet(sheetName) {
+  try {
+    const range = sheetName === 'STUDENTS' ? 'Students!A:Z' : `${sheetName}!A:Z`;
+    const data = await fetch(SPREADSHEET_IDS.V2_MAIN, range);
+    return {
+      exists: true,
+      rows: data.length,
+      cols: data[0]?.length || 0,
+      hasData: data.length > 1
+    };
+  } catch (error) {
+    return {
+      exists: false,
+      error: error.message
+    };
+  }
+}
+
 // Export everything
 module.exports = {
+  // Core functions
   fetch,
   fetchAsObjects,
   test,
   saveLocal,
-  SHEETS,
+  
+  // V2 helpers
+  fetchV2Sheet,
+  getV2SheetRowCount,
+  checkV2Sheet,
+  
+  // Constants
+  SHEETS, // Legacy compatibility
+  SPREADSHEET_IDS,
+  V2_SHEETS,
+  REQUIRED_SHEETS,
   
   // Convenience shortcuts
   scenarios: () => fetchAsObjects(SHEETS.scenarios),
   roster: () => fetchAsObjects(SHEETS.roster),
+  
+  // Test helper to reset cached auth
+  __resetAuth: () => { cachedAuth = null; }
 };
 
 // If run directly, test connection

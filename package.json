@@ -17,7 +17,11 @@
     "build": "npm run build:apps && npm run build:unified",
     "build:apps": "echo 'Building all apps...' && npm run build --workspaces",
     "build:unified": "cd unified-app && npm run build",
-    "test": "npm test --workspaces",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:sheets": "jest sheets.test.js debug-sheets.test.js",
+    "test:services": "jest v2-sheet-script/DataService.test.js v2-sheet-script/Authentication.test.js",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "repository": {
@@ -34,8 +38,10 @@
   "author": "Larry",
   "license": "UNLICENSED",
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.0.0",
     "eslint": "^8.54.0",
+    "jest": "^30.2.0",
     "prettier": "^3.1.0"
   },
   "engines": {

@@ -2,152 +2,138 @@
  * Session Management Module for Financial TruPath V2.0
  * Handles session creation, validation, and expiration
  * Sessions are stored in the SESSIONS sheet in Google Sheets
+ * Refactored for improved error handling and data operations
  */
 
 /**
- * Get the SESSIONS sheet from the configured spreadsheet
- * @returns {Sheet} The SESSIONS sheet
+ * Get the SESSIONS sheet with improved error handling
+ * @returns {Object} Result with sheet or error
  */
 function getSessionsSheet() {
-  try {
-    const ss = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
-    let sheet = ss.getSheetByName('SESSIONS');
-    
-    if (!sheet) {
-      // Create sheet if it doesn't exist
-      sheet = ss.insertSheet('SESSIONS');
-      // Set headers to match existing structure
-      const headers = ['Session_Token', 'Client_ID', 'Created_At', 'Expires_At', 'Last_Activity', 'IP_Address'];
-      sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-      sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
-      sheet.setFrozenRows(1);
+  const headers = ['Session_Token', 'Client_ID', 'Created_At', 'Expires_At', 'Last_Activity', 'IP_Address'];
+  
+  return DataOperations.withSheet('SESSIONS', (sheet) => {
+    // Ensure headers exist
+    const headerResult = DataOperations.getOrCreateHeaders(sheet, headers);
+    if (!headerResult.success) {
+      throw new Error(headerResult.error);
     }
-    
     return sheet;
-  } catch (error) {
-    console.error('Error accessing SESSIONS sheet:', error);
-    throw new Error('Unable to access sessions database');
-  }
+  }, 'get sessions sheet');
 }
 
 /**
- * Create a new session for authenticated user
+ * Create a new session for authenticated user with improved data operations
  * @param {string} clientId - The validated client ID
  * @returns {Object} Session object with token and details
  */
 function createSession(clientId) {
   try {
-    const sessionId = Utilities.getUuid();
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + (24 * 60 * 60 * 1000)); // 24 hours from now
-    
-    // Get the SESSIONS sheet
-    const sheet = getSessionsSheet();
-    
-    // Check for existing active session
+    // Check for existing active session first
     const existingSession = findActiveSession(clientId);
-    if (existingSession) {
-      // Update last activity of existing session
+    if (existingSession && existingSession.success) {
       updateSessionActivity(existingSession.sessionId);
-      // Ensure success flag is present
-      existingSession.success = true;
       return existingSession;
     }
     
-    // Create new session record (matching sheet columns)
-    const sessionData = [
-      sessionId,        // Session_Token
-      clientId,         // Client_ID
-      now,             // Created_At
-      expiresAt,       // Expires_At
-      now,             // Last_Activity
-      'active'         // IP_Address (using for status)
-    ];
+    // Create new session
+    const sessionData = _prepareNewSessionData(clientId);
+    const headers = ['Session_Token', 'Client_ID', 'Created_At', 'Expires_At', 'Last_Activity', 'IP_Address'];
     
-    // Append to sheet
-    sheet.appendRow(sessionData);
+    const result = DataOperations.saveToSheet(
+      'SESSIONS',
+      sessionData,
+      headers,
+      'create session'
+    );
     
-    // Log session creation
-    console.log(`Session created for ${clientId}: ${sessionId}`);
+    if (!result.success) {
+      return DataOperations.createError('create session', result.error);
+    }
     
-    return {
-      success: true,
-      sessionId: sessionId,
+    console.log(`Session created for ${clientId}: ${sessionData.Session_Token}`);
+    
+    return DataOperations.createSuccess('create session', {
+      sessionId: sessionData.Session_Token,
       clientId: clientId,
-      loginTime: now.toISOString(),
-      expiresAt: expiresAt.toISOString(),
+      loginTime: sessionData.Created_At,
+      expiresAt: sessionData.Expires_At,
       status: 'active'
-    };
+    });
     
   } catch (error) {
     console.error('Error creating session:', error);
-    return {
-      success: false,
-      error: 'Failed to create session'
-    };
+    return DataOperations.createError('create session', error);
   }
 }
 
 /**
- * Validate a session token
+ * Validate a session token with improved data operations
  * @param {string} sessionId - The session token to validate
  * @returns {Object} Validation result with session details
  */
 function validateSession(sessionId) {
+  if (!sessionId) {
+    return {
+      valid: false,
+      error: 'No session token provided'
+    };
+  }
+  
   try {
-    if (!sessionId) {
+    const result = DataOperations.findRecord(
+      'SESSIONS',
+      { Session_Token: sessionId },
+      false
+    );
+    
+    if (!result.success || !result.record) {
       return {
         valid: false,
-        error: 'No session token provided'
+        error: 'Session not found'
       };
     }
     
-    const sheet = getSessionsSheet();
-    const data = sheet.getDataRange().getValues();
+    const session = result.record;
     
-    // Skip header row
-    for (let i = 1; i < data.length; i++) {
-      const row = data[i];
-      const storedSessionId = row[0];  // Session_Token
-      const clientId = row[1];          // Client_ID
-      const expiresAt = new Date(row[3]); // Expires_At (column 4)
-      const status = row[5];             // IP_Address (column 6, using for status)
-      
-      if (storedSessionId === sessionId) {
-        // Check if session is active
-        if (status !== 'active') {
-          return {
-            valid: false,
-            error: 'Session is not active'
-          };
-        }
-        
-        // Check if session has expired
-        const now = new Date();
-        if (now > expiresAt) {
-          // Mark session as expired
-          sheet.getRange(i + 1, 6).setValue('expired');
-          return {
-            valid: false,
-            error: 'Session has expired'
-          };
-        }
-        
-        // Update last activity
-        sheet.getRange(i + 1, 4).setValue(new Date());
-        
-        return {
-          valid: true,
-          sessionId: sessionId,
-          clientId: clientId,
-          expiresAt: expiresAt.toISOString()
-        };
-      }
+    // Check if session is active
+    if (session.IP_Address !== 'active') {
+      return {
+        valid: false,
+        error: 'Session is not active'
+      };
     }
     
+    // Check if session has expired
+    const now = new Date();
+    const expiresAt = new Date(session.Expires_At);
+    
+    if (now > expiresAt) {
+      // Mark session as expired
+      DataOperations.updateRecord(
+        'SESSIONS',
+        { Session_Token: sessionId },
+        { IP_Address: 'expired' }
+      );
+      
+      return {
+        valid: false,
+        error: 'Session has expired'
+      };
+    }
+    
+    // Update last activity
+    DataOperations.updateRecord(
+      'SESSIONS',
+      { Session_Token: sessionId },
+      { Last_Activity: new Date().toISOString() }
+    );
+    
     return {
-      valid: false,
-      error: 'Session not found'
+      valid: true,
+      sessionId: sessionId,
+      clientId: session.Client_ID,
+      expiresAt: expiresAt.toISOString()
     };
     
   } catch (error) {
@@ -160,30 +146,40 @@ function validateSession(sessionId) {
 }
 
 /**
- * Find active session for a client
+ * Find active session for a client with improved data operations
  * @param {string} clientId - The client ID to search for
  * @returns {Object|null} Active session or null
  */
 function findActiveSession(clientId) {
   try {
-    const sheet = getSessionsSheet();
-    const data = sheet.getDataRange().getValues();
-    const now = new Date();
+    const sessionsData = DataOperations.loadFromSheet('SESSIONS', null, 'find active session');
     
-    // Skip header row
-    for (let i = 1; i < data.length; i++) {
-      const row = data[i];
-      const sessionId = row[0];           // Session_Token
-      const storedClientId = row[1];      // Client_ID
-      const expiresAt = new Date(row[3]); // Expires_At
-      const status = row[5];             // IP_Address (using for status)
+    if (!sessionsData.success || sessionsData.data.length === 0) {
+      return null;
+    }
+    
+    const now = new Date();
+    const headers = sessionsData.headers;
+    
+    // Find indices for our columns
+    const sessionTokenCol = headers.indexOf('Session_Token');
+    const clientIdCol = headers.indexOf('Client_ID');
+    const createdAtCol = headers.indexOf('Created_At');
+    const expiresAtCol = headers.indexOf('Expires_At');
+    const statusCol = headers.indexOf('IP_Address'); // Using this for status
+    
+    // Search for active session
+    for (const row of sessionsData.data) {
+      const storedClientId = row[clientIdCol];
+      const status = row[statusCol];
+      const expiresAt = new Date(row[expiresAtCol]);
       
       if (storedClientId === clientId && status === 'active' && now < expiresAt) {
         return {
-          success: true,  // Add success flag
-          sessionId: sessionId,
+          success: true,
+          sessionId: row[sessionTokenCol],
           clientId: clientId,
-          loginTime: row[2],
+          loginTime: row[createdAtCol],
           expiresAt: expiresAt.toISOString(),
           status: 'active'
         };
@@ -353,7 +349,7 @@ function testSessionManagement() {
     }
     
     // Test validating the session
-    const validation = validateSession(session.sessionId);
+    const validation = validateSession(session.data.sessionId);
     
     // Test finding active session
     const activeSession = findActiveSession(testClientId);
@@ -362,9 +358,9 @@ function testSessionManagement() {
     const message = `Session Management Test Results:
     
 ✅ Session Created:
-- Session ID: ${session.sessionId}
-- Client ID: ${session.clientId}
-- Expires: ${session.expiresAt}
+- Session ID: ${session.data.sessionId}
+- Client ID: ${session.data.clientId}
+- Expires: ${session.data.expiresAt}
 
 ✅ Session Validated:
 - Valid: ${validation.valid}
@@ -381,4 +377,25 @@ Check the SESSIONS sheet for the new record!`;
   } catch (error) {
     SpreadsheetApp.getUi().alert('Test Error', error.toString(), SpreadsheetApp.getUi().ButtonSet.OK);
   }
+}
+
+// ===== HELPER FUNCTIONS =====
+
+/**
+ * Prepare new session data
+ * @private
+ */
+function _prepareNewSessionData(clientId) {
+  const sessionId = Utilities.getUuid();
+  const now = new Date().toISOString();
+  const expiresAt = new Date(Date.now() + (24 * 60 * 60 * 1000)).toISOString(); // 24 hours
+  
+  return {
+    Session_Token: sessionId,
+    Client_ID: clientId,
+    Created_At: now,
+    Expires_At: expiresAt,
+    Last_Activity: now,
+    IP_Address: 'active' // Using this field for status
+  };
 }

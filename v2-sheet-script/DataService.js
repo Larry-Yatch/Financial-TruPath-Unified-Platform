@@ -2,6 +2,7 @@
  * DataService.js - Core Data Management for Financial TruPath V2.0
  * Handles all data operations for tools and responses
  * Foundation for cross-tool data flow
+ * Refactored to use centralized DataOperations utility
  */
 
 const DataService = {
@@ -37,62 +38,32 @@ const DataService = {
    * @returns {Object} Result with success status
    */
   saveToolDraftToSheet(clientId, toolId, data, progress, status = 'DRAFT') {
-    try {
-      if (!clientId || !toolId) {
-        throw new Error(`Invalid parameters: clientId=${clientId}, toolId=${toolId}`);
-      }
-      
-      console.log(`Saving Tool Draft - Client: ${clientId}, Tool: ${toolId}, Status: ${status}`);
-      
-      const ss = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
-      const responseSheet = ss.getSheetByName(CONFIG.SHEETS.RESPONSES);
-      
-      if (!responseSheet) {
-        throw new Error('RESPONSES sheet not found');
-      }
-      
-      const timestamp = new Date();
-      const sessionId = this.getCurrentSessionId();
-      
-      // Prepare draft record with status
-      const draftRecord = {
-        timestamp: timestamp.toISOString(),
-        clientId: clientId,
-        toolId: toolId,
-        data: JSON.stringify(data),
-        version: CONFIG.VERSION,
-        sessionId: sessionId || 'draft-' + Utilities.getUuid(),
-        status: status,
-        progress: JSON.stringify(progress || {})
-      };
-      
-      // Append to sheet
-      responseSheet.appendRow([
-        draftRecord.timestamp,
-        draftRecord.sessionId, 
-        draftRecord.clientId,
-        draftRecord.toolId,
-        draftRecord.data,
-        draftRecord.version,
-        draftRecord.status,
-        draftRecord.progress
-      ]);
-      
+    if (!this._validateDraftParams(clientId, toolId)) {
+      return DataOperations.createError('save draft', 'Invalid parameters');
+    }
+    
+    console.log(`Saving Tool Draft - Client: ${clientId}, Tool: ${toolId}, Status: ${status}`);
+    
+    const draftRecord = this._prepareDraftRecord(clientId, toolId, data, progress, status);
+    const headers = ['Timestamp', 'Session_ID', 'Client_ID', 'Tool_ID', 'Version', 'Status', 'Progress'];
+    
+    const result = DataOperations.saveToSheet(
+      CONFIG.SHEETS.RESPONSES,
+      draftRecord,
+      headers,
+      'save tool draft'
+    );
+    
+    if (result.success) {
       console.log('Draft saved successfully');
-      
       return {
         success: true,
         message: 'Draft saved',
-        draftId: draftRecord.sessionId
-      };
-      
-    } catch (error) {
-      console.error('Error saving draft:', error);
-      return {
-        success: false,
-        error: error.toString()
+        draftId: draftRecord.Session_ID
       };
     }
+    
+    return result;
   },
   
   /**
@@ -102,46 +73,28 @@ const DataService = {
    * @returns {Object|null} Draft data or null
    */
   getToolDraftFromSheet(clientId, toolId) {
+    const result = DataOperations.findRecord(
+      CONFIG.SHEETS.RESPONSES,
+      { Client_ID: clientId, Tool_ID: toolId, Status: 'DRAFT' },
+      true // return latest
+    );
+    
+    if (!result.success || !result.record) {
+      return null;
+    }
+    
     try {
-      const ss = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
-      const responseSheet = ss.getSheetByName(CONFIG.SHEETS.RESPONSES);
-      
-      if (!responseSheet) {
-        return null;
-      }
-      
-      const data = responseSheet.getDataRange().getValues();
-      
-      // Find most recent draft
-      let latestDraft = null;
-      let latestTimestamp = null;
-      
-      for (let i = data.length - 1; i > 0; i--) {
-        const row = data[i];
-        // Check if this is a draft for the right client/tool
-        if (row[2] === clientId && 
-            row[3] === toolId && 
-            row[6] === 'DRAFT') {
-          const timestamp = new Date(row[0]);
-          if (!latestTimestamp || timestamp > latestTimestamp) {
-            latestTimestamp = timestamp;
-            latestDraft = {
-              timestamp: row[0],
-              sessionId: row[1],
-              clientId: row[2],
-              toolId: row[3],
-              data: JSON.parse(row[4] || '{}'),
-              status: row[6] || 'DRAFT',
-              progress: JSON.parse(row[7] || '{}')
-            };
-          }
-        }
-      }
-      
-      return latestDraft;
-      
+      return {
+        timestamp: result.record.Timestamp,
+        sessionId: result.record.Session_ID,
+        clientId: result.record.Client_ID,
+        toolId: result.record.Tool_ID,
+        data: JSON.parse(result.record.Version || '{}'),
+        status: result.record.Status || 'DRAFT',
+        progress: JSON.parse(result.record.Progress || '{}')
+      };
     } catch (error) {
-      console.error('Error getting draft:', error);
+      console.error('Error parsing draft data:', error);
       return null;
     }
   },
@@ -152,35 +105,28 @@ const DataService = {
    * @returns {Object|null} Draft data or null
    */
   getSpecificDraft(draftId) {
-    try {
-      const ss = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
-      const responseSheet = ss.getSheetByName(CONFIG.SHEETS.RESPONSES);
-      
-      if (!responseSheet) {
-        return null;
-      }
-      
-      const data = responseSheet.getDataRange().getValues();
-      
-      for (let i = 1; i < data.length; i++) {
-        const row = data[i];
-        if (row[1] === draftId) {
-          return {
-            timestamp: row[0],
-            sessionId: row[1],
-            clientId: row[2],
-            toolId: row[3],
-            data: JSON.parse(row[4] || '{}'),
-            status: row[6] || 'COMPLETED',
-            progress: JSON.parse(row[7] || '{}')
-          };
-        }
-      }
-      
+    const result = DataOperations.findRecord(
+      CONFIG.SHEETS.RESPONSES,
+      { Session_ID: draftId },
+      false // return first match
+    );
+    
+    if (!result.success || !result.record) {
       return null;
-      
+    }
+    
+    try {
+      return {
+        timestamp: result.record.Timestamp,
+        sessionId: result.record.Session_ID,
+        clientId: result.record.Client_ID,
+        toolId: result.record.Tool_ID,
+        data: JSON.parse(result.record.Version || '{}'),
+        status: result.record.Status || 'COMPLETED',
+        progress: JSON.parse(result.record.Progress || '{}')
+      };
     } catch (error) {
-      console.error('Error getting specific draft:', error);
+      console.error('Error parsing specific draft data:', error);
       return null;
     }
   },
@@ -193,96 +139,34 @@ const DataService = {
    * @returns {Object} Result with save status and any generated insights
    */
   saveToolResponse(clientId, toolId, data) {
-    try {
-      // Validate inputs
-      if (!clientId || !toolId || !data) {
-        throw new Error(`Invalid parameters: clientId=${clientId}, toolId=${toolId}, data exists=${!!data}`);
-      }
-      
-      console.log(`Saving Tool Response - Client: ${clientId}, Tool: ${toolId}`);
-      
-      const ss = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
-      const responseSheet = ss.getSheetByName(CONFIG.SHEETS.RESPONSES);
-      
-      if (!responseSheet) {
-        throw new Error('RESPONSES sheet not found');
-      }
-      
-      // Prepare response data
-      const timestamp = new Date();
-      const sessionId = this.getCurrentSessionId();
-      
-      // Log warning if no session but continue saving
-      if (!sessionId) {
-        console.warn('No active session found, saving with no-session marker');
-      }
-      
-      const responseRecord = {
-        timestamp: timestamp.toISOString(),
-        clientId: clientId,
-        toolId: toolId,
-        data: JSON.stringify(data),
-        version: CONFIG.VERSION,
-        sessionId: sessionId || 'no-session'
-      };
-      
-      // Get headers or create them
-      let headers = responseSheet.getRange(1, 1, 1, responseSheet.getLastColumn() || 1).getValues()[0];
-      if (!headers[0]) {
-        // Initialize headers if sheet is empty
-        headers = ['Timestamp', 'Client_ID', 'Tool_ID', 'Response_Data', 'Version', 'Session_ID'];
-        responseSheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-      }
-      
-      // Add new response row
-      const newRow = [
-        responseRecord.timestamp,
-        responseRecord.clientId,
-        responseRecord.toolId,
-        responseRecord.data,
-        responseRecord.version,
-        responseRecord.sessionId
-      ];
-      
-      responseSheet.appendRow(newRow);
-      
-      // Update tool status (with error handling)
-      try {
-        this.updateToolStatus(clientId, toolId, 'completed');
-      } catch (statusError) {
-        console.warn('Could not update tool status:', statusError);
-      }
-      
-      // Trigger insight generation (with error handling)
-      let insights = [];
-      try {
-        insights = this.triggerInsightGeneration(clientId, toolId, data);
-      } catch (insightError) {
-        console.warn('Could not generate insights:', insightError);
-      }
-      
-      // Log the activity (with error handling)
-      try {
-        this.logActivity(clientId, `Saved ${toolId} response`);
-      } catch (logError) {
-        console.warn('Could not log activity:', logError);
-      }
-      
-      return {
-        success: true,
-        message: `${toolId} response saved successfully`,
-        timestamp: timestamp,
-        insights: insights || []
-      };
-      
-    } catch (error) {
-      console.error('Error saving tool response:', error);
-      return {
-        success: false,
-        error: error.toString(),
-        message: `Failed to save ${toolId} response`
-      };
+    if (!this._validateResponseParams(clientId, toolId, data)) {
+      return DataOperations.createError('save response', 'Invalid parameters');
     }
+    
+    console.log(`Saving Tool Response - Client: ${clientId}, Tool: ${toolId}`);
+    
+    const responseRecord = this._prepareResponseRecord(clientId, toolId, data);
+    const headers = ['Timestamp', 'Client_ID', 'Tool_ID', 'Version', 'Session_ID'];
+    
+    const result = DataOperations.saveToSheet(
+      CONFIG.SHEETS.RESPONSES,
+      responseRecord,
+      headers,
+      'save tool response'
+    );
+    
+    if (!result.success) {
+      return result;
+    }
+    
+    // Post-save operations with graceful error handling
+    const insights = this._handlePostSaveOperations(clientId, toolId, data);
+    
+    return DataOperations.createSuccess(
+      'save tool response',
+      { insights },
+      `${toolId} response saved successfully`
+    );
   },
   
   /**
@@ -962,22 +846,110 @@ const DataService = {
    * @param {string} activity - Activity description
    */
   logActivity(clientId, activity) {
-    try {
-      const ss = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
-      const logSheet = ss.getSheetByName(CONFIG.SHEETS.ACTIVITY_LOG);
-      
-      if (!logSheet) {
-        return;
-      }
-      
-      const timestamp = new Date().toISOString();
-      const sessionId = this.getCurrentSessionId() || 'no-session';
-      
-      logSheet.appendRow([timestamp, clientId, activity, sessionId]);
-      
-    } catch (error) {
-      console.error('Error logging activity:', error);
+    const logData = {
+      Timestamp: new Date().toISOString(),
+      Client_ID: clientId,
+      Activity: activity,
+      Session_ID: this.getCurrentSessionId() || 'no-session'
+    };
+    
+    const headers = ['Timestamp', 'Client_ID', 'Activity', 'Session_ID'];
+    
+    DataOperations.saveToSheet(
+      CONFIG.SHEETS.ACTIVITY_LOG,
+      logData,
+      headers,
+      'log activity'
+    );
+  },
+  
+  // ===== HELPER METHODS =====
+  
+  /**
+   * Validate draft parameters
+   * @private
+   */
+  _validateDraftParams(clientId, toolId) {
+    return !!(clientId && toolId);
+  },
+  
+  /**
+   * Validate response parameters
+   * @private
+   */
+  _validateResponseParams(clientId, toolId, data) {
+    return !!(clientId && toolId && data);
+  },
+  
+  /**
+   * Prepare draft record for saving
+   * @private
+   */
+  _prepareDraftRecord(clientId, toolId, data, progress, status) {
+    const timestamp = new Date().toISOString();
+    const sessionId = this.getCurrentSessionId() || 'draft-' + Utilities.getUuid();
+    
+    return {
+      Timestamp: timestamp,
+      Session_ID: sessionId,
+      Client_ID: clientId,
+      Tool_ID: toolId,
+      Version: JSON.stringify(data),
+      Status: status,
+      Progress: JSON.stringify(progress || {})
+    };
+  },
+  
+  /**
+   * Prepare response record for saving
+   * @private
+   */
+  _prepareResponseRecord(clientId, toolId, data) {
+    const timestamp = new Date().toISOString();
+    const sessionId = this.getCurrentSessionId();
+    
+    if (!sessionId) {
+      console.warn('No active session found, saving with no-session marker');
     }
+    
+    return {
+      Timestamp: timestamp,
+      Client_ID: clientId,
+      Tool_ID: toolId,
+      Version: JSON.stringify(data),
+      Session_ID: sessionId || 'no-session'
+    };
+  },
+  
+  /**
+   * Handle post-save operations with error handling
+   * @private
+   */
+  _handlePostSaveOperations(clientId, toolId, data) {
+    let insights = [];
+    
+    // Update tool status (with error handling)
+    try {
+      this.updateToolStatus(clientId, toolId, 'completed');
+    } catch (statusError) {
+      console.warn('Could not update tool status:', statusError);
+    }
+    
+    // Trigger insight generation (with error handling)
+    try {
+      insights = this.triggerInsightGeneration(clientId, toolId, data);
+    } catch (insightError) {
+      console.warn('Could not generate insights:', insightError);
+    }
+    
+    // Log the activity (with error handling)
+    try {
+      this.logActivity(clientId, `Saved ${toolId} response`);
+    } catch (logError) {
+      console.warn('Could not log activity:', logError);
+    }
+    
+    return insights;
   }
 };
 
@@ -1021,4 +993,9 @@ function testDataService() {
   console.log('Relevant insights:', insights);
   
   return 'DataService test complete - check logs';
+}
+
+// Export for testing
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = DataService;
 }

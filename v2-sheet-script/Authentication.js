@@ -1,6 +1,7 @@
 /**
  * Authentication Module for Financial TruPath V2.0
  * Based on Investment Tool pattern - Client ID gate with roster validation
+ * Refactored for improved error handling and code consolidation
  */
 
 // ====== ROSTER CONFIGURATION ======
@@ -31,229 +32,94 @@ function normalizeId(id) {
 }
 
 /**
- * Get roster sheet by GID first, then by name
+ * Get roster sheet with improved error handling
  */
 function getRosterSheet() {
-  try {
-    const ss = SpreadsheetApp.openById(ROSTER.SPREADSHEET_ID);
-    
-    // Try by GID if set
-    if (ROSTER.SHEET_GID) {
-      const byGid = ss.getSheets().find(sh => sh.getSheetId() === ROSTER.SHEET_GID);
-      if (byGid) return byGid;
-    }
-    
-    // Fallback to name
-    const byName = ss.getSheetByName(ROSTER.SHEET_NAME);
-    return byName || null;
-  } catch (error) {
-    console.error('Error accessing roster sheet:', error);
-    return null;
-  }
+  return DataOperations.withSheet(
+    ROSTER.SHEET_NAME,
+    (sheet) => sheet,
+    'get roster sheet'
+  );
 }
 
 /**
- * Lookup student by Client ID
+ * Lookup student by Client ID with improved data operations
  * @param {string} clientId - The client ID to lookup
  * @returns {Object} Result with student info or error
  */
 function lookupClientById(clientId) {
-  try {
-    const input = (clientId || '').toString().trim();
-    if (!input) {
-      return { success: false, error: 'Please enter your Client ID' };
-    }
-    
-    const idNorm = normalizeId(input);
-    const sheet = getRosterSheet();
-    
-    if (!sheet) {
-      return { 
-        success: false, 
-        error: 'Unable to access roster. Please contact support.' 
-      };
-    }
-    
-    const lastRow = sheet.getLastRow();
-    if (lastRow < 2) {
-      return { success: false, error: 'Roster is empty' };
-    }
-    
-    // Get all Client IDs for comparison
-    const numRows = lastRow - 1;
-    const idCells = sheet.getRange(2, ROSTER.COLUMNS.CLIENT_ID, numRows, 1).getDisplayValues();
-    
-    // Search for matching ID
-    for (let i = 0; i < idCells.length; i++) {
-      const candidate = normalizeId(idCells[i][0]);
-      if (candidate && candidate === idNorm) {
-        const row = 2 + i;
-        
-        // Check if account is active
-        const status = sheet.getRange(row, ROSTER.COLUMNS.STATUS).getValue();
-        if (status && status.toLowerCase() === 'inactive') {
-          return { 
-            success: false, 
-            error: 'Your account is inactive. Please contact support.' 
-          };
-        }
-        
-        // Get student details
-        const firstName = String(sheet.getRange(row, ROSTER.COLUMNS.FIRST_NAME).getValue() || '').trim();
-        const lastName = String(sheet.getRange(row, ROSTER.COLUMNS.LAST_NAME).getValue() || '').trim();
-        const email = String(sheet.getRange(row, ROSTER.COLUMNS.EMAIL).getValue() || '').trim();
-        
-        // Check if returning student (has completed any tools)
-        let hasCompletedTools = false;
-        try {
-          const profile = DataHub.getUnifiedProfile(idNorm);
-          if (profile && profile.metadata && profile.metadata.completedTools) {
-            hasCompletedTools = profile.metadata.completedTools.length > 0;
-          }
-        } catch (e) {
-          console.log('Could not check tool completion status:', e);
-        }
-        
-        return {
-          success: true,
-          clientId: idNorm,
-          firstName: firstName,
-          lastName: lastName,
-          email: email,
-          fullName: `${firstName} ${lastName}`,
-          hasCompletedTools: hasCompletedTools
-        };
-      }
-    }
-    
-    return { 
-      success: false, 
-      error: 'Client ID not found. Please check your ID and try again.' 
-    };
-    
-  } catch (error) {
-    console.error('Lookup error:', error);
-    return { 
-      success: false, 
-      error: 'An error occurred during verification. Please try again.' 
+  // Input validation
+  const validation = _validateClientInput(clientId);
+  if (!validation.success) {
+    return validation;
+  }
+  
+  const idNorm = normalizeId(validation.input);
+  
+  // Load roster data
+  const rosterData = DataOperations.loadFromSheet(
+    ROSTER.SHEET_NAME,
+    null,
+    'lookup client by ID'
+  );
+  
+  if (!rosterData.success) {
+    return {
+      success: false,
+      error: 'Unable to access roster. Please contact support.'
     };
   }
+  
+  if (rosterData.data.length === 0) {
+    return { success: false, error: 'Roster is empty' };
+  }
+  
+  // Search for matching client
+  const matchResult = _findClientInRoster(rosterData, idNorm, 'id');
+  if (matchResult) {
+    return matchResult;
+  }
+  
+  return {
+    success: false,
+    error: 'Client ID not found. Please check your ID and try again.'
+  };
 }
 
 /**
- * Lookup student by name/email (requires 2 out of 3 fields)
+ * Lookup student by name/email with improved validation
  * @param {Object} params - Object with firstName, lastName, email
  * @returns {Object} Result with student info or error
  */
 function lookupClientByDetails(params) {
-  try {
-    const firstName = (params.firstName || '').toString().trim().toLowerCase();
-    const lastName = (params.lastName || '').toString().trim().toLowerCase();
-    const email = (params.email || '').toString().trim().toLowerCase();
-    
-    // Count provided fields
-    let providedCount = 0;
-    if (firstName) providedCount++;
-    if (lastName) providedCount++;
-    if (email) providedCount++;
-    
-    if (providedCount < 2) {
-      return { 
-        success: false, 
-        error: 'Please provide at least 2 fields (first name, last name, and/or email)' 
-      };
-    }
-    
-    const sheet = getRosterSheet();
-    if (!sheet) {
-      return { 
-        success: false, 
-        error: 'Unable to access roster. Please contact support.' 
-      };
-    }
-    
-    const lastRow = sheet.getLastRow();
-    if (lastRow < 2) {
-      return { success: false, error: 'Roster is empty' };
-    }
-    
-    // Get all relevant data
-    const numRows = lastRow - 1;
-    const data = sheet.getRange(2, ROSTER.COLUMNS.FIRST_NAME, numRows, 
-      ROSTER.COLUMNS.STATUS - ROSTER.COLUMNS.FIRST_NAME + 1).getValues();
-    
-    const matches = [];
-    
-    for (let i = 0; i < data.length; i++) {
-      const row = data[i];
-      // Correct column indices (0-based from the data range which starts at column C)
-      const rowFirst = String(row[0] || '').trim().toLowerCase();  // Column C - First Name
-      const rowLast = String(row[1] || '').trim().toLowerCase();   // Column D - Last Name
-      const rowPhone = String(row[2] || '').trim();                // Column E - Phone
-      const rowEmail = String(row[3] || '').trim().toLowerCase();  // Column F - Email
-      const rowClientId = String(row[4] || '').trim();             // Column G - Client ID
-      const rowStatus = String(row[5] || '').trim();               // Column H - Status
-      
-      // Skip inactive accounts
-      if (rowStatus.toLowerCase() === 'inactive') continue;
-      
-      let matchCount = 0;
-      let matchTypes = [];
-      
-      if (firstName && rowFirst === firstName) {
-        matchCount++;
-        matchTypes.push('First Name');
-      }
-      if (lastName && rowLast === lastName) {
-        matchCount++;
-        matchTypes.push('Last Name');
-      }
-      if (email && rowEmail === email) {
-        matchCount++;
-        matchTypes.push('Email');
-      }
-      
-      // Require at least 2 matches
-      if (matchCount >= 2 && rowClientId) {
-        matches.push({
-          clientId: normalizeId(rowClientId),
-          firstName: String(row[0] || '').trim(),  // Column C - First Name
-          lastName: String(row[1] || '').trim(),   // Column D - Last Name
-          email: String(row[3] || '').trim(),      // Column F - Email (index 3)
-          fullName: `${row[0]} ${row[1]}`.trim(),
-          matchedOn: matchTypes.join(' & ')
-        });
-      }
-    }
-    
-    if (matches.length === 0) {
-      return { 
-        success: false, 
-        error: 'No matching records found. Please check your information.' 
-      };
-    }
-    
-    if (matches.length === 1) {
-      return {
-        success: true,
-        ...matches[0]
-      };
-    }
-    
-    // Multiple matches
+  // Validate detail parameters
+  const validation = _validateDetailParams(params);
+  if (!validation.success) {
+    return validation;
+  }
+  
+  // Load roster data
+  const rosterData = DataOperations.loadFromSheet(
+    ROSTER.SHEET_NAME,
+    null,
+    'lookup client by details'
+  );
+  
+  if (!rosterData.success) {
     return {
       success: false,
-      error: `Found ${matches.length} possible matches. Please use your Client ID instead.`,
-      matches: matches
-    };
-    
-  } catch (error) {
-    console.error('Lookup error:', error);
-    return { 
-      success: false, 
-      error: 'An error occurred during verification. Please try again.' 
+      error: 'Unable to access roster. Please contact support.'
     };
   }
+  
+  if (rosterData.data.length === 0) {
+    return { success: false, error: 'Roster is empty' };
+  }
+  
+  // Find matches based on provided details
+  const matches = _findDetailMatches(rosterData, validation.details);
+  
+  return _processDetailMatches(matches);
 }
 
 /**
@@ -288,4 +154,212 @@ function verifySession(sessionId, clientId) {
   // Simple verification for now
   // In production, check against stored sessions
   return sessionId && clientId && normalizeId(clientId).length > 0;
+}
+
+// Export functions for testing
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    lookupClientById,
+    lookupClientByDetails,
+    createUserSession,
+    verifySession
+  };
+}
+
+// ===== HELPER FUNCTIONS =====
+
+/**
+ * Validate client ID input
+ * @private
+ */
+function _validateClientInput(clientId) {
+  const input = (clientId || '').toString().trim();
+  if (!input) {
+    return { success: false, error: 'Please enter your Client ID' };
+  }
+  return { success: true, input };
+}
+
+/**
+ * Validate detail lookup parameters
+ * @private
+ */
+function _validateDetailParams(params) {
+  const firstName = (params.firstName || '').toString().trim().toLowerCase();
+  const lastName = (params.lastName || '').toString().trim().toLowerCase();
+  const email = (params.email || '').toString().trim().toLowerCase();
+  
+  // Count provided fields
+  let providedCount = 0;
+  if (firstName) providedCount++;
+  if (lastName) providedCount++;
+  if (email) providedCount++;
+  
+  if (providedCount < 2) {
+    return {
+      success: false,
+      error: 'Please provide at least 2 fields (first name, last name, and/or email)'
+    };
+  }
+  
+  return {
+    success: true,
+    details: { firstName, lastName, email }
+  };
+}
+
+/**
+ * Find client in roster data
+ * @private
+ */
+function _findClientInRoster(rosterData, searchValue, searchType) {
+  const headers = rosterData.headers;
+  const clientIdCol = headers.indexOf('Client_ID') >= 0 ? headers.indexOf('Client_ID') : ROSTER.COLUMNS.CLIENT_ID - 1;
+  const statusCol = headers.indexOf('Status') >= 0 ? headers.indexOf('Status') : ROSTER.COLUMNS.STATUS - 1;
+  const firstNameCol = headers.indexOf('First_Name') >= 0 ? headers.indexOf('First_Name') : ROSTER.COLUMNS.FIRST_NAME - 1;
+  const lastNameCol = headers.indexOf('Last_Name') >= 0 ? headers.indexOf('Last_Name') : ROSTER.COLUMNS.LAST_NAME - 1;
+  const emailCol = headers.indexOf('Email') >= 0 ? headers.indexOf('Email') : ROSTER.COLUMNS.EMAIL - 1;
+  
+  for (const row of rosterData.data) {
+    if (searchType === 'id') {
+      const candidate = normalizeId(row[clientIdCol] || '');
+      if (candidate && candidate === searchValue) {
+        return _createClientResult(row, headers);
+      }
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Create standardized client result
+ * @private
+ */
+function _createClientResult(row, headers) {
+  const firstNameCol = headers.indexOf('First_Name') >= 0 ? headers.indexOf('First_Name') : ROSTER.COLUMNS.FIRST_NAME - 1;
+  const lastNameCol = headers.indexOf('Last_Name') >= 0 ? headers.indexOf('Last_Name') : ROSTER.COLUMNS.LAST_NAME - 1;
+  const emailCol = headers.indexOf('Email') >= 0 ? headers.indexOf('Email') : ROSTER.COLUMNS.EMAIL - 1;
+  const clientIdCol = headers.indexOf('Client_ID') >= 0 ? headers.indexOf('Client_ID') : ROSTER.COLUMNS.CLIENT_ID - 1;
+  const statusCol = headers.indexOf('Status') >= 0 ? headers.indexOf('Status') : ROSTER.COLUMNS.STATUS - 1;
+  
+  // Check if account is active
+  const status = String(row[statusCol] || '').trim();
+  if (status && status.toLowerCase() === 'inactive') {
+    return {
+      success: false,
+      error: 'Your account is inactive. Please contact support.'
+    };
+  }
+  
+  const firstName = String(row[firstNameCol] || '').trim();
+  const lastName = String(row[lastNameCol] || '').trim();
+  const email = String(row[emailCol] || '').trim();
+  const clientId = normalizeId(row[clientIdCol] || '');
+  
+  // Check if returning student (has completed any tools)
+  let hasCompletedTools = false;
+  try {
+    if (typeof DataHub !== 'undefined') {
+      const profile = DataHub.getUnifiedProfile(clientId);
+      if (profile && profile.metadata && profile.metadata.completedTools) {
+        hasCompletedTools = profile.metadata.completedTools.length > 0;
+      }
+    }
+  } catch (e) {
+    console.log('Could not check tool completion status:', e);
+  }
+  
+  return {
+    success: true,
+    clientId: clientId,
+    firstName: firstName,
+    lastName: lastName,
+    email: email,
+    fullName: `${firstName} ${lastName}`,
+    hasCompletedTools: hasCompletedTools
+  };
+}
+
+/**
+ * Find matches based on detail criteria
+ * @private
+ */
+function _findDetailMatches(rosterData, details) {
+  const { firstName, lastName, email } = details;
+  const headers = rosterData.headers;
+  const matches = [];
+  
+  const firstNameCol = headers.indexOf('First_Name') >= 0 ? headers.indexOf('First_Name') : ROSTER.COLUMNS.FIRST_NAME - 1;
+  const lastNameCol = headers.indexOf('Last_Name') >= 0 ? headers.indexOf('Last_Name') : ROSTER.COLUMNS.LAST_NAME - 1;
+  const emailCol = headers.indexOf('Email') >= 0 ? headers.indexOf('Email') : ROSTER.COLUMNS.EMAIL - 1;
+  const clientIdCol = headers.indexOf('Client_ID') >= 0 ? headers.indexOf('Client_ID') : ROSTER.COLUMNS.CLIENT_ID - 1;
+  const statusCol = headers.indexOf('Status') >= 0 ? headers.indexOf('Status') : ROSTER.COLUMNS.STATUS - 1;
+  
+  for (const row of rosterData.data) {
+    const rowStatus = String(row[statusCol] || '').trim();
+    if (rowStatus.toLowerCase() === 'inactive') continue;
+    
+    const rowFirst = String(row[firstNameCol] || '').trim().toLowerCase();
+    const rowLast = String(row[lastNameCol] || '').trim().toLowerCase();
+    const rowEmail = String(row[emailCol] || '').trim().toLowerCase();
+    const rowClientId = String(row[clientIdCol] || '').trim();
+    
+    let matchCount = 0;
+    let matchTypes = [];
+    
+    if (firstName && rowFirst === firstName) {
+      matchCount++;
+      matchTypes.push('First Name');
+    }
+    if (lastName && rowLast === lastName) {
+      matchCount++;
+      matchTypes.push('Last Name');
+    }
+    if (email && rowEmail === email) {
+      matchCount++;
+      matchTypes.push('Email');
+    }
+    
+    // Require at least 2 matches
+    if (matchCount >= 2 && rowClientId) {
+      matches.push({
+        clientId: normalizeId(rowClientId),
+        firstName: String(row[firstNameCol] || '').trim(),
+        lastName: String(row[lastNameCol] || '').trim(),
+        email: String(row[emailCol] || '').trim(),
+        fullName: `${row[firstNameCol]} ${row[lastNameCol]}`.trim(),
+        matchedOn: matchTypes.join(' & ')
+      });
+    }
+  }
+  
+  return matches;
+}
+
+/**
+ * Process detail matches and return appropriate response
+ * @private
+ */
+function _processDetailMatches(matches) {
+  if (matches.length === 0) {
+    return {
+      success: false,
+      error: 'No matching records found. Please check your information.'
+    };
+  }
+  
+  if (matches.length === 1) {
+    return {
+      success: true,
+      ...matches[0]
+    };
+  }
+  
+  // Multiple matches
+  return {
+    success: false,
+    error: `Found ${matches.length} possible matches. Please use your Client ID instead.`,
+    matches: matches
+  };
 }

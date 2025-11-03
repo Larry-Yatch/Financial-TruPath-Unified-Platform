@@ -1,46 +1,17 @@
 ---
-allowed-tools: all
-description: Create natural git commits and push to remote
+description: Create a clear, human-readable git commit
 ---
 
-# /commit
+Analyze the current git changes and create a commit with a clear, concise message.
 
-## Purpose
-Creates human-style git commits and syncs with remote repository.
+Requirements:
+- Run `git status` and `git diff --staged` (or `git diff` if nothing staged)
+- Write a commit message that's human-readable and to the point
+- Format: Start with a brief summary (50 chars max), then detailed explanation if needed
+- Focus on WHAT changed and WHY, not HOW
+- Use present tense ("Add feature" not "Added feature")
+- Be specific and clear - avoid vague terms like "fix stuff" or "update code"
 
-## Arguments
-Optional: `ARGUMENTS$` for commit context
+After drafting the message, create the commit using `git commit -m "message"`.
 
-## Execution
-
-### Execution
-Sequential flow (single gitty agent):
-1. gitty: Review staged/unstaged changes
-2. gitty: Generate natural commit message
-3. gitty: Create commit with human wording
-4. gitty: Push to remote repository
-
-Commit style: Human-like, conversational, no AI-speak
-
-## Success Criteria
-- Commit message sounds human
-- Changes committed locally
-- Pushed to remote
-- No conflicts
-
-## Failure Protocol
-When push fails:
-1. Pull latest changes
-2. Resolve conflicts if any
-3. Retry push
-
-## Visual Response
-```
-📝 Commit: "[commit message]"
-📊 Changes: X files, +Y lines, -Z lines
-🔄 Branch: [branch] → [remote]
-✅ Pushed successfully
-```
-
----
-*Optimized for: speed*
+If nothing is staged, ask if I should stage all changes first.
