@@ -2357,21 +2357,52 @@ function clearAllTestData() {
  * Global wrapper for DataService.saveToolDraftToSheet
  * Required for google.script.run API calls from client
  */
-function saveToolDraftToSheet(clientId, toolId, data, progress, status = 'DRAFT') {
+function saveToolDraftToSheet(clientIdOrParams, toolId, data, progress, status = 'DRAFT') {
   try {
-    console.log('[DEBUG] saveToolDraftToSheet called with:', { clientId, toolId, status });
+    // Handle both calling conventions:
+    // 1. Direct call: (clientId, toolId, data, progress, status)
+    // 2. Batch service call: ({userId, toolId, data, progress})
+    let actualClientId, actualToolId, actualData, actualProgress, actualStatus;
+    
+    if (typeof clientIdOrParams === 'object' && clientIdOrParams !== null) {
+      // Called from batch service with params object
+      actualClientId = clientIdOrParams.userId || clientIdOrParams.clientId;
+      actualToolId = clientIdOrParams.toolId;
+      actualData = clientIdOrParams.data;
+      actualProgress = clientIdOrParams.progress;
+      actualStatus = clientIdOrParams.status || 'DRAFT';
+      console.log('[DEBUG] Batch service call detected, extracted params');
+    } else {
+      // Direct call with individual parameters
+      actualClientId = clientIdOrParams;
+      actualToolId = toolId;
+      actualData = data;
+      actualProgress = progress;
+      actualStatus = status;
+    }
+    
+    console.log('[DEBUG] saveToolDraftToSheet called with:', { 
+      clientId: actualClientId, 
+      toolId: actualToolId, 
+      status: actualStatus,
+      hasData: !!actualData
+    });
     
     // CRITICAL FIX: Save to BOTH Sheet AND Properties for compatibility
     // The load function looks in Properties, not Sheets!
     
     // 1. Save to Sheet for persistence
-    const sheetResult = DataService.saveToolDraftToSheet(clientId, toolId, data, progress, status);
+    const sheetResult = DataService.saveToolDraftToSheet(
+      actualClientId, actualToolId, actualData, actualProgress, actualStatus
+    );
     console.log('[DEBUG] Sheet save result:', sheetResult);
     
     // 2. ALSO save to Properties so the load function can find it
     // Determine save type based on user action (MANUAL for user-initiated saves)
     const saveType = 'MANUAL'; // User clicked save, so it's manual
-    const propsResult = DataService.saveToolDraftToProperties(clientId, toolId, data, saveType);
+    const propsResult = DataService.saveToolDraftToProperties(
+      actualClientId, actualToolId, actualData, saveType
+    );
     console.log('[DEBUG] Properties save result:', propsResult);
     
     // Return success if either save worked (prefer Properties result for load compatibility)
