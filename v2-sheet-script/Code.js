@@ -2359,7 +2359,27 @@ function clearAllTestData() {
  */
 function saveToolDraftToSheet(clientId, toolId, data, progress, status = 'DRAFT') {
   try {
-    return DataService.saveToolDraftToSheet(clientId, toolId, data, progress, status);
+    console.log('[DEBUG] saveToolDraftToSheet called with:', { clientId, toolId, status });
+    
+    // CRITICAL FIX: Save to BOTH Sheet AND Properties for compatibility
+    // The load function looks in Properties, not Sheets!
+    
+    // 1. Save to Sheet for persistence
+    const sheetResult = DataService.saveToolDraftToSheet(clientId, toolId, data, progress, status);
+    console.log('[DEBUG] Sheet save result:', sheetResult);
+    
+    // 2. ALSO save to Properties so the load function can find it
+    // Determine save type based on user action (MANUAL for user-initiated saves)
+    const saveType = 'MANUAL'; // User clicked save, so it's manual
+    const propsResult = DataService.saveToolDraftToProperties(clientId, toolId, data, saveType);
+    console.log('[DEBUG] Properties save result:', propsResult);
+    
+    // Return success if either save worked (prefer Properties result for load compatibility)
+    if (propsResult && propsResult.success) {
+      return propsResult;
+    }
+    
+    return sheetResult;
   } catch (error) {
     console.error('Error in saveToolDraftToSheet wrapper:', error);
     return {
