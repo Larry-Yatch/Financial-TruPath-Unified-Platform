@@ -139,21 +139,28 @@ const DataService = {
    * @returns {Object} Result with save status and any generated insights
    */
   saveToolResponse(clientId, toolId, data) {
+    console.log(`[DEBUG] saveToolResponse START - Client: ${clientId}, Tool: ${toolId}`);
+    
     if (!this._validateResponseParams(clientId, toolId, data)) {
+      console.error('[DEBUG] Validation failed for response params');
       return DataOperations.createError('save response', 'Invalid parameters');
     }
     
-    console.log(`Saving Tool Response - Client: ${clientId}, Tool: ${toolId}`);
+    console.log(`[DEBUG] Validation passed, preparing record...`);
     
     const responseRecord = this._prepareResponseRecord(clientId, toolId, data);
+    console.log('[DEBUG] Response record prepared:', JSON.stringify(responseRecord).substring(0, 200));
+    
     const headers = ['Timestamp', 'Client_ID', 'Tool_ID', 'Version', 'Session_ID'];
     
+    console.log(`[DEBUG] Calling DataOperations.saveToSheet...`);
     const result = DataOperations.saveToSheet(
       CONFIG.SHEETS.RESPONSES,
       responseRecord,
       headers,
       'save tool response'
     );
+    console.log('[DEBUG] saveToSheet result:', result);
     
     if (!result.success) {
       return result;

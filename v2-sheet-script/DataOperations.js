@@ -55,19 +55,44 @@ const DataOperations = {
       // Convert data object to array based on headers
       let rowData;
       if (headers) {
-        rowData = headers.map(header => data[header] || '');
+        rowData = headers.map(header => {
+          const value = data[header];
+          // Handle different data types appropriately
+          if (value === undefined || value === null) {
+            return '';
+          }
+          if (typeof value === 'object') {
+            return JSON.stringify(value);
+          }
+          return String(value);
+        });
       } else {
         // If no headers provided, assume data is already in correct array format
         rowData = Array.isArray(data) ? data : Object.values(data);
       }
       
-      sheet.appendRow(rowData);
+      // Log the data being saved for debugging
+      console.log(`Saving to ${sheetName}:`, rowData);
       
-      return {
-        success: true,
-        message: `${operationName} completed successfully`,
-        timestamp: new Date().toISOString()
-      };
+      // Try to append the row with error handling
+      try {
+        sheet.appendRow(rowData);
+        
+        // Force a flush to ensure the data is written
+        SpreadsheetApp.flush();
+        
+        console.log(`Successfully saved to ${sheetName}`);
+        
+        return {
+          success: true,
+          message: `${operationName} completed successfully`,
+          timestamp: new Date().toISOString(),
+          rowData: rowData
+        };
+      } catch (appendError) {
+        console.error(`Failed to append row to ${sheetName}:`, appendError);
+        throw appendError;
+      }
     }, operationName);
   },
 
