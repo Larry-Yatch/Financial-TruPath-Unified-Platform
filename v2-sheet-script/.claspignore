@@ -7,3 +7,10 @@ safe-deploy.js
 *.sh
 sheets.js
 DeploymentArchiver.js
+**/*.test.js
+**/*Test.js
+**/test/**
+**/__tests__/**
+jest.config.js
+jest.setup.js
+RefactorTests.js

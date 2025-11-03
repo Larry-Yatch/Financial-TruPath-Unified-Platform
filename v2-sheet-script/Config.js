@@ -1,6 +1,7 @@
 /**
  * Configuration file for Financial TruPath V2.0 Platform
  * Connected to Master Sheet: 18qpjnCvFVYDXOAN14CKb3ceoiG6G_nIFc9n3ZO5St24
+ * Deploy @194 - Test files removed
  */
 
 const CONFIG = {
