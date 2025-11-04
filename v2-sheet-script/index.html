@@ -271,11 +271,10 @@
         document.body.appendChild(loadingOverlay);
         
         console.log('🔄 Navigation loading indicator shown');
-        
-        // Submit the form to navigate (slight delay for visual feedback)
-        setTimeout(() => {
-          navForm.submit();
-        }, 150);
+
+        // CRITICAL: Submit immediately (no setTimeout) to preserve user gesture chain for iframe navigation
+        // setTimeout breaks the gesture chain and causes white screen/stuck navigation in iframes
+        navForm.submit();
       }
       
       // Draft version selection functions (from TestTool pattern)
